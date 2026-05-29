@@ -1,3 +1,8 @@
 name = "opentao"
 compatibility_date = "2025-01-01"
-pages_build_output_dir = "./dist"
+
+# Cloudflare unified Workers + Pages — static deploy goes through the
+# Workers-with-Assets pattern. dist/ is uploaded and served from edge.
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"
