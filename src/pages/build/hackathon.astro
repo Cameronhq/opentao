@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/build/hackathon', label: 'Hackathon' },
+  { href: '/build/incubator', label: 'Incubator' },
+  { href: '/build/idea-bank', label: 'Idea bank' },
+];
+
+const countdown = [
+  { label: 'Opens', date: '2026·05·12', meta: '✓ done', done: true },
+  { label: 'Kickoff', date: '2026·05·14', meta: '✓ done', done: true },
+  { label: 'Mid-check', date: '2026·06·14', meta: 'in 18 days' },
+  { label: 'Deadline', date: '2026·07·14', meta: 'in 48 days', highlight: true },
+  { label: 'Demo day', date: '2026·07·22', meta: 'in 56 days' },
+];
+
+const funnel = [
+  { n: '01', title: 'Submit an idea', body: 'A one-pager, a 3-minute video, and a GitHub repo. No 30-page deck.', meta: '~500 / season' },
+  { n: '02', title: 'Make it to Top 30', body: 'First-round judging by three independent reviewers. Top 30 move to demo day.', meta: '~30 / season', highlight: true },
+  { n: '03', title: 'Win a track', body: "Live demo, judges' pick. Top three teams per track. Winners get prize + Incubator fast-track.", meta: '~10 / season' },
+  { n: '04', title: 'Ship a subnet', body: '10-week incubation, then your team registers a netuid and goes live on mainnet.', meta: '~3 / season' },
+];
+
+const tracks = [
+  { name: 'LLM', pool: '$75K', body: 'Subnets for text generation, code, translation, retrieval, agent workflows.', prizes: ['1st $35K', '2nd $20K', '3rd $10K'] },
+  { name: 'Robotics & physical AI', pool: '$75K', body: 'Subnets that close the loop with the physical world — policies, sim-to-real, motor control, perception.', prizes: ['1st $35K', '2nd $20K', '3rd $10K'] },
+  { name: 'Data & synthetic', pool: '$50K', body: 'Subnets that produce datasets, labels, or synthetic training data — graded by downstream model gains.', prizes: ['1st $25K', '2nd $15K', '3rd $10K'] },
+  { name: 'Open', pool: '$50K', body: 'Anything else. Reasoning, audio, scientific computing, novel mechanism designs — surprise us.', prizes: ['1st $25K', '2nd $15K', '3rd $10K'] },
+];
+---
+<BaseLayout
+  title="Hackathon — Build a subnet — OpenTAO"
+  description="OpenTAO Hackathon Season 1 — $250,000 across four tracks. Top teams move directly to Incubator interviews."
+  section="build"
+>
+  <SubNav items={subnav} active="/build/hackathon" rightMeta="Season 1 · live until Jul 14" />
+
+  <section class="relative overflow-hidden border-b hairline stripe">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-20">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/build/hackathon', label: 'Build a subnet' },
+        { label: 'Hackathon' },
+      ]} />
+
+      <div class="flex items-center gap-3 mb-5">
+        <span class="accent-dot"></span>
+        <span class="section-label" style="color: #b8470b">Season 01 · live · submissions open</span>
+      </div>
+      <h1 class="text-[64px] md:text-[76px] leading-[0.96] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic text-[color:var(--color-fg-muted)] font-normal">The </span>OpenTAO<br>Hackathon<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">$250,000 across four tracks. The strongest projects from each season move straight to Incubator interviews — and a clear path to launching as a real subnet on mainnet.</p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="#" class="btn-accent inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">Submit your idea<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="#tracks" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">View 4 tracks</a>
+        <span class="ml-2 text-xs text-[color:var(--color-fg-dim)] font-mono">submission closes 2026·07·14 · demo day 2026·07·22</span>
+      </div>
+
+      <div class="mt-12 grid grid-cols-2 md:grid-cols-5 border hairline rounded-md overflow-hidden bg-[color:var(--color-surface)] max-w-3xl">
+        {countdown.map((c, i) => (
+          <div class="font-mono px-4 py-3 border-r hairline last:border-r-0" style={c.highlight ? 'background: rgba(184,71,11,0.05);' : ''}>
+            <div class="section-label" style={c.highlight ? 'color: #b8470b' : ''}>{c.label}</div>
+            <div class="text-[color:var(--color-fg)] mt-1 text-sm">{c.date}</div>
+            <div class={`text-[10px] font-mono mt-0.5 ${c.highlight ? 'text-[color:var(--color-accent)]' : c.done ? 'text-[color:var(--color-ok)]' : 'text-[color:var(--color-fg-dim)]'}`}>{c.meta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">From idea to mainnet</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">The path is the same every season.</h2>
+      <div class="grid lg:grid-cols-4 gap-3">
+        {funnel.map((f) => (
+          <div
+            class="relative p-6 border rounded-md bg-[color:var(--color-paper)]"
+            style={f.highlight
+              ? 'border-color: rgba(184,71,11,0.25); background: rgba(184,71,11,0.04);'
+              : 'border-color: rgba(15,15,18,0.08);'
+            }
+          >
+            <div class={`font-mono text-xs mb-3 ${f.highlight ? 'text-[color:var(--color-accent)]' : 'text-[color:var(--color-fg-dim)]'}`}>{f.n}</div>
+            <h3 class="font-semibold mb-2">{f.title}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">{f.body}</p>
+            <div class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">{f.meta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="tracks" class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">Four tracks</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-3 max-w-[600px]">$250,000 in prizes, split across four directions.</h2>
+      <p class="text-[color:var(--color-fg-muted)] max-w-[560px] mb-12">Pick one when you submit. Cross-track entries allowed (only score in one).</p>
+      <div class="grid md:grid-cols-2 gap-4">
+        {tracks.map((t) => (
+          <div class="card rounded-md p-7">
+            <div class="flex items-baseline justify-between mb-5">
+              <h3 class="text-xl font-semibold tracking-tight">{t.name}</h3>
+              <span class="text-[color:var(--color-fg-muted)] text-sm">{t.pool}</span>
+            </div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] mb-5 leading-relaxed">{t.body}</p>
+            <div class="flex items-center gap-4 text-xs font-mono text-[color:var(--color-fg-dim)] border-t hairline pt-4">
+              {t.prizes.map((p) => {
+                const parts = p.split(' ');
+                return <span>{parts[0]} <span class="text-[color:var(--color-fg)]">{parts[1]}</span></span>;
+              })}
+              <span class="ml-auto">+ Incubator fast-track</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">Judges & mentors</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">Active subnet founders, core devs, and operators.</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #b8470b, #16a34a);"></div><div class="font-medium">Ke Zhang</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">@ke.ng · SN3 founder</div></div>
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #6741d9, #1c6ea4);"></div><div class="font-medium">Rho Carter</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">@rho.lab · core dev</div></div>
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #c2410c, #b8470b);"></div><div class="font-medium">Yuki Tanaka</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">@yuki · SN18 partner</div></div>
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #15803d, #1c6ea4);"></div><div class="font-medium">+ 14 more</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">see all judges →</div></div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

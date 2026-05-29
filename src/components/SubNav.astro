@@ -1,0 +1,20 @@
+---
+interface Item {
+  href: string;
+  label: string;
+}
+interface Props {
+  items: Item[];
+  active: string; // href that should be marked active
+  rightMeta?: string;
+}
+const { items, active, rightMeta } = Astro.props;
+---
+<div class="border-b hairline">
+  <div class="max-w-[1200px] mx-auto px-6 subnav text-sm text-[color:var(--color-fg-muted)] flex items-center gap-8 overflow-x-auto">
+    {items.map((it) => (
+      <a href={it.href} class={`${active === it.href ? 'active' : ''} hover:text-[color:var(--color-fg)]`}>{it.label}</a>
+    ))}
+    {rightMeta && <span class="ml-auto font-mono text-[11px] text-[color:var(--color-fg-dim)] hidden md:block">{rightMeta}</span>}
+  </div>
+</div>

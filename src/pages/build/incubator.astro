@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/build/hackathon', label: 'Hackathon' },
+  { href: '/build/incubator', label: 'Incubator' },
+  { href: '/build/idea-bank', label: 'Idea bank' },
+];
+
+const benefits = [
+  { value: '$50K', label: 'Funding', body: 'Pure grant. Disbursed in two tranches. We take nothing back.' },
+  { value: '$30K', label: 'Compute credits', body: 'GPU credits across Lambda, RunPod, and CoreWeave to run your prototype at scale.' },
+  { value: '8h/wk', label: 'Mentor time', body: 'Two hours weekly 1:1 + group office hours. Mentors are active subnet operators.' },
+  { value: '1 netuid', label: 'Mainnet launch', body: 'We help you register, fund the lock, and document your subnet on OpenTAO from day one.' },
+];
+
+const timeline = [
+  { week: 'W0', title: 'Selection', meta: 'interviews, offer', state: 'done' },
+  { week: 'W1', title: 'Kickoff', meta: 'retreat (SF)', state: 'done' },
+  { week: 'W2-3', title: 'Architecture', meta: 'scoring design', state: 'done' },
+  { week: 'W4', title: 'Testnet alpha', meta: 'running miners', state: 'now' },
+  { week: 'W5-6', title: 'Tuning', meta: 'scoring & bonding', state: '' },
+  { week: 'W7', title: 'Security review', meta: '3rd-party audit', state: '' },
+  { week: 'W8', title: 'Mainnet prep', meta: 'lock funding', state: '' },
+  { week: 'W9', title: 'Pitch prep', meta: 'demo polish', state: '' },
+  { week: 'W10', title: 'Demo day', meta: 'VC + community', state: '' },
+  { week: 'W11+', title: 'Launch', meta: 'your netuid live', state: '' },
+];
+
+const cohort01 = [
+  { netuid: '82', status: 'live', name: 'Continuum', body: 'Long-form summarization scored by faithfulness models.' },
+  { netuid: '94', status: 'live', name: 'Aria', body: 'Music synthesis with reference-fit scoring.' },
+  { netuid: '117', status: 'live', name: 'Mesa', body: 'Textured 3D mesh generation from prompts.' },
+  { netuid: null, status: 'pivoting', name: 'Solstice', body: 'Originally a forecasting subnet, now pivoting to B2B SaaS.' },
+  { netuid: null, status: 'paused', name: 'Watershed', body: 'Federated training subnet — paused while founders reassess.' },
+  { netuid: '122', status: 'testnet', name: 'Caldera', body: 'Voice cloning subnet, currently in mainnet prep.' },
+];
+
+function statusStyle(status: string) {
+  if (status === 'live') return 'background: rgba(21,128,61,0.1); color: #15803d;';
+  if (status === 'testnet') return 'background: rgba(184,71,11,0.1); color: #b8470b;';
+  return '';
+}
+---
+<BaseLayout
+  title="Incubator — Build a subnet — OpenTAO"
+  description="OpenTAO Incubator — a 10-week run from prototype to mainnet. Eight teams per cohort. $50K grant + compute + mentor time + netuid registration."
+  section="build"
+>
+  <SubNav items={subnav} active="/build/incubator" rightMeta="Cohort 02 · applications open" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/build/hackathon', label: 'Build a subnet' },
+        { label: 'Incubator' },
+      ]} />
+
+      <div class="flex items-center gap-3 mb-5">
+        <span class="section-label">Cohort 02 · applications open until Jun 30</span>
+      </div>
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold max-w-[840px]">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">A</span> 10-week run<br>from prototype to mainnet<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">Eight teams per cohort. Fifty thousand dollars each, plus compute, mentor hours, and direct support to register a netuid and launch a real subnet.</p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="#" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">Apply to Cohort 02<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="#cohort" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">See what's included</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="cohort" class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">What you get</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">No equity. No tokens. Just runway.</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {benefits.map((b) => (
+          <div class="card rounded-md p-6">
+            <div class="text-3xl font-semibold mb-2">{b.value}</div>
+            <div class="section-label mb-3">{b.label}</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{b.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">Week by week</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">Ten weeks. Remote-first. One in-person retreat.</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-2">
+        {timeline.map((w) => (
+          <div class={`timeline-week ${w.state}`}>
+            <div class={`font-mono text-xs mb-1 ${w.state === 'now' ? '' : 'text-[color:var(--color-fg-dim)]'}`} style={w.state === 'now' ? 'color: #b8470b' : ''}>{w.week}</div>
+            <div class="font-medium text-sm">{w.title}</div>
+            <div class="text-xs text-[color:var(--color-fg-muted)] mt-1">{w.meta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">Cohort 01 · graduated 2026·02</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">Six teams shipped. Three on mainnet.</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {cohort01.map((t) => {
+          const dim = t.status === 'pivoting' || t.status === 'paused';
+          return (
+            <a href="#" class={`card rounded-md p-6 block ${dim ? 'opacity-70' : ''}`}>
+              <div class="flex items-baseline justify-between mb-3">
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">
+                  {t.netuid ? <>netuid <span class="text-[color:var(--color-fg)]">{t.netuid}</span></> : 'project'}
+                </div>
+                {dim ? (
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded text-[color:var(--color-fg-dim)] border hairline">{t.status}</span>
+                ) : (
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded" style={statusStyle(t.status)}>{t.status}</span>
+                )}
+              </div>
+              <h3 class="font-semibold mb-1">{t.name}</h3>
+              <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{t.body}</p>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .timeline-week { position: relative; padding: 14px 16px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #ffffff; }
+  .timeline-week.done { opacity: 0.5; }
+  .timeline-week.now { border-color: rgba(184,71,11,0.35); background: rgba(184,71,11,0.04); }
+  .timeline-week.now::before { content: ""; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border: 1px solid rgba(184,71,11,0.18); border-radius: 8px; }
+</style>

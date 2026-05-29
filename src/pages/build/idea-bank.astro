@@ -1,0 +1,594 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/build/hackathon', label: 'Hackathon' },
+  { href: '/build/incubator', label: 'Incubator' },
+  { href: '/build/idea-bank', label: 'Idea bank' },
+];
+
+const domainCounts = [
+  { code: 'EDU', n: 2 },
+  { code: 'FIN', n: 3 },
+  { code: 'ROBOT', n: 2 },
+  { code: 'DATA', n: 2 },
+  { code: 'HEALTH', n: 2 },
+  { code: 'CODE', n: 1 },
+];
+
+const filters = [
+  { label: 'All · 12', active: true },
+  { label: 'Education · 2', active: false },
+  { label: 'Finance · 3', active: false },
+  { label: 'Robotics · 2', active: false },
+  { label: 'Data · 2', active: false },
+  { label: 'Code · 1', active: false },
+  { label: 'Health · 2', active: false },
+];
+
+const domainStyles: Record<string, string> = {
+  EDUCATION: 'background: rgba(184,71,11,0.08); color: #b8470b;',
+  FINANCE: 'background: rgba(28,110,164,0.08); color: #1c6ea4;',
+  ROBOTICS: 'background: rgba(103,65,217,0.08); color: #6741d9;',
+  HEALTH: 'background: rgba(21,128,61,0.08); color: #15803d;',
+  DATA: 'background: rgba(194,65,12,0.08); color: #c2410c;',
+  CODE: 'background: rgba(75,85,99,0.08); color: #4b5563;',
+};
+
+const ideas = [
+  {
+    domain: 'EDUCATION', heat: 92,
+    title: 'First-pass tutoring grader for K-12 math',
+    body: 'Schools and tutoring chains spend hundreds of hours per week marking long-form math homework. A subnet that returns rubric-aligned scores plus next-step hints turns that into a per-page API call.',
+    rowA: [
+      { k: 'Buyer', v: 'Tutoring chains, school districts, ed-tech apps' },
+      { k: 'Miner job', v: 'Score + hint JSON given a scanned page' },
+      { k: 'Validator', v: 'Rubric-bound LLM judge with held-out gold set' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-page is compute-bound', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Pages hashed + perturbed; replay fails' },
+      { k: 'Exit ramp', v: 'SaaS API priced per page' },
+    ],
+  },
+  {
+    domain: 'FINANCE', heat: 88,
+    title: 'Earnings-call sentiment & guidance extraction',
+    body: 'Quant desks pay six figures for first-hour transcription + structured sentiment on 800+ public companies. A subnet that ingests audio and emits a structured JSON inside the call window has a clean enterprise SKU.',
+    rowA: [
+      { k: 'Buyer', v: 'Quant funds, sell-side research, financial data vendors' },
+      { k: 'Miner job', v: 'Audio → speaker-tagged JSON with sentiment + guidance fields' },
+      { k: 'Validator', v: 'Compare against post-call SEC filings + ensemble agreement' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-call inference', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Live audio, no pre-computation possible' },
+      { k: 'Exit ramp', v: 'API + S3 drop, $15K/seat/yr' },
+    ],
+  },
+  {
+    domain: 'ROBOTICS', heat: 70,
+    title: 'Sim-to-real policy distillation for manipulation',
+    body: 'Robot startups have piles of teleop demonstrations and no compute to distill them into deployable policies. Buyers supply the demos; miners train compact policies; validators grade on a held-out sim suite.',
+    rowA: [
+      { k: 'Buyer', v: 'Humanoid + manipulation startups (data has been collected externally)' },
+      { k: 'Miner job', v: 'Train a policy network on supplied trajectories, return checkpoint' },
+      { k: 'Validator', v: 'Replay on locked sim envs, score by task success rate' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'sim runs in parallel', scaling: 'super-linear' },
+      { k: 'L3 — Cheat path', v: 'Envs randomized per round, no overfit' },
+      { k: 'Exit ramp', v: 'Licensed checkpoints, $5–25K each' },
+    ],
+  },
+  {
+    domain: 'HEALTH', heat: 76,
+    title: 'Radiology pre-read prioritization',
+    body: "Radiology groups need triage models that flag likely-urgent studies first. The buyer (the practice) supplies the studies; miners run inference; validators grade against the radiologist's eventual read.",
+    rowA: [
+      { k: 'Buyer', v: 'Radiology groups, teleradiology firms, hospital IT' },
+      { k: 'Miner job', v: 'DICOM → urgency score + finding tags' },
+      { k: 'Validator', v: 'Delayed grading vs. actual radiologist label' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-study inference', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Studies one-shot, no public benchmarks' },
+      { k: 'Exit ramp', v: 'Per-study fee or seat license' },
+    ],
+  },
+  {
+    domain: 'FINANCE', heat: 82,
+    title: 'Loan-document field extraction',
+    body: 'Mid-market lenders pay $4–8 per page to extract structured fields from credit memos and tax returns. A subnet of OCR + field-classifier models running per page is naturally parallel.',
+    rowA: [
+      { k: 'Buyer', v: 'Mid-market commercial lenders, BPO vendors, fintech underwriters' },
+      { k: 'Miner job', v: 'PDF page → structured field JSON with confidence' },
+      { k: 'Validator', v: 'Spot-check against human-labeled gold sample per epoch' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'embarrassingly parallel', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Live customer documents, never seen twice' },
+      { k: 'Exit ramp', v: 'API gateway billed per page' },
+    ],
+  },
+  {
+    domain: 'EDUCATION', heat: 64,
+    title: 'Personalized practice-set generator for board exams',
+    body: 'Test-prep companies sell adaptive question banks. A subnet that generates fresh, syllabus-aligned questions with calibrated difficulty (graded by held-out human pass-rate) keeps the bank ahead of memorization.',
+    rowA: [
+      { k: 'Buyer', v: 'Test-prep platforms, professional certification boards' },
+      { k: 'Miner job', v: 'Topic + difficulty → question + answer key + rationale' },
+      { k: 'Validator', v: 'Distill scoring from past-paper psychometrics, ensemble agreement' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-question generation', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: "Difficulty seeds private, can't precompute" },
+      { k: 'Exit ramp', v: 'Per-question licensing or bundled bank' },
+    ],
+  },
+  {
+    domain: 'DATA', heat: 78,
+    title: 'Synthetic chain-of-thought for math/coding',
+    body: 'Frontier labs license long-form reasoning traces. Miners produce diverse, verifier-checked traces; validators grade by passing a held-out unit-test or step-by-step checker. Each H100 produces thousands of traces per hour.',
+    rowA: [
+      { k: 'Buyer', v: 'Model labs, post-training providers, open-source RLHF projects' },
+      { k: 'Miner job', v: 'Problem → reasoning trace + verified final answer' },
+      { k: 'Validator', v: 'Verifier model + executable check on terminal answer' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'trace-bound', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Fresh seeds per epoch + diversity penalty' },
+      { k: 'Exit ramp', v: 'Bulk dataset licensing' },
+    ],
+  },
+  {
+    domain: 'HEALTH', heat: 58,
+    title: 'Clinical-trial protocol deviation detection',
+    body: 'CROs need real-time scanning of trial documentation for protocol deviations. A subnet ingests trial notes + EDC entries and flags anomalies — grading is against eventual monitor adjudication.',
+    rowA: [
+      { k: 'Buyer', v: 'Contract research organizations, pharma sponsors' },
+      { k: 'Miner job', v: 'Trial event log → flag + reason JSON' },
+      { k: 'Validator', v: 'Delayed reconciliation with monitor reports' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-event inference', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Live trial data, never repeats' },
+      { k: 'Exit ramp', v: 'SaaS per study site' },
+    ],
+  },
+  {
+    domain: 'ROBOTICS', heat: 56,
+    title: 'Closed-loop video understanding for warehouse autonomy',
+    body: 'Warehouse robotics players need scene-graph and intent prediction from depth + RGB streams. Buyers supply rolling clips, miners output event tracks, validators grade against locked test-set ground truth.',
+    rowA: [
+      { k: 'Buyer', v: 'Warehouse automation OEMs, third-party logistics integrators' },
+      { k: 'Miner job', v: 'Video chunk → event + object track JSON' },
+      { k: 'Validator', v: 'Held-out clips with ground-truth labels rotated weekly' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-clip inference', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: "Buyer-private clips, can't be cached" },
+      { k: 'Exit ramp', v: 'Per-camera-hour API' },
+    ],
+  },
+  {
+    domain: 'DATA', heat: 68,
+    title: 'Long-context retrieval grading',
+    body: 'Model labs need adversarial benchmarks for long-context retrieval. A subnet generates needle-in-haystack tasks (legal, scientific, codebase) plus reference passages and grades miner-submitted retrievers.',
+    rowA: [
+      { k: 'Buyer', v: 'Model labs, eval frameworks (lm-eval-harness style)' },
+      { k: 'Miner job', v: 'Query + corpus → top-k passages with scores' },
+      { k: 'Validator', v: "Programmatic exact-match against generator's locked needle" },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-query retrieval', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Fresh corpora every round' },
+      { k: 'Exit ramp', v: 'Eval-as-a-service contracts' },
+    ],
+  },
+  {
+    domain: 'CODE', heat: 72,
+    title: 'Test-generation subnet for unmaintained repos',
+    body: 'Enterprises pay external firms to add test coverage to legacy services. Miners produce property-based tests against a target repo; validators run the tests, score by mutation-survival and coverage delta.',
+    rowA: [
+      { k: 'Buyer', v: 'Enterprise engineering teams, dev-tools vendors' },
+      { k: 'Miner job', v: 'Repo snapshot → generated test suite + reasoning' },
+      { k: 'Validator', v: 'Mutation testing + coverage delta on sandboxed runs' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'sandbox executions parallelize', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Mutated targets per epoch, no precompute' },
+      { k: 'Exit ramp', v: 'Per-repo coverage license' },
+    ],
+  },
+  {
+    domain: 'FINANCE', heat: 60,
+    title: 'Counterparty news-event extraction',
+    body: 'Banks and insurers monitor counterparty news for credit events. A subnet ingests press + regulatory feeds and emits structured events with severity scores; validators check against canonical post-hoc records.',
+    rowA: [
+      { k: 'Buyer', v: 'Commercial banks, trade-credit insurers, KYC vendors' },
+      { k: 'Miner job', v: 'News article → entity + event type + severity JSON' },
+      { k: 'Validator', v: 'Compare against curated event ledger weekly' },
+    ],
+    rowB: [
+      { k: 'L2 — Scaling', v: 'per-article inference', scaling: 'linear' },
+      { k: 'L3 — Cheat path', v: 'Sources rotated, embargo-protected' },
+      { k: 'Exit ramp', v: 'Subscription per monitored entity' },
+    ],
+  },
+];
+
+const lenses = [
+  {
+    n: 'L1 — Demand',
+    title: "Who's the buyer, and what would they pay?",
+    body: 'Not "would the crypto community find this useful" — would a buyer outside Bittensor pay cash for the output today? If you can name three concrete buyers and the price they\'d pay per call, you have demand. If not, you have a hobby project on a token treadmill.',
+    good: '"Mid-market law firms pay $0.40/page for first-pass contract review — three firms in our pipeline have signed LOIs."',
+  },
+  {
+    n: 'L2 — Scaling',
+    title: 'Does doubling compute double the output?',
+    body: 'A subnet has ~192 miner slots. If output growth caps at the human in the loop, the design will not scale past cohort one. Bittensor pays for cycles, not headcount. Compute-bound problems thrive; people-bound problems suffocate.',
+    good: '"Each H100 produces ~1,200 fine-grained reasoning traces per hour. 2× GPU → 2× traces. Buyer-side collection is independent."',
+  },
+  {
+    n: 'L3 — Cheatability',
+    title: "What's the cheapest way for a miner to fake good output?",
+    body: 'If a miner can hard-code answers, replay yesterday\'s results, or call a cheap API and resell, your scoring is dead. Good designs make cheating cost more than honest mining: fresh ground truth, hidden seeds, adversarial verifiers.',
+    good: '"Seeds are sampled from a private buyer-side corpus rotated every hour. Pre-computation is wasted; the only honest strategy is to serve the model."',
+  },
+  {
+    n: 'L4 — Convergence',
+    title: 'Can two honest validators reach the same ranking?',
+    body: "Yuma consensus requires validators to converge on weights, or emission gets cut. If your scoring depends on subjective judgment, slow oracles, or unstable model APIs, validators won't agree and the subnet will drift.",
+    good: '"Validators replay the same hashed seed → deterministic verifier model → identical numeric score within ±0.5%."',
+  },
+];
+
+const failures = [
+  { code: 'F1 · Demand-shaped like a forum', title: '"Builders on Bittensor will want this."', body: 'User persona only exists inside this network. Dollar never enters. Pick a buyer outside crypto.' },
+  { code: 'F2 · Human-paced output', title: '"Miners hire labelers / drivers."', body: '192 slots × N humans = a tiny ops company on-chain. Fails L2.' },
+  { code: 'F3 · Reference-replay attack', title: '"Score by similarity to a public dataset."', body: 'Top miners just memorize the dataset. Rotate ground truth, or generate it adversarially per epoch.' },
+  { code: 'F4 · Subjective scoring', title: '"Validators rate creativity / quality."', body: "Validators won't converge. Need a deterministic stand-in: a verifier model, or downstream task accuracy." },
+  { code: 'F5 · API-resale subnet', title: '"Miners proxy GPT-4 / Claude."', body: 'Buyer pays gateway to pay OpenAI, with extra steps. Adds no defensible value.' },
+  { code: 'F6 · No exit ramp', title: '"We\'ll figure out monetization later."', body: "Without a market exit, miners survive on emission alone. The TAO price holds you up — until it doesn't." },
+];
+
+const refSubnets = [
+  { netuid: '64', name: 'Chutes', body: 'Inference market with hard determinism on output bytes. Clean L3/L4.' },
+  { netuid: '5', name: 'OpenKaito', body: 'Search ranking judged against rotating private gold set. Strong L3.' },
+  { netuid: '120', name: 'Affine', body: 'Reasoning traces, verifier-graded. Compute fully utilized at scale.' },
+];
+
+const onePager = [
+  { n: '1 · Buyer', v: 'A named segment outside Bittensor. Three reachable contacts.' },
+  { n: '2 · Pain', v: "What they currently pay for, and what's broken about it." },
+  { n: '3 · Miner job', v: 'One sentence. Input schema → output schema.' },
+  { n: '4 · Validator score', v: 'Deterministic function. Replayable from logs.' },
+  { n: '5 · L2 check', v: 'Throughput at 1×/2×/4×/8× GPU. Show linear (or better) scaling.' },
+  { n: '6 · Cheap-cheat path', v: 'The most attractive way to cheat, and why your design makes it unprofitable.' },
+  { n: '7 · Exit ramp', v: 'Path from chain output to dollar invoice. API, license, app — pick one.' },
+  { n: '8 · 90-day evidence', v: "Anything you've already built or proven. A demo, an LOI, a working verifier." },
+];
+
+const computeRowsA = [
+  { g: '1× GPU', w: 20, t: '1k/d' },
+  { g: '2× GPU', w: 22, t: '1.1k/d' },
+  { g: '4× GPU', w: 24, t: '1.2k/d' },
+  { g: '8× GPU', w: 24, t: '1.2k/d' },
+];
+
+const computeRowsB = [
+  { g: '1× GPU', w: 12, t: '1k/h' },
+  { g: '2× GPU', w: 24, t: '2k/h' },
+  { g: '4× GPU', w: 48, t: '4k/h' },
+  { g: '8× GPU', w: 96, t: '8k/h' },
+];
+---
+<BaseLayout
+  title="Idea bank — Build a subnet — OpenTAO"
+  description="A working catalog of subnet directions, pre-vetted against the four lenses we use to evaluate every applicant."
+  section="build"
+>
+  <SubNav items={subnav} active="/build/idea-bank" rightMeta="12 open · refreshed weekly" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/build/hackathon', label: 'Build a subnet' },
+        { label: 'Idea bank' },
+      ]} />
+
+      <div class="flex items-center gap-3 mb-5">
+        <span class="accent-dot"></span>
+        <span class="section-label" style="color: #b8470b">Open problems · pre-vetted · unclaimed</span>
+      </div>
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold max-w-[920px]">
+        Twelve subnets<br><span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">that don't exist yet.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[640px] leading-relaxed">
+        A working catalog of subnet directions. Every entry has a named buyer outside crypto, scales linearly with GPUs, and resists the obvious cheats — pressure-tested against the four lenses we use to evaluate every applicant.
+      </p>
+      <p class="mt-4 text-sm text-[color:var(--color-fg-muted)] max-w-[640px] leading-relaxed">
+        Pick one. Steal one. Combine two. The bank is meant to be raided.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="#catalog" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">Browse the catalog<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="#vetting" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">How we vet ideas →</a>
+      </div>
+
+      <div class="mt-14 grid grid-cols-2 md:grid-cols-6 gap-2 max-w-3xl text-center">
+        {domainCounts.map((d) => (
+          <div class="border hairline rounded-md py-3">
+            <div class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">{d.code}</div>
+            <div class="font-semibold mt-1">{d.n}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="catalog" class="border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
+        <div class="flex flex-wrap gap-2">
+          {filters.map((f) => (
+            <button class={`filter-btn ${f.active ? 'active' : ''}`}>{f.label}</button>
+          ))}
+        </div>
+        <div class="flex items-center gap-3 text-xs font-mono text-[color:var(--color-fg-dim)]">
+          <span>sort</span>
+          <select class="bg-transparent border hairline rounded px-2 py-1 text-[color:var(--color-fg)]">
+            <option>buyer-readiness</option>
+            <option>compute intensity</option>
+            <option>recently added</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4">
+        {ideas.map((idea) => (
+          <article class="card rounded-md p-7">
+            <div class="flex items-baseline justify-between mb-3">
+              <span class="domain-tag" style={domainStyles[idea.domain]}>{idea.domain}</span>
+              <span class="heat text-[color:var(--color-fg-dim)]">buyer ready <span class="heat-bar"><span style={`width: ${idea.heat}%`}></span></span></span>
+            </div>
+            <h3 class="text-xl font-semibold tracking-tight mb-2 leading-snug">{idea.title}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">{idea.body}</p>
+            <div class="idea-row">
+              {idea.rowA.map((c) => (
+                <div><div class="k">{c.k}</div>{c.v}</div>
+              ))}
+            </div>
+            <div class="idea-row">
+              {idea.rowB.map((c) => (
+                <div>
+                  <div class="k">{c.k}</div>
+                  {c.scaling && <><span class="check-pill check-ok">✓ {c.scaling}</span> </>}{c.v}
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-12 grid md:grid-cols-[1.4fr_1fr] gap-6 items-stretch">
+        <div class="card stripe rounded-md p-7">
+          <div class="section-label mb-3" style="color: #b8470b;">Have a different idea?</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-3 leading-snug">Run it through the four lenses. If it survives, submit it.</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">
+            The catalog is a starting set, not a fence. Most of the best subnets that exist today weren't on anyone's list a year ago. If you have something compute-bound with a real buyer outside crypto, we want to see it.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="/build/hackathon" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-md">Submit to the hackathon<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+            <a href="#vetting" class="text-sm text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)]">Read the four lenses →</a>
+          </div>
+        </div>
+        <div class="card rounded-md p-7">
+          <div class="section-label mb-3">What we politely decline</div>
+          <ul class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed space-y-2.5">
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">"Crypto-native" tooling.</strong> The buyer needs to live outside crypto.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">Human-bound output.</strong> Annotation farms, gig-worker dispatch.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">API-resale subnets.</strong> Miners just proxy a frontier model.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">Subjective grading.</strong> Yuma won't converge, emission gets cut.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vetting" class="vetting-section border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+
+      <div class="mb-14 max-w-[680px]">
+        <div class="section-label mb-3" style="color: #b8470b;">How we vet ideas</div>
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tight mb-4 leading-[1.05]">
+          <span class="font-serif italic text-[color:var(--color-fg-muted)] font-normal">The rubric</span><br>behind every entry above.
+        </h2>
+        <p class="text-[color:var(--color-fg-muted)] leading-relaxed">
+          Each idea in the bank passed these four lenses before it was added. If you bring your own, the same lenses apply — and the reviewers will start here.
+        </p>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">The four lenses</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-10 max-w-[640px]">Four questions. Answer them honestly before you write code.</h3>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          {lenses.map((l) => (
+            <div class="lens">
+              <div class="lens-num mb-3">{l.n}</div>
+              <h4 class="text-lg font-semibold tracking-tight mb-3">{l.title}</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">{l.body}</p>
+              <div class="border-t hairline pt-4 mt-auto">
+                <div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] mb-2">good answer looks like</div>
+                <p class="text-sm leading-relaxed">{l.good}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">Anatomy</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">Every entry above fills three columns.</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">
+          If you can't fill these three columns in three sentences each, the design is not ready. Vague columns produce vague code, and vague code produces emission with no buyer.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="anatomy-col">
+            <header>Miner job</header>
+            <h4 class="font-semibold text-base mb-2">What the miner produces</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">A single, well-defined output per challenge. Not "do AI for X" — "given prompt P, return JSON with fields A, B, C."</p>
+          </div>
+          <div class="anatomy-col" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.03);">
+            <header>Validator scoring</header>
+            <h4 class="font-semibold text-base mb-2">How "good" is measured</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">A deterministic function from (miner output, ground truth) to a scalar. If two validators disagree by more than noise, the subnet won't converge.</p>
+          </div>
+          <div class="anatomy-col">
+            <header>Market exit</header>
+            <h4 class="font-semibold text-base mb-2">Who consumes the output</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">The path from chain output to dollar revenue. Without it, emission is the only payer and the subnet is a Ponzi with a Python wrapper.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">The compute test</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">If GPUs double, does output double?</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">
+          This is the single most useful test. Apply it to your draft idea and feel the answer.
+        </p>
+
+        <div class="lens mb-8">
+          <div class="lens-num mb-4">A worked example — language data labeling</div>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-6">
+            Two versions. Version A asks miners to recruit annotators. Version B asks miners to run a model that grades a buyer-supplied dataset.
+          </p>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <div class="flex items-center gap-2 mb-4"><span class="pill no">version a — human-bound</span></div>
+              {computeRowsA.map((r) => (
+                <div class="compute-row">
+                  <span class="text-[color:var(--color-fg-dim)] font-mono text-xs">{r.g}</span>
+                  <div class="bar"><span style={`width: ${r.w}%`}></span></div>
+                  <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{r.t}</span>
+                </div>
+              ))}
+              <p class="text-xs text-[color:var(--color-fg-muted)] mt-4 leading-relaxed">Output is capped by annotator speed. GPUs sit idle. Emission goes out, work doesn't come back. <span class="text-[color:var(--color-accent)]">Fails L2.</span></p>
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2 mb-4"><span class="pill ok">version b — compute-bound</span></div>
+              {computeRowsB.map((r) => (
+                <div class="compute-row">
+                  <span class="text-[color:var(--color-fg-dim)] font-mono text-xs">{r.g}</span>
+                  <div class="bar"><span style={`width: ${r.w}%`}></span></div>
+                  <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{r.t}</span>
+                </div>
+              ))}
+              <p class="text-xs text-[color:var(--color-fg-muted)] mt-4 leading-relaxed">Each GPU runs an eval model end-to-end. Buyer collects the corpus on their side. <span class="text-[color:var(--color-accent)]">Passes L2.</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail">
+          <p class="text-sm leading-relaxed italic font-serif text-[color:var(--color-fg-muted)]">
+            The data collection itself can be valuable — but it belongs <em>outside</em> the subnet, in the buyer or in a separate
+            aggregator. Inside the subnet, the only thing that scales linearly with miner slots is what GPUs can do.
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">Common failures</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-10 max-w-[640px]">Six ways subnets quietly die.</h3>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {failures.map((f) => (
+            <div class="fail-card">
+              <div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] mb-2">{f.code}</div>
+              <h4 class="font-semibold mb-2 text-sm">{f.title}</h4>
+              <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">Reference subnets</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">Three live subnets that already pass the rubric.</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">Read them like autopsies — what's the buyer, what's the GPU actually doing, what's the verifier replaying?</p>
+
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {refSubnets.map((s) => (
+            <a href="/beginner/subnets" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">netuid {s.netuid} · live</div>
+              <h4 class="font-semibold mb-1">{s.name}</h4>
+              <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{s.body}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label mb-3">Before you apply</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">The one-pager you should be able to write.</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">
+          If you can fill all 8 rows in plain language, you're ready for the Hackathon or Incubator. If two rows are still hand-wavy, fix them first.
+        </p>
+
+        <div class="border hairline rounded-md overflow-hidden bg-[color:var(--color-paper)]">
+          {onePager.map((row, i) => (
+            <div class={`grid grid-cols-[180px_1fr] ${i < onePager.length - 1 ? 'border-b hairline' : ''}`}>
+              <div class="bg-[color:var(--color-surface)] p-4 text-xs font-mono text-[color:var(--color-fg-dim)] border-r hairline">{row.n}</div>
+              <div class="p-4 text-sm">{row.v}</div>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="/build/hackathon" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">Take it to the hackathon<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+          <a href="/build/incubator" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">Or apply to the incubator</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lens { border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; padding: 24px; background: #ffffff; }
+  .lens-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #b8470b; letter-spacing: 0.1em; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; border: 1px solid rgba(15,15,18,0.1); }
+  .pill.ok { background: rgba(21,128,61,0.06); color: #15803d; border-color: rgba(21,128,61,0.2); }
+  .pill.no { background: rgba(184,28,28,0.05); color: #b91c1c; border-color: rgba(184,28,28,0.2); }
+  .rail { border-left: 2px solid rgba(184,71,11,0.18); padding-left: 20px; }
+  .anatomy-col { padding: 24px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #ffffff; }
+  .anatomy-col header { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #b8470b; text-transform: uppercase; margin-bottom: 10px; }
+  .compute-row { display: grid; grid-template-columns: 100px 1fr 80px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(15,15,18,0.06); font-size: 14px; }
+  .compute-row:last-child { border-bottom: 0; }
+  .bar { height: 10px; border-radius: 999px; background: rgba(184,71,11,0.18); }
+  .bar > span { display: block; height: 100%; border-radius: 999px; background: #b8470b; }
+  .fail-card { padding: 20px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #fafaf9; }
+  .filter-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 999px; color: #4a4a52; transition: all .15s; cursor: pointer; background: transparent; }
+  .filter-btn:hover { color: #0c0c10; border-color: rgba(15,15,18,0.3); }
+  .filter-btn.active { background: #0c0c10; color: #ffffff; border-color: #0c0c10; }
+  .domain-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+  .heat { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; }
+  .heat-bar { display: inline-block; vertical-align: middle; width: 36px; height: 4px; border-radius: 2px; background: rgba(15,15,18,0.08); margin-left: 6px; position: relative; overflow: hidden; }
+  .heat-bar > span { position: absolute; left: 0; top: 0; bottom: 0; background: #b8470b; }
+  .idea-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); font-size: 13px; }
+  .idea-row .k { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #767680; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+  .check-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+  .check-ok { background: rgba(21,128,61,0.08); color: #15803d; }
+  .vetting-section { background: #fafaf9; }
+</style>

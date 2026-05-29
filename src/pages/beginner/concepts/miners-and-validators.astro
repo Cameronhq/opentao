@@ -1,0 +1,210 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getAdjacent } from '../../../data/concepts';
+
+const { prev, next } = getAdjacent('miners-and-validators');
+---
+<BaseLayout
+  title="Miners & validators — Wiki — OpenTAO"
+  description="One submits work. The other scores it. Almost everything else in Bittensor follows."
+  section="beginner"
+>
+  <header class="border-b hairline">
+    <div class="article px-6 pt-16 pb-12">
+      <div class="flex items-baseline gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-8 flex-wrap">
+        <a href="/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
+        <a href="/beginner/wiki" class="hover:text-[color:var(--color-fg)]">Wiki</a><span>/</span>
+        <span>Roles</span><span>/</span>
+        <span class="text-[color:var(--color-fg)]">Miners &amp; Validators</span>
+      </div>
+      <div class="section-label mb-4">Cluster II · Roles · concept 02 (featured)</div>
+      <h1 class="font-serif font-medium text-[56px] md:text-[64px] leading-[1.02] tracking-[-0.025em]">
+        Miners <span class="italic text-[color:var(--color-fg-muted)] font-normal">&amp;</span> validators.
+      </h1>
+      <p class="font-serif italic font-normal text-2xl text-[color:var(--color-fg-muted)] mt-6 leading-[1.4]">
+        One submits work. The other scores it. Almost everything else in Bittensor follows.
+      </p>
+      <div class="mt-10 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)]">
+          <span><span class="text-[color:var(--color-fg)]">12</span> min read</span>
+          <span class="opacity-30">·</span>
+          <span>last verified 2026·05·27 by @editorial</span>
+          <span class="opacity-30">·</span>
+          <span>2 contributors</span>
+        </div>
+        <div class="depth-toggle">
+          <button>5 min</button>
+          <button class="active">12 min</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="border-b hairline">
+    <article class="article px-6 py-16">
+      <p class="lead">
+        Bittensor is a two-sided market, and the two sides are miners and validators. Miners do the work; validators score it. The clever part is that both get paid in <span class="term" title="The native token">TAO</span>, but on different curves — and the difference is where the network's incentives live.
+      </p>
+
+      <h2 id="miner"><span class="index">I.</span>The miner</h2>
+      <p>
+        A miner is anyone who has registered a hotkey on a subnet and is submitting work. The work depends on the subnet: text generation, image generation, reasoning traces, robot policies. Some subnets ask for one submission per tempo; others run continuous streams.
+      </p>
+      <p>
+        Miners are paid in proportion to how validators rank them. Rank well, earn more; rank poorly, earn less; rank not at all, get deregistered when someone newer comes along.
+      </p>
+
+      <h2 id="validator"><span class="index">II.</span>The validator</h2>
+      <p>
+        A validator is anyone with enough TAO stake to claim one of the top-N validator slots on a subnet (usually N=64). They don't produce work — they grade it. At each tempo, they submit a weight vector saying who they think did well.
+      </p>
+      <p>
+        Validators are paid in proportion to <em>two</em> things: how much TAO they (and their delegators) have staked, <strong>and</strong> how much their weights agree with the consensus. Wild dissent costs you. Lazy agreement (just copying the median) also costs you, eventually.
+      </p>
+
+      <h2 id="compare"><span class="index">III.</span>Side by side</h2>
+      <div class="compare-grid">
+        <div class="compare-cell miner">
+          <div class="role-label">Miner</div>
+          <h4>The contributor</h4>
+          <ul>
+            <li><strong>Cost to start:</strong> a GPU + registration fee (<code>~0.4 τ</code>)</li>
+            <li><strong>What you do:</strong> run a model, submit work each tempo</li>
+            <li><strong>Earns from:</strong> being ranked highly by validators</li>
+            <li><strong>Risk:</strong> deregistration when newer hotkeys outperform you</li>
+            <li><strong>Time to first emission:</strong> ~2 tempos (~2.5 hours)</li>
+          </ul>
+        </div>
+        <div class="compare-cell validator">
+          <div class="role-label">Validator</div>
+          <h4>The scorer</h4>
+          <ul>
+            <li><strong>Cost to start:</strong> enough TAO stake to enter top-64</li>
+            <li><strong>What you do:</strong> grade miners, submit weights each tempo</li>
+            <li><strong>Earns from:</strong> stake × consensus alignment</li>
+            <li><strong>Risk:</strong> punishment for excessive disagreement with median</li>
+            <li><strong>Time to first emission:</strong> immediate, but ramps with bonding</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 id="why"><span class="index">IV.</span>Why it works (in theory)</h2>
+      <p>
+        The miner side is straightforward: do good work, get paid. The validator side is more delicate. If validators were paid only on stake, they could vote randomly and still earn. If they were paid only on accuracy, anyone with cheap stake could vote correctly and farm without contributing capital.
+      </p>
+      <p>
+        Bittensor combines both. <a class="inline" href="/beginner/concepts/yuma-consensus">Yuma consensus</a> rewards validators for matching the stake-weighted median <em>and</em> for being early to correct shifts. The result, in theory, is that validators have a real incentive to grade carefully — neither to cheat nor to coast.
+      </p>
+
+      <h2 id="practice"><span class="index">V.</span>In practice</h2>
+      <p>
+        Most newcomers pick the miner side. A working miner is a weekend project; a working validator is more like a small business. Both can earn well, but the operational shapes are different — a miner is closer to running a model in production; a validator is closer to running an oracle service.
+      </p>
+      <p>
+        If you're unsure which side suits you, start with a mining playbook for a quiet subnet — <a class="inline" href="/beginner/subnets/42-cortex">SN42 Cortex</a> is a good first one — and see whether you enjoy the rhythm.
+      </p>
+
+      <h2 id="going-deeper"><span class="index">VI.</span>Going deeper</h2>
+      <div class="going-deeper-list mt-4">
+        <a href="/beginner/concepts/yuma-consensus"><div><div class="text-[color:var(--color-fg)] font-medium">Yuma Consensus</div><div class="meta">Concept · 25 min · the aggregation rule</div></div><span class="arrow">→</span></a>
+        <a href="/beginner/concepts/validator"><div><div class="text-[color:var(--color-fg)] font-medium">Validator (separate concept)</div><div class="meta">Concept · 8 min · deeper on the scorer role</div></div><span class="arrow">→</span></a>
+        <a href="/beginner/concepts/miner"><div><div class="text-[color:var(--color-fg)] font-medium">Miner (separate concept)</div><div class="meta">Concept · 8 min · deeper on the contributor role</div></div><span class="arrow">→</span></a>
+        <a href="/mine/playbooks"><div><div class="text-[color:var(--color-fg)] font-medium">Subnet mining playbooks</div><div class="meta">128 subnets, each with a playbook</div></div><span class="arrow">→</span></a>
+      </div>
+
+      <h2 id="related"><span class="index">VII.</span>Related concepts</h2>
+      <div class="grid sm:grid-cols-2 gap-3 mt-6">
+        <a href="/beginner/concepts/yuma-consensus" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">17</span><span class="section-label">Consensus</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Yuma Consensus</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">How validator weights aggregate into reward.</div>
+        </a>
+        <a href="/beginner/concepts/staking-nomination" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">15</span><span class="section-label">Economics</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Staking &amp; nomination</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Locking TAO behind a validator.</div>
+        </a>
+        <a href="/beginner/concepts/bonding-ema" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">19</span><span class="section-label">Consensus</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Bonding &amp; EMA</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Why old correct opinions still matter.</div>
+        </a>
+        <a href="/beginner/concepts/validator-trust" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">20</span><span class="section-label">Consensus</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Validator trust</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Why dissent is expensive.</div>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <section class="border-b hairline">
+    <div class="article px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <div class="flex items-center gap-5">
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Suggest an edit</a>
+        </div>
+        <span>Verified against chain v2.1.4</span>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3 mt-8">
+        {prev && (
+          <a href={`/beginner/concepts/${prev.slug}`} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1">← Previous</div>
+            <div class="text-[color:var(--color-fg)] text-sm font-medium">{prev.title}</div>
+          </a>
+        )}
+        {next && (
+          <a href={`/beginner/concepts/${next.slug}`} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1 text-right">Next →</div>
+            <div class="text-[color:var(--color-fg)] text-sm text-right font-medium">{next.title}</div>
+          </a>
+        )}
+      </div>
+      <div class="mt-8 text-center">
+        <a href="/beginner/wiki" class="text-sm hover:text-[color:var(--color-accent)] inline-flex items-center gap-2 text-[color:var(--color-fg-muted)]">← All 26 concepts</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .article { max-width: 680px; margin: 0 auto; }
+  .article p { color: #1c1c22; line-height: 1.75; margin: 22px 0; font-size: 18px; }
+  .article p.lead { font-family: var(--font-serif); font-weight: 400; font-size: 24px; line-height: 1.55; color: #0c0c10; margin: 32px 0 40px; letter-spacing: -0.005em; }
+  .article p.lead::first-letter { font-size: 56px; line-height: 0.95; float: left; padding: 6px 12px 0 0; font-weight: 500; color: #b8470b; }
+  .article h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.015em; margin: 64px 0 16px; color: #0c0c10; }
+  .article h2 .index { font-family: var(--font-mono); font-size: 13px; color: #b8b8be; letter-spacing: 0.06em; vertical-align: middle; margin-right: 14px; font-weight: 400; }
+  .article ul { margin: 18px 0; padding-left: 24px; }
+  .article li { color: #1c1c22; line-height: 1.75; margin: 8px 0; padding-left: 6px; font-size: 17px; }
+  .article li::marker { color: #b8b8be; }
+  .article a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .article a.inline:hover { text-decoration-color: #b8470b; }
+  .article code { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); border-radius: 3px; padding: 1px 6px; font-family: var(--font-mono); font-size: 14px; }
+  .article strong { font-weight: 600; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+  .compare-cell { border: 1px solid rgba(15,15,18,0.1); border-radius: 8px; padding: 22px; background: #fafaf9; }
+  .compare-cell.miner { border-left: 3px solid #b8470b; }
+  .compare-cell.validator { border-left: 3px solid #1c6ea4; }
+  .compare-cell .role-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 8px; }
+  .compare-cell h4 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; color: #0c0c10; margin: 0 0 14px; }
+  .compare-cell ul { padding-left: 18px; margin: 0; }
+  .compare-cell li { font-size: 14px; line-height: 1.55; margin: 6px 0; color: #1c1c22; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+
+  .depth-toggle { display: inline-flex; border: 1px solid rgba(15,15,18,0.14); border-radius: 6px; padding: 2px; }
+  .depth-toggle button { padding: 4px 12px; font-size: 12px; color: #4a4a52; border-radius: 4px; font-family: var(--font-mono); }
+  .depth-toggle button.active { background: rgba(184,71,11,0.1); color: #b8470b; }
+
+  .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); padding: 18px 20px; border-radius: 6px; transition: all .15s; display: block; }
+  .related-card:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; }
+  .related-card .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; }
+
+  .going-deeper-list a { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(15,15,18,0.06); transition: color .15s; }
+  .going-deeper-list a:hover { color: #b8470b; }
+  .going-deeper-list a .meta { color: #767680; font-family: var(--font-mono); font-size: 11px; }
+  .going-deeper-list a .arrow { margin-left: auto; color: #b8b8be; }
+
+  .term { border-bottom: 1px dashed rgba(184,71,11,0.5); cursor: help; color: #0c0c10; }
+</style>

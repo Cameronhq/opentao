@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { chapters, type Chapter } from '../../../data/chapters';
+
+export async function getStaticPaths() {
+  // Only generate stub pages here. Rich chapter pages (rich === true, e.g. tokyo)
+  // live as their own .astro files and would conflict with the dynamic route.
+  return chapters
+    .filter((c) => !c.rich)
+    .map((c) => ({ params: { slug: c.slug }, props: { chapter: c } }));
+}
+
+interface Props { chapter: Chapter }
+const { chapter } = Astro.props;
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+---
+<BaseLayout
+  title={`${chapter.city} Chapter — Community — OpenTAO`}
+  description={chapter.blurb}
+  section="community"
+>
+  <SubNav items={subnav} active="/community/chapters" rightMeta={`since ${chapter.since} · active`} />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 pt-16 pb-12">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { href: '/community/chapters', label: 'Chapters' },
+        { label: chapter.city },
+      ]} />
+      <div class="flex items-baseline gap-4 mb-4">
+        <span class="text-3xl">{chapter.flag}</span>
+        <div class="section-label">{chapter.region}</div>
+      </div>
+      <h1 class="text-[52px] md:text-[64px] leading-[1.02] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">{chapter.city}</span> chapter<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-6 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">{chapter.blurb}</p>
+
+      <div class="mt-10 flex items-center gap-6 text-xs font-mono text-[color:var(--color-fg-dim)] flex-wrap">
+        <span>hosts <span class="text-[color:var(--color-fg)]">{chapter.hosts}</span></span>
+        <span class="opacity-30">·</span>
+        <span>since {chapter.since}</span>
+        <span class="opacity-30">·</span>
+        <span>{chapter.events}</span>
+        <span class="opacity-30">·</span>
+        <span>{chapter.members} members</span>
+        {chapter.language && <><span class="opacity-30">·</span><span>{chapter.language}</span></>}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 py-12">
+      <div class="stub-banner">
+        <div class="label">Editor's note</div>
+        <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
+          The full <strong>{chapter.city}</strong> chapter page — recent meetups, partners, photo recap, recurring schedule — is being written. Meanwhile, here's what we know. For a sense of what the finished version looks like, see the <a class="inline" href="/community/chapters/tokyo">Tokyo chapter page</a>.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 mt-10">
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Hosts</div>
+          <div class="text-[color:var(--color-fg)]">{chapter.hosts}</div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">running since {chapter.since}</div>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Region</div>
+          <div class="text-[color:var(--color-fg)]">{chapter.flag} {chapter.region}</div>
+          {chapter.language && <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">primary language · {chapter.language}</div>}
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Events</div>
+          <div class="text-[color:var(--color-fg)] text-2xl font-semibold tracking-tight">{chapter.events.replace(' hosted', '')}</div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">to date</div>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Members</div>
+          <div class="text-[color:var(--color-fg)] text-2xl font-semibold tracking-tight">{chapter.members}</div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">Discord + Telegram</div>
+        </div>
+      </div>
+
+      <div class="mt-10 flex flex-wrap items-center gap-3 text-sm">
+        <a href="/community/chapters" class="pill">← All chapters</a>
+        <a href="/community/events" class="pill">Upcoming events</a>
+        <a href="/community/chapters/tokyo" class="pill">See a finished chapter page</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 0; }
+  .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+  .stub-banner a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; }
+  .stub-banner a.inline:hover { text-decoration-color: #b8470b; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; }
+  .pill:hover { color: #0c0c10; border-color: rgba(15,15,18,0.28); }
+</style>

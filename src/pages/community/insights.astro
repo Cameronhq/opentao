@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const latest = [
+  { href: '/community/insights/why-dtao-changed-everything',  cover: 'cover-2', coverText: 'cover · dtao-one-year.svg', type: 'Retrospective · 14 min', title: 'Why dTAO changed everything (and three things it didn\'t).', body: 'One year in. The data, the surprises, the second-order effects nobody warned about.', meta: 'by @ke.ng · 2026·05·11' },
+  { href: '/community/insights/sn-18-interview',              cover: 'cover-3', coverText: 'cover · sn18-interview.svg', type: 'Interview · 32 min', title: '"We almost shipped a centralized API and called it a subnet." — SN-18.', body: 'The founders of one of Bittensor\'s longest-running subnets on the temptation of shortcuts.', meta: 'by editorial · 2026·05·04' },
+  { href: '/community/insights/validator-bonding-tutorial',   cover: 'cover-4', coverText: 'cover · validator-tuning.svg', type: 'Tutorial · 18 min', title: 'Tuning a validator\'s bonding parameters without getting penalized.', body: 'The advanced moves nobody documents. With numbers from three production validators.', meta: 'by @reza · 2026·04·28' },
+  { href: '/community/insights/scoring-function-field-guide', cover: 'cover-5', coverText: 'cover · subnet-incentive-design.svg', type: 'Deep dive · 25 min', title: 'Designing a subnet\'s scoring function: a field guide.', body: 'Six patterns that work, three that don\'t, and how to know which you have.', meta: 'by @maya · 2026·04·22' },
+  { href: '/community/insights/emission-curve-halving',       cover: 'cover-6', coverText: 'cover · emission-charts.svg', type: 'Field notes · 8 min', title: 'What the emission-curve halving will actually look like in practice.', body: 'Three charts and a short take. We\'re closer than most miners realize.', meta: 'by @yuki · 2026·04·18' },
+  { href: '/community/insights/governance-hyperparam-votes',  cover: 'cover-1', coverText: 'cover · governance-process.svg', type: 'Retrospective · 12 min', title: 'How the last three hyperparameter votes played out.', body: 'A look at who voted, who didn\'t, and what\'s about to change.', meta: 'by @sasha · 2026·04·09' },
+];
+---
+<BaseLayout
+  title="Insights — Community — OpenTAO"
+  description="Deep dives, retrospectives, and interviews from people doing the work."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/insights" rightMeta="28 articles · weekly" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-20 pb-14">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { label: 'Insights' },
+      ]} />
+      <div class="grid lg:grid-cols-[1.4fr_1fr] gap-12 items-end">
+        <div>
+          <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold">
+            <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">Long </span>reads<span class="text-[color:var(--color-accent)]">.</span>
+          </h1>
+          <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[580px] leading-relaxed">Deep dives, retrospectives, and interviews from people doing the work — written for people who already know the basics.</p>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Subscribe</div>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">One email every other Friday. New essays, never spam.</p>
+          <div class="flex gap-2">
+            <input class="flex-1 px-3 py-2 bg-[color:var(--color-surface)] border hairline rounded text-sm text-[color:var(--color-fg)] outline-none focus:border-[color:var(--color-fg-muted)]" placeholder="you@example.com" />
+            <button class="btn-primary px-4 py-2 text-sm font-medium rounded">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-12 flex flex-wrap items-center gap-2">
+        <button class="pill active">All</button>
+        <button class="pill">Deep dive</button>
+        <button class="pill">Retrospective</button>
+        <button class="pill">Interview</button>
+        <button class="pill">Tutorial</button>
+        <button class="pill">Field notes</button>
+        <button class="pill ml-auto">RSS</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">Featured</div>
+      <a href="/community/insights/yuma-walk-through" class="grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center group">
+        <div class="cover cover-1 rounded-md">cover · yuma-walkthrough.svg</div>
+        <div>
+          <div class="flex items-center gap-3 mb-4"><span class="type-tag" style="color: #b8470b;">Deep dive · 22 min</span><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">2026·05·19</span></div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.1] mb-4">
+            <span class="font-serif italic font-normal">Yuma</span> consensus, slowly: a hand-traced walk through one block.
+          </h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6 max-w-[520px]">We pause at every variable. By the end you can predict what every validator's weight does to emission — without opening the paper.</p>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #6741d9, #1c6ea4);"></div>
+            <div><div class="text-sm text-[color:var(--color-fg)]">Rho Carter</div><div class="text-xs font-mono text-[color:var(--color-fg-dim)]">@rho.lab</div></div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">Latest</div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {latest.map((p) => (
+          <a href={p.href} class="block">
+            <div class={`cover ${p.cover} rounded-md mb-4`}>{p.coverText}</div>
+            <div class="flex items-center gap-3 mb-2"><span class="type-tag">{p.type}</span></div>
+            <h3 class="text-xl font-serif italic font-medium tracking-tight leading-snug mb-2">{p.title}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">{p.body}</p>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">{p.meta}</div>
+          </a>
+        ))}
+      </div>
+      <div class="mt-10 flex items-center justify-center">
+        <button class="pill px-5 py-2.5">Load 22 more</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-[1.3fr_1fr] gap-10 items-center">
+        <div>
+          <div class="section-label mb-3">Pitch us an essay</div>
+          <h2 class="text-3xl font-serif italic font-medium leading-snug max-w-[520px]">Have a long-form take? Send the outline first, full draft if we like it.</h2>
+        </div>
+        <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+          <p>We pay for accepted essays. Standard rates published, no negotiation games. We edit lightly, never for tone.</p>
+          <a href="/community/insights/contribute" class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-md border hairline-strong text-sm hover:border-[color:var(--color-fg-muted)]">Submit a pitch →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; }
+  .pill:hover { color: #0c0c10; border-color: rgba(15,15,18,0.28); }
+  .pill.active { color: #b8470b; border-color: rgba(184,71,11,0.4); background: rgba(184,71,11,0.06); }
+  .type-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #4a4a52; }
+  .cover { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; color: #767680; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .cover-1 { background: linear-gradient(135deg, #fdf3e3, #f5e8d2); color: #b8470b; }
+  .cover-2 { background: linear-gradient(135deg, #e8f1f7, #d4e4f0); color: #1c6ea4; }
+  .cover-3 { background: linear-gradient(135deg, #f0eafa, #e0d6f0); color: #6741d9; }
+  .cover-4 { background: linear-gradient(135deg, #e6f4ea, #d2ead8); color: #15803d; }
+  .cover-5 { background: linear-gradient(135deg, #fceae3, #f6d6cd); color: #c2410c; }
+  .cover-6 { background: linear-gradient(135deg, #faf0d6, #f0e2bd); color: #a16207; }
+</style>

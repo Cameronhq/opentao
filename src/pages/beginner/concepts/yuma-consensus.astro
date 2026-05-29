@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getAdjacent } from '../../../data/concepts';
+
+const { prev, next } = getAdjacent('yuma-consensus');
+---
+<BaseLayout
+  title="Yuma Consensus — Wiki — OpenTAO"
+  description="The aggregation rule that turns dozens of validator opinions into a single reward vector — and somehow keeps everyone honest."
+  section="beginner"
+>
+  <header class="border-b hairline">
+    <div class="article px-6 pt-16 pb-12">
+      <div class="flex items-baseline gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-8 flex-wrap">
+        <a href="/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
+        <a href="/beginner/wiki" class="hover:text-[color:var(--color-fg)]">Wiki</a><span>/</span>
+        <span>Consensus</span><span>/</span>
+        <span class="text-[color:var(--color-fg)]">Yuma</span>
+      </div>
+      <div class="section-label mb-4">Cluster IV · Consensus · concept 17</div>
+      <h1 class="font-serif font-medium text-[56px] md:text-[64px] leading-[1.02] tracking-[-0.025em]">
+        <span class="italic font-normal text-[color:var(--color-fg-muted)]">Yuma</span>, intuitively.
+      </h1>
+      <p class="font-serif italic font-normal text-2xl text-[color:var(--color-fg-muted)] mt-6 leading-[1.4]">
+        The aggregation rule that turns dozens of validator opinions into a single reward vector — and somehow keeps everyone honest.
+      </p>
+      <div class="mt-10 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)]">
+          <span><span class="text-[color:var(--color-fg)]">18</span> min read</span>
+          <span class="opacity-30">·</span>
+          <span>last verified 2026·05·27</span>
+          <span class="opacity-30">·</span>
+          <span>4 contributors</span>
+        </div>
+        <div class="depth-toggle"><button>5 min</button><button class="active">18 min</button></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="border-b hairline">
+    <article class="article px-6 py-16">
+      <p class="lead">
+        Every tempo, sixty-four validators submit their opinions about which miners did the best work. Those opinions arrive on chain as raw vectors of weights. Yuma's job is to combine them into one — to decide, finally, who gets paid.
+      </p>
+
+      <h2 id="problem"><span class="index">I.</span>The problem Yuma solves</h2>
+      <p>
+        Imagine each validator hands in a scorecard with one row per miner. Sixty-four scorecards, mostly agreeing, occasionally not. How do you turn that into a single ordering that's <strong>honest</strong>, <strong>stable</strong>, and <strong>hard to game</strong>?
+      </p>
+      <p>
+        Easy answers fail. A simple average lets a single rogue validator move the result. A stake-weighted average is better, but lets a big stakeholder bully everyone else. Median ignores intensity. Yuma is the compromise — close to a stake-weighted average, with corrections that punish big disagreements and reward consistent honesty over time.
+      </p>
+
+      <h2 id="how"><span class="index">II.</span>How it actually computes</h2>
+      <p>
+        The whole thing fits in a few lines. At each tempo, for each miner <code>j</code>:
+      </p>
+      <div class="formula">
+        reward<span class="var">[j]</span> = <em>norm</em>( Σ<sub>i ∈ validators</sub> stake<span class="var">[i]</span> · weight<span class="var">[i, j]</span> · bonding<span class="var">[i, j]</span> )
+      </div>
+      <p>
+        Three pieces: <strong>stake</strong> (how much TAO this validator brings), <strong>weight</strong> (what they said about this miner this tempo), and <strong>bonding</strong> (a memory of how correctly this validator has voted in the past). Multiply all three, sum over validators, normalize.
+      </p>
+
+      <h2 id="bonding"><span class="index">III.</span>The bonding term</h2>
+      <p>
+        Bonding is what makes Yuma interesting. Naively, it's the dot product of this validator's past votes with the consensus. The closer a validator has tracked the truth historically, the higher their bonding — and the more weight their current vote carries.
+      </p>
+      <p>
+        The effect: new validators with high stake but no track record have less power than they think. And an old validator who suddenly turns rogue loses their grip on the consensus only gradually, giving the network time to react.
+      </p>
+
+      <h2 id="incentives"><span class="index">IV.</span>What this incentivizes</h2>
+      <ul>
+        <li><strong>Honest validators</strong> are rewarded — agreeing with the slow-moving consensus is the highest-EV strategy.</li>
+        <li><strong>Lazy validators</strong> (just copying the median) earn fine but lose ground over time as bonding shifts to active graders.</li>
+        <li><strong>Rogue validators</strong> (deliberately wrong) bleed bonding quickly. Their stake stops mattering long before they realize it.</li>
+        <li><strong>Early honest validators</strong> who spot a shift before the median are rewarded extra — the "scoop" bonus.</li>
+      </ul>
+
+      <h2 id="caveat"><span class="index">V.</span>What it doesn't do</h2>
+      <p>
+        Yuma doesn't solve the "garbage in, garbage out" problem. If most validators are wrong about what good work looks like — because the subnet's scoring is bad, or the test set is leaked, or the verifier models are saturated — Yuma will faithfully aggregate that wrongness into a tidy reward vector.
+      </p>
+      <p>
+        That's why <a class="inline" href="/beginner/subnets/42-cortex">subnet design</a> matters as much as Yuma itself. Yuma is the back half of the machine; the validators' scoring logic is the front half.
+      </p>
+
+      <h2 id="deeper"><span class="index">VI.</span>Going deeper</h2>
+      <div class="going-deeper-list mt-4">
+        <a href="/community/insights"><div><div class="text-[color:var(--color-fg)] font-medium">Yuma Consensus, slowly: a hand-traced walk through one block</div><div class="meta">Insight · 22 min · the math, by hand</div></div><span class="arrow">→</span></a>
+        <a href="#"><div><div class="text-[color:var(--color-fg)] font-medium">The Bittensor whitepaper</div><div class="meta">PDF · 2021</div></div><span class="arrow">↗</span></a>
+        <a href="/beginner/concepts/bonding-ema"><div><div class="text-[color:var(--color-fg)] font-medium">Bonding &amp; EMA</div><div class="meta">Concept · 8 min · the memory term in detail</div></div><span class="arrow">→</span></a>
+      </div>
+
+      <h2 id="related"><span class="index">VII.</span>Related concepts</h2>
+      <div class="grid sm:grid-cols-2 gap-3 mt-6">
+        <a href="/beginner/concepts/weights-setting" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">18</span><span class="section-label">Consensus</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Weights setting</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">What a validator actually submits each tempo.</div>
+        </a>
+        <a href="/beginner/concepts/bonding-ema" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">19</span><span class="section-label">Consensus</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Bonding &amp; EMA</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">How memory is baked into the score.</div>
+        </a>
+        <a href="/beginner/concepts/validator-trust" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">20</span><span class="section-label">Consensus</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Validator trust</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Why disagreeing with the median is expensive.</div>
+        </a>
+        <a href="/beginner/concepts/miners-and-validators" class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">02</span><span class="section-label">Roles</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Miners &amp; validators</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Who Yuma is sorting between.</div>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <section class="border-b hairline">
+    <div class="article px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
+        <span>Verified against chain v2.1.4</span>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3 mt-8">
+        {prev && (
+          <a href={`/beginner/concepts/${prev.slug}`} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1">← Previous</div>
+            <div class="text-[color:var(--color-fg)] text-sm font-medium">{prev.title}</div>
+          </a>
+        )}
+        {next && (
+          <a href={`/beginner/concepts/${next.slug}`} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1 text-right">Next →</div>
+            <div class="text-[color:var(--color-fg)] text-sm text-right font-medium">{next.title}</div>
+          </a>
+        )}
+      </div>
+      <div class="mt-8 text-center"><a href="/beginner/wiki" class="text-sm hover:text-[color:var(--color-accent)] text-[color:var(--color-fg-muted)]">← All 26 concepts</a></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .article { max-width: 680px; margin: 0 auto; }
+  .article p { color: #1c1c22; line-height: 1.75; margin: 22px 0; font-size: 18px; }
+  .article p.lead { font-family: var(--font-serif); font-weight: 400; font-size: 24px; line-height: 1.55; color: #0c0c10; margin: 32px 0 40px; letter-spacing: -0.005em; }
+  .article p.lead::first-letter { font-size: 56px; line-height: 0.95; float: left; padding: 6px 12px 0 0; font-weight: 500; color: #b8470b; }
+  .article h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.015em; margin: 64px 0 16px; color: #0c0c10; }
+  .article h2 .index { font-family: var(--font-mono); font-size: 13px; color: #b8b8be; letter-spacing: 0.06em; vertical-align: middle; margin-right: 14px; font-weight: 400; }
+  .article ul { margin: 18px 0; padding-left: 24px; }
+  .article li { color: #1c1c22; line-height: 1.75; margin: 8px 0; padding-left: 6px; font-size: 17px; }
+  .article li::marker { color: #b8b8be; }
+  .article a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .article a.inline:hover { text-decoration-color: #b8470b; }
+  .article code { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); border-radius: 3px; padding: 1px 6px; font-family: var(--font-mono); font-size: 14px; }
+  .article strong { font-weight: 600; }
+
+  .formula { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); border-radius: 6px; padding: 24px 28px; font-family: var(--font-mono); font-size: 15px; text-align: center; margin: 28px 0; color: #0c0c10; }
+  .formula .var { color: #b8470b; }
+
+  .depth-toggle { display: inline-flex; border: 1px solid rgba(15,15,18,0.14); border-radius: 6px; padding: 2px; }
+  .depth-toggle button { padding: 4px 12px; font-size: 12px; color: #4a4a52; border-radius: 4px; font-family: var(--font-mono); }
+  .depth-toggle button.active { background: rgba(184,71,11,0.1); color: #b8470b; }
+
+  .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); padding: 18px 20px; border-radius: 6px; transition: all .15s; display: block; }
+  .related-card:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; }
+  .related-card .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; }
+
+  .going-deeper-list a { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(15,15,18,0.06); transition: color .15s; }
+  .going-deeper-list a:hover { color: #b8470b; }
+  .going-deeper-list a .meta { color: #767680; font-family: var(--font-mono); font-size: 11px; }
+  .going-deeper-list a .arrow { margin-left: auto; color: #b8b8be; }
+</style>

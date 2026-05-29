@@ -1,0 +1,223 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { playbooks as allPlaybooks, stats } from '../../data/playbooks';
+
+const subnav = [
+  { href: '/mine/general-setup', label: 'General setup' },
+  { href: '/mine/playbooks', label: 'Subnet playbooks' },
+  { href: '/mine/resources', label: 'Resources' },
+];
+
+const hardwareTiers = [
+  { dots: 1, name: 'CPU only', meta: '11 subnets · easiest start' },
+  { dots: 2, name: 'Single GPU', meta: '62 subnets · most common' },
+  { dots: 3, name: '2–4 GPU', meta: '42 subnets' },
+  { dots: 4, name: 'Cluster', meta: '13 subnets · advanced' },
+];
+
+// Show verified playbooks first, then missing — both grouped, full 128 in DOM.
+const playbooks = [...allPlaybooks].sort((a, b) => {
+  const order: Record<string, number> = { verified: 0, stale: 1, missing: 2 };
+  if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+  return Number(a.netuid) - Number(b.netuid);
+});
+
+const pctVerified = Math.round((stats.verified / stats.total) * 100);
+const pctStale = Math.round((stats.stale / stats.total) * 100);
+const pctMissing = 100 - pctVerified - pctStale;
+
+---
+<BaseLayout
+  title="Subnet Playbooks — Start Mining — OpenTAO"
+  description="One playbook per subnet. Every command copy-pasteable. Every step verified by a real miner, with a date attached."
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/playbooks" rightMeta={`${stats.verified} verified · ${stats.stale} stale · ${stats.missing} missing`} />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/mine/playbooks', label: 'Start mining' },
+        { label: 'Playbooks' },
+      ]} />
+
+      <div class="flex items-end justify-between gap-6 flex-wrap mb-10">
+        <div>
+          <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">Subnet playbooks</h1>
+          <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[600px]">One playbook per subnet. Every command copy-pasteable. Every step verified by a real miner, with a date attached.</p>
+        </div>
+        <a href="/mine/general-setup" class="text-sm hover:text-[color:var(--color-accent)] inline-flex items-center gap-2 px-4 py-2 border hairline-strong rounded-md">↑ Start with General setup</a>
+      </div>
+
+      <div class="section-label mb-3">Coverage · {stats.total} subnets total</div>
+      <div class="coverage-bar">
+        <div class="cov-verified" style={`width: ${pctVerified}%`}></div>
+        <div class="cov-stale" style={`width: ${pctStale}%`}></div>
+        <div class="cov-missing" style={`width: ${pctMissing}%`}></div>
+      </div>
+      <div class="mt-3 flex items-center gap-6 flex-wrap text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <span><span class="inline-block w-3 h-3 rounded-sm align-middle mr-1.5" style="background: #16a34a;"></span>Verified · {stats.verified}</span>
+        <span><span class="inline-block w-3 h-3 rounded-sm align-middle mr-1.5" style="background: #b91c1c; opacity: 0.7;"></span>Stale · {stats.stale}</span>
+        <span><span class="inline-block w-3 h-3 rounded-sm align-middle mr-1.5" style="background: rgba(15,15,18,0.08); border: 1px solid rgba(15,15,18,0.15);"></span>Missing · {stats.missing}</span>
+        <a href="https://github.com/opentao-ai/opentao" target="_blank" rel="noopener" class="ml-auto hover:text-[color:var(--color-fg)] underline underline-offset-2">Help us write the missing {stats.missing} →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline nav-blur">
+    <div class="max-w-[1400px] mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2 px-3 py-2 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] w-full sm:w-64">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search playbooks…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+      </div>
+      <div class="flex items-center gap-2 overflow-x-auto">
+        <button class="pill active">All categories</button>
+        <button class="pill">LLM</button>
+        <button class="pill">Vision</button>
+        <button class="pill">Robotics</button>
+        <button class="pill">Data</button>
+      </div>
+      <div class="flex items-center gap-2 ml-auto">
+        <button class="pill flex items-center gap-1.5">By hardware ▾</button>
+        <button class="pill flex items-center gap-1.5">By status ▾</button>
+        <button class="pill flex items-center gap-1.5">Sort: emission ↓</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 py-10">
+      <div class="section-label mb-4">Pick by what's plugged in</div>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
+        {hardwareTiers.map((t) => (
+          <a href="#" class="card rounded-md p-5">
+            <div class="flex items-center gap-1 mb-3">
+              {[1, 2, 3, 4].map((i) => (
+                <span class={`hw-icon ${i <= t.dots ? 'on' : ''}`}></span>
+              ))}
+            </div>
+            <h3 class="font-medium mb-1">{t.name}</h3>
+            <div class="text-xs text-[color:var(--color-fg-dim)] font-mono">{t.meta}</div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="max-w-[1400px] mx-auto px-6 py-10">
+      <div class="section-label mb-5">Playbooks · sorted by emission</div>
+
+      <div class="grid lg:grid-cols-2 gap-3">
+        {playbooks.map((p) => (
+          <a href={p.href} class={`pcard card rounded-md p-6 block`} style={p.dashed ? 'border-style: dashed;' : ''}>
+            <div class="flex items-baseline justify-between mb-4">
+              <div class="flex items-baseline gap-3">
+                <span class={`netuid text-2xl font-semibold ${p.faded ? 'text-[color:var(--color-fg-muted)]' : 'text-[color:var(--color-fg)]'}`}>{p.netuid}</span>
+                <span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">{p.emission}</span>
+              </div>
+              <span class={`cat cat-${p.category}`}>{p.categoryLabel}</span>
+            </div>
+            <h3 class={`text-lg font-semibold mb-1 ${p.faded ? 'text-[color:var(--color-fg-muted)]' : ''}`}>{p.name}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">{p.blurb}</p>
+            {p.hardware ? (
+              <div class="grid grid-cols-3 gap-3 text-xs font-mono mb-5 pt-4 border-t hairline">
+                <div><div class="text-[color:var(--color-fg-dim)]">Hardware</div><div class="text-[color:var(--color-fg)] mt-0.5">{p.hardware}</div></div>
+                <div><div class="text-[color:var(--color-fg-dim)]">Setup time</div><div class="text-[color:var(--color-fg)] mt-0.5">{p.setupTime}</div></div>
+                <div><div class="text-[color:var(--color-fg-dim)]">First emission</div><div class="text-[color:var(--color-fg)] mt-0.5">{p.firstEmission}</div></div>
+              </div>
+            ) : (
+              <div class="mt-4 pt-4 border-t hairline"></div>
+            )}
+            <div class="flex items-center justify-between text-xs font-mono">
+              <span class={`pb-${p.status}`}>{p.statusText}</span>
+              <span class={p.status === 'missing' ? 'text-[color:var(--color-accent)]' : 'text-[color:var(--color-fg-muted)]'}>
+                {p.status === 'missing' ? '→ start a draft' : '→ open playbook'}
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="mt-8 text-center text-xs font-mono text-[color:var(--color-fg-dim)]">
+        Showing all {stats.total} subnets · sorted verified → missing
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .coverage-bar {
+    display: flex;
+    height: 32px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(15, 15, 18, 0.1);
+  }
+  .cov-verified { background: #16a34a; }
+  .cov-aging { background: #b8470b; }
+  .cov-stale { background: #b91c1c; opacity: 0.7; }
+  .cov-missing { background: rgba(15, 15, 18, 0.08); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid rgba(15, 15, 18, 0.12);
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4a4a52;
+    background: transparent;
+    white-space: nowrap;
+  }
+  .pill:hover {
+    border-color: rgba(15, 15, 18, 0.28);
+    color: #0c0c10;
+  }
+  .pill.active {
+    color: #b8470b;
+    border-color: rgba(184, 71, 11, 0.4);
+    background: rgba(184, 71, 11, 0.06);
+  }
+
+  .cat {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+  .cat-llm     { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision  { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio   { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics{ color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data    { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason  { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-storage { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+  .cat-compute { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
+
+  .pb-verified { color: #15803d; }
+  .pb-stale { color: #b91c1c; }
+  .pb-missing { color: #767680; }
+
+  .pcard:hover .netuid { color: #b8470b; }
+  .netuid {
+    font-family: var(--font-mono);
+    transition: color 0.15s;
+  }
+
+  .hw-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    background: rgba(15, 15, 18, 0.18);
+  }
+  .hw-icon.on { background: #16a34a; }
+</style>

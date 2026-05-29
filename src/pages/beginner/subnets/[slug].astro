@@ -1,0 +1,167 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { subnets, getSubnet, type Subnet } from '../../../data/subnets';
+
+export async function getStaticPaths() {
+  return subnets
+    .filter((s) => !s.rich)
+    .map((s) => ({ params: { slug: s.slug }, props: { subnet: s } }));
+}
+
+interface Props { subnet: Subnet }
+const { subnet } = Astro.props;
+
+// related: same category, exclude self
+const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.slug).slice(0, 3);
+---
+<BaseLayout
+  title={`Subnet ${subnet.netuid} · ${subnet.name} — OpenTAO`}
+  description={subnet.description}
+  section="beginner"
+>
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
+      <div class="flex items-center gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-6 flex-wrap">
+        <a href="/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
+        <a href="/beginner/subnets" class="hover:text-[color:var(--color-fg)]">Subnets</a><span>/</span>
+        <span class="text-[color:var(--color-fg)]">{subnet.netuid} · {subnet.name}</span>
+      </div>
+
+      <div class="flex items-end justify-between gap-8 flex-wrap mb-10">
+        <div>
+          <div class="flex items-center gap-3 mb-4 flex-wrap">
+            <span class={`cat cat-${subnet.cat}`}>{subnet.catLabel}</span>
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]"><span class="dot-active mr-1"></span>active</span>
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">· owner: {subnet.owner}</span>
+          </div>
+          <div class="flex items-baseline gap-5 mb-3">
+            <span class="font-mono text-[color:var(--color-fg-dim)] text-sm">netuid</span>
+            <span class="font-mono text-[64px] leading-none font-semibold tracking-tight">{subnet.netuid}</span>
+          </div>
+          <h1 class="font-serif text-[44px] font-medium leading-tight tracking-[-0.015em]">{subnet.name}</h1>
+          <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{subnet.description}</p>
+        </div>
+
+        <div class="flex flex-col items-end gap-2">
+          <a href="/mine/playbooks" class="inline-flex items-center gap-2 text-sm font-semibold px-5 py-3 rounded-md" style="background: #0c0c10; color: #ffffff;">
+            Open mining playbook
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">{subnet.verifiedNote}</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-6 border hairline rounded-md overflow-hidden bg-[color:var(--color-surface)]">
+        <div class="stat-cell"><div class="section-label">Emission · 24h</div><div class="stat-num mt-1 tabular">{subnet.emission} <span class="text-[color:var(--color-fg-muted)] text-sm">τ</span></div></div>
+        <div class="stat-cell"><div class="section-label">Market cap</div><div class="stat-num mt-1 tabular">{subnet.mcap}</div></div>
+        <div class="stat-cell"><div class="section-label">Price (τ)</div><div class="stat-num mt-1 tabular">{subnet.price} <span class={`${subnet.deltaSign} text-xs font-mono`}>{subnet.delta}</span></div></div>
+        <div class="stat-cell"><div class="section-label">Miners</div><div class="stat-num mt-1 tabular">{subnet.miners}</div></div>
+        <div class="stat-cell"><div class="section-label">Validators</div><div class="stat-num mt-1 tabular">{subnet.validators}</div></div>
+        <div class="stat-cell"><div class="section-label">Registered</div><div class="stat-num mt-1 tabular text-lg">{subnet.registered}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 py-16 grid lg:grid-cols-[1fr_320px] gap-12">
+      <div class="prose">
+        <div class="stub-banner">
+          <div class="label">Editor's note</div>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">This subnet page is still being written. The chain stats above are live; the rest is being filled in by the editorial team or by {subnet.owner} when they claim the page. <a class="inline" href="#" style="color: #b8470b">Help write this page →</a></p>
+        </div>
+
+        <h2 id="what">What it does</h2>
+        <p class="lead">{subnet.description}</p>
+        <p>Full subnet page with how-it-works, scoring details, validator/miner graphic, and team Twitter feed is being assembled. In the meantime, the <a class="inline" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;" href="/mine/playbooks">mining playbook</a> has the operational details miners need.</p>
+
+        <h2 id="reference">Reference page</h2>
+        <p>For a fully-built subnet page with validator/miner graph, team feed, and full content sections, see <a class="inline" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;" href="/beginner/subnets/42-cortex">SN42 Cortex</a>. Every subnet page will eventually have this depth.</p>
+      </div>
+
+      <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
+        <div>
+          <div class="section-label mb-3">Quick facts</div>
+          <div class="card rounded-md p-5 space-y-3 text-sm">
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Hardware</span><span class="text-[color:var(--color-fg)]">{subnet.hardware}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Category</span><span class="text-[color:var(--color-fg)]">{subnet.catLabel}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Owner</span><span class="text-[color:var(--color-fg)] font-mono">{subnet.owner}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Registered</span><span class="text-[color:var(--color-fg)] font-mono">{subnet.registered}</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label mb-3">Links</div>
+          <div class="card rounded-md p-4 text-sm text-[color:var(--color-fg-muted)]">
+            External links (GitHub, Discord, X, website) are added when the subnet owner claims this page. <a href="#" class="text-[color:var(--color-accent)]">Claim this subnet →</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">More from the directory</div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <a href="/beginner/subnets/42-cortex" class="card rounded-md p-5">
+          <div class="flex items-baseline justify-between mb-3"><span class="font-mono text-2xl font-semibold">42</span><span class="cat cat-reason">Reasoning</span></div>
+          <div class="font-medium mb-1">Cortex ★</div>
+          <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">Fully-built reference page. See how the full subnet template looks.</p>
+        </a>
+        {related.map((r) => (
+          <a href={`/beginner/subnets/${r.slug}`} class="card rounded-md p-5">
+            <div class="flex items-baseline justify-between mb-3"><span class="font-mono text-2xl font-semibold">{r.netuid}</span><span class={`cat cat-${r.cat}`}>{r.catLabel}</span></div>
+            <div class="font-medium mb-1">{r.name}</div>
+            <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{r.description}</p>
+          </a>
+        ))}
+        <a href="/beginner/subnets" class="card rounded-md p-5" style="border-style: dashed; background: transparent;">
+          <div class="font-mono text-xs text-[color:var(--color-fg-dim)] mb-3">Browse all</div>
+          <div class="font-medium mb-1 text-[color:var(--color-fg-muted)]">128 subnets →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 py-12">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <div class="flex items-center gap-5">
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Claim this subnet</a>
+        </div>
+        <span>Stub · chain data refreshed 3 min ago</span>
+      </div>
+      <div class="mt-6 text-center"><a href="/beginner/subnets" class="text-sm hover:text-[color:var(--color-accent)] text-[color:var(--color-fg-muted)]">← All 128 subnets</a></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stat-cell { padding: 16px 20px; border-right: 1px solid rgba(15,15,18,0.07); }
+  .stat-cell:last-child { border-right: 0; }
+  .stat-num { font-weight: 600; letter-spacing: -0.01em; font-size: 22px; font-variant-numeric: tabular-nums; }
+
+  .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+  .cat-llm    { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio  { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics { color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data   { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-storage { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+
+  .dot-active { width: 7px; height: 7px; border-radius: 999px; background: #16a34a; box-shadow: 0 0 8px rgba(22,163,74,0.4); display: inline-block; }
+  .pos { color: #15803d; }
+  .neg { color: #b91c1c; }
+
+  .prose { max-width: 720px; }
+  .prose p { color: #1c1c22; line-height: 1.75; margin: 18px 0; font-size: 17px; }
+  .prose p.lead { font-size: 19px; color: #0c0c10; }
+  .prose h2 { font-family: var(--font-serif); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin: 48px 0 12px; color: #0c0c10; }
+
+  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 28px 0; }
+  .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+</style>

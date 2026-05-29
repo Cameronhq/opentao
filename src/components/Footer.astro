@@ -1,0 +1,72 @@
+---
+const cols = [
+  {
+    label: 'Learn',
+    links: [
+      { href: '/beginner/wiki', label: 'Wiki' },
+      { href: '/beginner/subnets', label: 'Subnet directory' },
+      { href: 'https://www.hackquest.io/learning-track/Bittensor', label: 'Learning track ↗', external: true },
+    ],
+  },
+  {
+    label: 'Build & mine',
+    links: [
+      { href: '/build/hackathon', label: 'Hackathon' },
+      { href: '/build/incubator', label: 'Incubator' },
+      { href: '/build/idea-bank', label: 'Idea bank' },
+      { href: '/mine/playbooks', label: 'Playbooks' },
+      { href: '/mine/resources', label: 'Resources' },
+    ],
+  },
+  {
+    label: 'Community',
+    links: [
+      { href: '/community/events', label: 'Events' },
+      { href: '/community/chapters', label: 'Chapters' },
+      { href: '/community/insights', label: 'Insights' },
+    ],
+  },
+];
+---
+<footer class="border-t hairline">
+  <div class="max-w-[1200px] mx-auto px-6 py-14">
+    <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-8">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2">
+          <img src="/opentaoai.jpeg" alt="OpenTAO" class="logo h-7 w-auto" />
+        </div>
+        <p class="text-sm text-[color:var(--color-fg-muted)] mt-4 max-w-[320px] leading-relaxed">
+          Builder's Gateway to Bittensor. Independent and community-built. Licensed CC BY-SA 4.0.
+        </p>
+        <p class="text-xs text-[color:var(--color-fg-dim)] mt-4 font-mono">
+          Not affiliated with the Opentensor Foundation.
+        </p>
+      </div>
+      {cols.map((c) => (
+        <div>
+          <div class="section-label mb-4">{c.label}</div>
+          <ul class="space-y-2 text-sm text-[color:var(--color-fg-muted)]">
+            {c.links.map((l) => (
+              <li>
+                <a
+                  href={l.href}
+                  class="hover:text-[color:var(--color-fg)]"
+                  target={l.external ? '_blank' : undefined}
+                  rel={l.external ? 'noopener' : undefined}
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <div class="mt-12 pt-6 border-t hairline flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[color:var(--color-fg-dim)]">
+      <div>© 2026 OpenTAO contributors · CC BY-SA 4.0</div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/opentao-ai/opentao" class="hover:text-[color:var(--color-fg)]" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>

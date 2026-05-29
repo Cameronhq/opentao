@@ -1,0 +1,246 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const stats = [
+  { label: 'Events hosted', n: '12', sub: '+3 in last 90d' },
+  { label: 'Members', n: '412', sub: 'Discord + Telegram' },
+  { label: 'Attendance', n: '68', unit: '/ev', sub: 'avg last 6 events' },
+  { label: 'Recap completion', n: '92%', sub: 'posted within 7d' },
+];
+
+const past = [
+  { month: 'Mar', day: '14', title: 'Tokyo Meetup #02 — Validator night', meta: '64 attended', links: [{ label: 'recap' }, { label: 'photos' }, { label: 'YouTube' }] },
+  { month: 'Feb', day: '22', title: 'Workshop — Mining your first subnet', meta: '38 attended', links: [{ label: 'recap' }, { label: 'slides' }] },
+  { month: 'Jan', day: '18', title: 'Tokyo Meetup #01 — Kickoff', meta: '87 attended', links: [{ label: 'recap' }, { label: 'photos' }] },
+  { month: 'Dec', day: '12', title: 'Year-end retreat — Hakone', meta: '22 attended · invite-only', links: [{ label: 'notes' }] },
+];
+
+const partners = [
+  { name: 'WeWork', meta: 'venue' },
+  { name: 'HackQuest', meta: 'media' },
+  { name: 'Asahi', meta: 'drinks' },
+  { name: 'Lambda Labs', meta: 'compute' },
+  { name: 'Tokyo Univ', meta: 'edu' },
+  { name: '+ 2 more', meta: '' },
+];
+---
+<BaseLayout
+  title="Tokyo Chapter — Community — OpenTAO"
+  description="Greater Tokyo Bittensor chapter. Monthly meetups, occasional workshops, bilingual JP/EN."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/chapters" rightMeta="since 2025-09 · active" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-16 pb-12">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { href: '/community/chapters', label: 'Chapters' },
+        { label: 'Tokyo' },
+      ]} />
+
+      <div class="grid lg:grid-cols-[1.4fr_1fr] gap-12 items-end">
+        <div>
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-3xl">🇯🇵</span>
+            <span class="tag" style="color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06);">Active</span>
+            <span class="tag">日本語 · English</span>
+            <span class="text-xs text-[color:var(--color-fg-dim)] font-mono">since 2025·09·12</span>
+          </div>
+          <h1 class="text-[64px] md:text-[80px] leading-[0.95] tracking-[-0.03em] font-semibold">
+            <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">Bittensor </span>Tokyo<span class="text-[color:var(--color-accent)]">.</span>
+          </h1>
+          <p class="mt-6 text-lg text-[color:var(--color-fg-muted)] max-w-[560px] leading-relaxed">Greater Tokyo — Shibuya, Roppongi, Yokohama. Monthly meetups, occasional workshops, and one big year-end conference. Bilingual JP/EN by default.</p>
+          <div class="mt-7 flex flex-wrap items-center gap-3">
+            <a href="#" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-md">Join the Discord<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+            <a href="#" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-md">Follow on X</a>
+            <a href="/community/become-a-host" class="text-xs text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] ml-2 font-mono">+ become a co-host</a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          {stats.map((s) => (
+            <div class="stat"><div class="section-label">{s.label}</div><div class="n mt-2">{s.n}{s.unit && <span class="text-base text-[color:var(--color-fg-muted)]">{s.unit}</span>}</div><div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">{s.sub}</div></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid lg:grid-cols-[1fr_2fr] gap-12">
+
+        <aside class="lg:sticky lg:top-24 lg:self-start space-y-5 text-sm">
+          <div>
+            <div class="section-label mb-2">Charter</div>
+            <p class="text-[color:var(--color-fg-muted)] leading-relaxed">Bring Bittensor's APAC community to one room regularly. Lower the barrier for first-time builders in Japan to participate in mainnet, hackathons, and incubator pipelines.</p>
+          </div>
+          <div>
+            <div class="section-label mb-2">Languages</div>
+            <p class="text-[color:var(--color-fg-muted)]">JP primary · EN secondary · slides bilingual</p>
+          </div>
+          <div>
+            <div class="section-label mb-2">Cadence</div>
+            <p class="text-[color:var(--color-fg-muted)]">Monthly meetup · quarterly workshop · annual end-of-year retreat</p>
+          </div>
+          <div>
+            <div class="section-label mb-2">Coverage</div>
+            <p class="text-[color:var(--color-fg-muted)]">Greater Tokyo · Yokohama · Chiba</p>
+          </div>
+          <div class="pt-4 border-t hairline">
+            <div class="section-label mb-2">Code of Conduct</div>
+            <p class="text-[color:var(--color-fg-muted)] leading-relaxed">No shilling, no investment talk, no recordings without consent. <a href="#" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">Read in full</a>.</p>
+          </div>
+        </aside>
+
+        <div>
+          <div class="section-label mb-3">Up next</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6">Three events on the books.</h2>
+          <div class="space-y-3 mb-12">
+            <a href="/community/events/2026-tokyo-meetup-03" class="card rounded-md p-5 flex items-center gap-5 block" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.03);">
+              <div class="date-block" style="background: rgba(184,71,11,0.06); border-color: rgba(184,71,11,0.2);"><div class="month" style="color: #b8470b;">Jun</div><div class="day" style="color: #b8470b;">08</div></div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1.5"><span class="tag">Meetup</span><span class="tag">In-person</span></div>
+                <h4 class="font-semibold tracking-tight">Bittensor Tokyo Meetup #03</h4>
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1.5">Shibuya · 19:00 JST · 62 / 80 registered</div>
+              </div>
+              <div class="text-xs text-[color:var(--color-fg-muted)] font-mono whitespace-nowrap">in 12 days</div>
+            </a>
+            <a href="#" class="card rounded-md p-5 flex items-center gap-5 block">
+              <div class="date-block"><div class="month">Jul</div><div class="day">15</div></div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1.5"><span class="tag">Workshop</span></div>
+                <h4 class="font-semibold tracking-tight">Workshop · 子网建模与算力测试</h4>
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1.5">Roppongi · 14:00 JST · in Japanese</div>
+              </div>
+              <div class="text-xs text-[color:var(--color-fg-muted)] font-mono whitespace-nowrap">in 49 days</div>
+            </a>
+            <a href="#" class="card rounded-md p-5 flex items-center gap-5 block">
+              <div class="date-block"><div class="month">Aug</div><div class="day">02</div></div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1.5"><span class="tag">Meetup</span></div>
+                <h4 class="font-semibold tracking-tight">Bittensor Tokyo Meetup #04 — summer edition</h4>
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1.5">Yokohama waterfront · 17:00 JST · outdoor BBQ</div>
+              </div>
+              <div class="text-xs text-[color:var(--color-fg-muted)] font-mono whitespace-nowrap">in 67 days</div>
+            </a>
+          </div>
+
+          <div class="section-label mb-3">Past events</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6">Where this chapter has been.</h2>
+          <div class="space-y-2 mb-4">
+            {past.map((e) => (
+              <a href="#" class="card rounded-md p-4 flex items-center gap-4 block">
+                <div class="date-block"><div class="month">{e.month}</div><div class="day">{e.day}</div></div>
+                <div class="flex-1">
+                  <h5 class="font-medium text-sm">{e.title}</h5>
+                  <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-0.5">
+                    {e.meta} · {e.links.map((l, i) => (
+                      <>{i > 0 && ' · '}<a href="#" class="hover:text-[color:var(--color-accent)] underline underline-offset-2">{l.label}</a></>
+                    ))}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+          <a href="#" class="text-xs text-[color:var(--color-accent)] hover:underline font-mono">All 12 past events →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="section-label mb-3">Hosts</div>
+      <h2 class="text-3xl font-semibold tracking-tight mb-10">Two people who show up.</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="host-card bg-[color:var(--color-paper)]">
+          <div class="av" style="background: linear-gradient(135deg, #b8470b, #c2410c);"></div>
+          <div class="flex-1">
+            <div class="flex items-baseline gap-2 mb-1"><h4 class="font-semibold">Yuki Tanaka</h4><span class="tag">Lead host</span></div>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-3">@yuki · since 2025-09</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-3">Senior eng at a Tokyo robotics startup. Built one of Japan's first miner nodes in 2024. Believes in beer-first, slides-second meetups.</p>
+            <div class="flex gap-2 text-xs"><a href="#" class="text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)]">Twitter</a> · <a href="#" class="text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)]">GitHub</a> · <a href="#" class="text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)]">Site</a></div>
+          </div>
+        </div>
+        <div class="host-card bg-[color:var(--color-paper)]">
+          <div class="av" style="background: linear-gradient(135deg, #1c6ea4, #6741d9);"></div>
+          <div class="flex-1">
+            <div class="flex items-baseline gap-2 mb-1"><h4 class="font-semibold">Takahiro Sato</h4><span class="tag">Co-host</span></div>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-3">@takahiro · since 2026-02</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-3">Quant researcher; runs an SN-5 validator on the side. Handles logistics, venues, and translation. Calm under last-minute chaos.</p>
+            <div class="flex gap-2 text-xs"><a href="#" class="text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)]">Twitter</a> · <a href="#" class="text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)]">GitHub</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-2 gap-8">
+        <div>
+          <div class="section-label mb-3">Venue &amp; sponsor partners</div>
+          <div class="grid grid-cols-3 gap-3">
+            {partners.map((p) => (
+              <div class="card rounded-md p-4 text-center text-xs font-mono text-[color:var(--color-fg-dim)] bg-[color:var(--color-paper)]">{p.name}{p.meta && <><br><span class="text-[10px] mt-1 block">{p.meta}</span></>}</div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="section-label mb-3">Reimbursement transparency</div>
+          <div class="card rounded-md p-5 bg-[color:var(--color-paper)] text-sm">
+            <div class="flex justify-between py-2 border-b hairline"><span class="text-[color:var(--color-fg-muted)]">2026 Q1 spent</span><span class="font-mono">¥184,200</span></div>
+            <div class="flex justify-between py-2 border-b hairline"><span class="text-[color:var(--color-fg-muted)]">2026 Q2 budget</span><span class="font-mono">¥240,000</span></div>
+            <div class="flex justify-between py-2"><span class="text-[color:var(--color-fg-muted)]">YTD events funded</span><span class="font-mono">3</span></div>
+            <a href="#" class="text-xs text-[color:var(--color-accent)] hover:underline font-mono mt-2 inline-block">View itemized →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="card rounded-md p-6">
+          <div class="section-label mb-3">Get involved</div>
+          <h4 class="font-semibold mb-2">Join the chat</h4>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">Discord channel (active daily) + a quieter Telegram group for announcements.</p>
+          <a href="#" class="text-sm text-[color:var(--color-accent)] hover:underline">Discord invite →</a>
+        </div>
+        <div class="card rounded-md p-6">
+          <div class="section-label mb-3">Propose a topic</div>
+          <h4 class="font-semibold mb-2">Pitch a talk</h4>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">Working on a subnet, validator, or research piece? We'll find you a slot.</p>
+          <a href="#" class="text-sm text-[color:var(--color-accent)] hover:underline">Submit a topic →</a>
+        </div>
+        <div class="card rounded-md p-6">
+          <div class="section-label mb-3">Co-host with us</div>
+          <h4 class="font-semibold mb-2">Become a co-host</h4>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">If you're showing up to most meetups already, this is the natural next step.</p>
+          <a href="/community/become-a-host" class="text-sm text-[color:var(--color-accent)] hover:underline">Apply →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stat { padding: 24px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #fafaf9; }
+  .stat .n { font-size: 32px; font-weight: 600; font-feature-settings: "tnum"; letter-spacing: -0.02em; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 7px; border-radius: 3px; border: 1px solid rgba(15,15,18,0.14); color: #4a4a52; }
+  .date-block { font-family: 'JetBrains Mono', monospace; text-align: center; padding: 10px 12px; background: #fafaf9; border-radius: 6px; min-width: 56px; border: 1px solid rgba(15,15,18,0.07); }
+  .date-block .month { font-size: 10px; color: #767680; letter-spacing: 0.15em; text-transform: uppercase; }
+  .date-block .day { font-size: 18px; font-weight: 600; color: #0c0c10; line-height: 1; margin-top: 3px; }
+  .host-card { display: flex; align-items: flex-start; gap: 14px; padding: 18px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #ffffff; }
+  .host-card .av { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; }
+</style>

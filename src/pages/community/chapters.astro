@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const pins = [
+  { city: 'SF', top: '38%', left: '18%' },
+  { city: 'NYC', top: '36%', left: '27%' },
+  { city: 'São Paulo', top: '70%', left: '32%' },
+  { city: 'London', top: '28%', left: '48%' },
+  { city: 'Berlin', top: '30%', left: '52%' },
+  { city: 'Lagos', top: '55%', left: '51%' },
+  { city: 'Bangalore', top: '50%', left: '68%' },
+  { city: 'Singapore', top: '60%', left: '75%' },
+  { city: 'Shenzhen', top: '45%', left: '80%' },
+  { city: 'Seoul', top: '39%', left: '82%' },
+  { city: 'Tokyo', top: '42%', left: '85%' },
+  { city: 'Sydney', top: '80%', left: '86%' },
+];
+
+const chapters = [
+  { href: '/community/chapters/tokyo', city: 'Tokyo', flag: '🇯🇵', hosts: '@yuki + @takahiro · since 2025-09', events: '12 hosted', members: '412' },
+  { href: '/community/chapters/san-francisco', city: 'San Francisco', flag: '🇺🇸', hosts: '@ke.ng + 2 more · since 2025-06', events: '18 hosted', members: '1,108' },
+  { href: '/community/chapters/berlin', city: 'Berlin', flag: '🇩🇪', hosts: '@carlos · since 2025-11', events: '6 hosted', members: '526' },
+  { href: '/community/chapters/singapore', city: 'Singapore', flag: '🇸🇬', hosts: '@wei · since 2025-10', events: '5 hosted', members: '308' },
+  { href: '/community/chapters/shenzhen', city: 'Shenzhen', flag: '🇨🇳', hosts: '@chen · since 2026-01 · 中文', events: '3 hosted', members: '144' },
+  { href: '/community/chapters/new-york', city: 'New York', flag: '🇺🇸', hosts: '@maya · since 2026-02', events: '4 hosted', members: '288' },
+  { href: '/community/chapters/london', city: 'London', flag: '🇬🇧', hosts: '@sasha · since 2025-12', events: '5 hosted', members: '331' },
+  { href: '/community/chapters/bangalore', city: 'Bangalore', flag: '🇮🇳', hosts: '@arjun · since 2026-01', events: '3 hosted', members: '204' },
+];
+---
+<BaseLayout
+  title="Chapters — Community — OpenTAO"
+  description="Twelve local Bittensor chapters around the world. Each runs its own meetups, in its own language."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/chapters" rightMeta="12 active · 3 founding" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-20 pb-14">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { label: 'Chapters' },
+      ]} />
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">Twelve </span>local groups<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">Each one runs its own meetups, on its own schedule, in its own language. We give you brand assets and reimbursements. You give the city a place to show up.</p>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-10">
+      <div class="section-label mb-4">Where we are</div>
+      <div class="map">
+        <svg width="100%" height="100%" viewBox="0 0 1000 420" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 opacity-60">
+          <defs><pattern id="dots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="rgba(15,15,18,0.15)"/></pattern></defs>
+          <rect width="1000" height="420" fill="url(#dots)" />
+          <ellipse cx="220" cy="160" rx="100" ry="60" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="500" cy="140" rx="120" ry="55" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="780" cy="170" rx="110" ry="60" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="280" cy="290" rx="60" ry="60" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="560" cy="260" rx="80" ry="50" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="820" cy="320" rx="50" ry="40" fill="rgba(184,71,11,0.05)"/>
+        </svg>
+        {pins.map((p) => (
+          <div class="pin" data-city={p.city} style={`top: ${p.top}; left: ${p.left};`}></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">All chapters</div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {chapters.map((c) => (
+          <a href={c.href} class="card ch-card rounded-md block">
+            <div class="flex items-baseline justify-between mb-2"><div class="city">{c.city}</div><span class="flag">{c.flag}</span></div>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-4">{c.hosts}</div>
+            <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+              <div><div class="text-[color:var(--color-fg-dim)]">Events</div><div class="text-[color:var(--color-fg)]">{c.events}</div></div>
+              <div><div class="text-[color:var(--color-fg-dim)]">Members</div><div class="text-[color:var(--color-fg)]">{c.members}</div></div>
+            </div>
+          </a>
+        ))}
+        <a href="/community/become-a-host" class="card ch-card rounded-md block opacity-70" style="border-style: dashed;">
+          <div class="flex items-baseline justify-between mb-2"><div class="city">São Paulo</div><span class="flag">🇧🇷</span></div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-4">founding · accepting host applications</div>
+          <div class="text-xs text-[color:var(--color-fg-muted)]">Be the first host →</div>
+        </a>
+        <a href="/community/become-a-host" class="card ch-card rounded-md block" style="border-style: dashed; background: transparent;">
+          <div class="flex items-baseline justify-between mb-2"><div class="city text-[color:var(--color-fg-muted)]">Your city?</div></div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] mt-2">If we don't have one where you are, start one. Application is one paragraph long.</div>
+          <div class="mt-3 text-xs font-mono text-[color:var(--color-accent)]">Apply to host →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-[1.3fr_1fr] gap-10 items-end">
+        <div>
+          <div class="section-label mb-3">Become a host</div>
+          <h2 class="text-3xl md:text-4xl font-serif italic font-medium leading-tight max-w-[580px]">One paragraph. No deck. We reply within a week.</h2>
+          <p class="text-[color:var(--color-fg-muted)] mt-5 max-w-[560px] leading-relaxed">Tell us where you are, why you want to host, and what kind of event you'd start with. That's it. We'll set up a 30-min video and decide together.</p>
+          <a href="/community/become-a-host" class="mt-7 inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md btn-primary">Apply to host<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="card rounded-md p-6">
+          <div class="section-label mb-4">What we provide</div>
+          <ul class="space-y-3 text-sm text-[color:var(--color-fg-muted)]">
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> Logo / poster / slide templates</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> Host playbook (how to run your first event)</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> $500 / event reimbursement for food &amp; venue</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> Stickers + T-shirts every quarter</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> Direct line to other hosts (Discord channel)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ch-card { position: relative; padding: 24px 20px; }
+  .ch-card .city { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 22px; letter-spacing: -0.01em; }
+  .flag { font-size: 16px; }
+  .map { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 8px; height: 420px; position: relative; overflow: hidden; }
+  .pin { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #b8470b; box-shadow: 0 0 12px rgba(184,71,11,0.5); cursor: pointer; }
+  .pin::after { content: attr(data-city); position: absolute; top: -28px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #ffffff; background: #0c0c10; padding: 3px 8px; border-radius: 3px; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+  .pin:hover::after { opacity: 1; }
+</style>

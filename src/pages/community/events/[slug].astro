@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { events, type EventItem } from '../../../data/events';
+
+export async function getStaticPaths() {
+  // Only generate stub pages here. Rich event pages (rich === true) live as
+  // their own .astro files and would conflict with the dynamic route.
+  return events
+    .filter((e) => !e.rich)
+    .map((e) => ({ params: { slug: e.slug }, props: { ev: e } }));
+}
+
+interface Props { ev: EventItem }
+const { ev } = Astro.props;
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+---
+<BaseLayout
+  title={`${ev.title} — Events — OpenTAO`}
+  description={ev.blurb}
+  section="community"
+>
+  <SubNav items={subnav} active="/community/events" rightMeta={ev.when} />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 pt-16 pb-12">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { href: '/community/events', label: 'Events' },
+        { label: ev.title },
+      ]} />
+
+      <div class="grid lg:grid-cols-[auto_1fr] gap-8 items-start">
+        <div class="date-block-lg">
+          <div class="month">{ev.month}</div>
+          <div class="day">{ev.day}</div>
+          <div class="year">2026</div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-4 flex-wrap">
+            {ev.tags.map((t) => <span class="tag">{t}</span>)}
+            {ev.host && <span class="text-xs text-[color:var(--color-fg-dim)] font-mono">· hosted by <span class="text-[color:var(--color-fg)]">{ev.host}</span></span>}
+          </div>
+          <h1 class="text-[40px] md:text-[52px] leading-[1.05] tracking-[-0.025em] font-semibold">{ev.title}</h1>
+          <p class="mt-6 text-lg text-[color:var(--color-fg-muted)] max-w-[640px] leading-relaxed">{ev.blurb}</p>
+          <div class="mt-8 flex items-center gap-5 text-sm font-mono text-[color:var(--color-fg-dim)] flex-wrap">
+            <span>🕒 {ev.time}{ev.duration && <> · {ev.duration}</>}</span>
+            <span class="opacity-30">·</span>
+            <span>{ev.location}</span>
+            <span class="opacity-30">·</span>
+            <span>{ev.when}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 py-12">
+      <div class="stub-banner">
+        <div class="label">Editor's note</div>
+        <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
+          The full event page — agenda, speakers, registration link, livestream, recap — is being written. Meanwhile, the basics are above. For a sense of what the finished version looks like, see the <a class="inline" href="/community/events/2026-tokyo-meetup-03">Tokyo Meetup #03 page</a>.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 mt-10">
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">When</div>
+          <div class="text-[color:var(--color-fg)]">{ev.date}</div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">{ev.time}{ev.duration && <> · {ev.duration}</>}</div>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Where</div>
+          <div class="text-[color:var(--color-fg)]">{ev.location}</div>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Category</div>
+          <div class="text-[color:var(--color-fg)]">{ev.category}</div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">{ev.tags.join(' · ')}</div>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2">Host</div>
+          <div class="text-[color:var(--color-fg)]">{ev.host || 'OpenTAO'}</div>
+        </div>
+      </div>
+
+      <div class="mt-10 flex flex-wrap items-center gap-3 text-sm">
+        <a href="/community/events" class="pill">← All events</a>
+        <a href="/community/chapters" class="pill">Local chapters</a>
+        <a href="/community/events/2026-tokyo-meetup-03" class="pill">See a finished event page</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 0; }
+  .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+  .stub-banner a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; }
+  .stub-banner a.inline:hover { text-decoration-color: #b8470b; }
+  .date-block-lg { font-family: 'JetBrains Mono', monospace; text-align: center; padding: 18px 22px; background: #fafaf9; border-radius: 8px; min-width: 96px; border: 1px solid rgba(15,15,18,0.07); }
+  .date-block-lg .month { font-size: 12px; color: #767680; letter-spacing: 0.15em; text-transform: uppercase; }
+  .date-block-lg .day { font-size: 38px; font-weight: 600; color: #0c0c10; line-height: 1; margin-top: 6px; }
+  .date-block-lg .year { font-size: 11px; color: #767680; margin-top: 6px; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid rgba(15,15,18,0.14); color: #4a4a52; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; }
+  .pill:hover { color: #0c0c10; border-color: rgba(15,15,18,0.28); }
+</style>

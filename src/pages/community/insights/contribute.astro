@@ -1,0 +1,256 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const formats = [
+  { title: 'Deep dive · 2000–5000 words', body: 'A single subnet, mechanism, or tool — taken apart and put back together. Closest to academic rigor without the academic prose.' },
+  { title: 'Tutorial · 1500–3000 words', body: "Beyond the playbooks. Advanced moves that aren't documented elsewhere. Bring numbers if you can." },
+  { title: 'Retrospective · 2000–4000 words', body: 'An event, upgrade, or governance moment — looked back at with the benefit of hindsight and data.' },
+  { title: 'Interview · 3000–6000 words', body: 'A subnet owner, core dev, or quiet builder worth hearing from. Q&A format with a short intro.' },
+  { title: 'Field notes · 800–1500 words', body: 'Short and sharp. A chart, a take, a thread of observation. Lower bar to entry.' },
+];
+
+const rates = [
+  { format: 'Deep dive', words: '2000–5000', rate: '$800', tr: '$400' },
+  { format: 'Tutorial', words: '1500–3000', rate: '$500', tr: '$250' },
+  { format: 'Retrospective', words: '2000–4000', rate: '$650', tr: '$325' },
+  { format: 'Interview', words: '3000–6000', rate: '$900', tr: '$450' },
+  { format: 'Field notes', words: '800–1500', rate: '$250', tr: '$125' },
+];
+
+const steps = [
+  { n: '01', title: 'Submit the pitch', body: 'Title, one-liner, outline, your background. Below.', when: 'day 0' },
+  { n: '02', title: 'Editorial reads + responds', body: 'Three editors read independently. Decision in 1 week.', when: '~ day 7' },
+  { n: '03', title: 'Accepted — kickoff call (optional)', body: '15 min to align scope, deadline, and any data we should share.', when: 'week 2' },
+  { n: '04', title: 'Draft → editor review', body: 'You submit draft. We do 1-2 rounds: structural notes first, line edits last.', when: 'week 3-5' },
+  { n: '05', title: 'Fact-check + cross-link pass', body: 'All claims verified, all references linked, Wiki & Subnet pages cross-linked.', when: 'week 5-6' },
+];
+---
+<BaseLayout
+  title="Pitch an essay — Insights — OpenTAO"
+  description="Send the outline first. The draft if we like it. We pay for accepted essays."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/insights" rightMeta="pitch → 1 week reply" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { href: '/community/insights', label: 'Insights' },
+        { label: 'Pitch' },
+      ]} />
+      <h1 class="text-[56px] md:text-[68px] leading-[1.02] tracking-[-0.03em] font-semibold max-w-[840px]">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">Send the outline </span>first.<br>The draft if we like it<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">
+        We publish ~4 essays a month. About a third come from open pitches. The bar is "would a curious Bittensor builder send this to a friend" — not "is the author famous". Send us an outline; we reply within a week.
+      </p>
+      <div class="mt-9 flex flex-wrap items-center gap-3">
+        <a href="#pitch-form" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">Submit a pitch<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="/community/insights" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">See what we've published</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <div class="section-label mb-3">What we accept</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">Five formats. Pick one.</h2>
+          <div class="space-y-4 text-sm">
+            {formats.map((f) => (
+              <div><div class="font-medium">{f.title}</div><div class="text-[color:var(--color-fg-muted)] leading-relaxed mt-1">{f.body}</div></div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="section-label mb-3">What we don't</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">Where we politely pass.</h2>
+          <ul class="space-y-3 text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">Price predictions or investment advice.</strong> We're a developer site, not a research desk.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">Project promo dressed as analysis.</strong> If the only conclusion is "our subnet is great," it's a press release.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">Re-publication of a Medium / Substack post.</strong> We pay for original work, not syndication.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">AI-generated draft.</strong> Tools to assist your editing are fine. A whole essay drafted by a model is not.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">Affiliate or referral links.</strong> We don't carry them; please don't include them.</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">Anything that reads like a Bittensor Foundation announcement.</strong> Editorial is independent.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="section-label mb-3">Rates</div>
+      <h2 class="text-3xl font-semibold tracking-tight mb-3">Published, no negotiation.</h2>
+      <p class="text-[color:var(--color-fg-muted)] leading-relaxed max-w-[640px] mb-10">USD on publication. Paid via wire / Wise / USDC. Translators get half of the format rate. If a piece runs long or short within a format, we don't dock you for it.</p>
+
+      <div class="card rounded-md overflow-hidden p-6 bg-[color:var(--color-paper)]">
+        <div class="rate-row"><div>Format</div><div>Words</div><div>Rate (USD)</div><div>Translator (USD)</div></div>
+        {rates.map((r) => (
+          <div class="rate-row"><div class="text-[color:var(--color-fg)]">{r.format}</div><div class="font-mono text-[color:var(--color-fg-muted)]">{r.words}</div><div class="font-mono">{r.rate}</div><div class="font-mono text-[color:var(--color-fg-muted)]">{r.tr}</div></div>
+        ))}
+      </div>
+
+      <p class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-5">No vendor placements, ever. We never accept payment from a subject of coverage.</p>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="section-label mb-3">Editorial process</div>
+      <h2 class="text-3xl font-semibold tracking-tight mb-3">Six steps. Six weeks, typically.</h2>
+      <p class="text-[color:var(--color-fg-muted)] leading-relaxed max-w-[640px] mb-10">Pitch is the gate. After accept, the process is collaborative — we edit lightly and almost never for tone.</p>
+
+      <div class="card rounded-md p-7 bg-[color:var(--color-paper)]">
+        {steps.map((s) => (
+          <div class="step-row"><span class="n">{s.n}</span><div><div class="font-medium">{s.title}</div><div class="text-[color:var(--color-fg-muted)] text-sm mt-1">{s.body}</div></div><span class="when">{s.when}</span></div>
+        ))}
+        <div class="step-row" style="background: rgba(184,71,11,0.03);"><span class="n" style="color: #b8470b;">06</span><div><div class="font-medium">Schedule + publish</div><div class="text-[color:var(--color-fg-muted)] text-sm mt-1">You get a preview link 1 week before. Then live + payment processed.</div></div><span class="when" style="color: #b8470b;">week 6</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pitch-form" class="border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-[1fr_1.4fr] gap-12">
+
+        <div class="lg:sticky lg:top-24 lg:self-start">
+          <div class="section-label mb-3" style="color: #b8470b;">Pitch form</div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-5 leading-tight">Be specific.<br>Be brief.</h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6">An outline beats a draft. A specific claim beats a topic. We can tell from a paragraph whether a piece will work.</p>
+          <ul class="text-sm text-[color:var(--color-fg-muted)] space-y-2 leading-relaxed">
+            <li>· Don't apologize for being a first-time writer. Show that you know the thing.</li>
+            <li>· If you have a draft, link it; we'll still read the outline first.</li>
+            <li>· If your idea spans two formats, pick one and say so in the notes.</li>
+            <li>· If you've already published part of this elsewhere, declare it.</li>
+          </ul>
+        </div>
+
+        <form action="mailto:cameron@moonshotcommons.com" method="post" enctype="text/plain" class="card rounded-md p-8 space-y-6">
+          <p class="text-xs text-[color:var(--color-fg-dim)] font-mono mb-4">v1 stopgap: submitting opens your email client. We're wiring a real GitHub PR flow next.</p>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div><label class="label">Name</label><input class="input" placeholder="Your name as it'll appear" /></div>
+            <div><label class="label">Twitter / GitHub handle</label><input class="input" placeholder="@handle" /></div>
+          </div>
+          <div>
+            <label class="label">Format</label>
+            <select class="select">
+              <option>Deep dive</option>
+              <option>Tutorial</option>
+              <option>Retrospective</option>
+              <option>Interview</option>
+              <option>Field notes</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Working title</label>
+            <input class="input" placeholder='e.g. "What scoring functions miss about adversarial inputs"' />
+          </div>
+          <div>
+            <label class="label">One-liner (≤ 120 chars)</label>
+            <input class="input" maxlength="120" placeholder="The pitch in a single sentence." />
+          </div>
+          <div>
+            <label class="label">Outline (200–500 words)</label>
+            <textarea class="textarea" rows="8" placeholder="Section by section. Bullet form is fine. What's the claim, what's the evidence, who's the reader?"></textarea>
+          </div>
+          <div>
+            <label class="label">Your background (relevant to this piece)</label>
+            <textarea class="textarea" rows="3" placeholder="What makes you the right person to write this? Links to past work welcome."></textarea>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div><label class="label">Draft ready when?</label><input class="input" placeholder='e.g. "2 weeks after accept"' /></div>
+            <div><label class="label">Language</label>
+              <select class="select">
+                <option>English</option>
+                <option>中文</option>
+                <option>Both (with our translator)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="label">Anything else? (optional)</label>
+            <textarea class="textarea" rows="3" placeholder="Conflicts of interest, dual-publication, ideas for charts we should commission, etc."></textarea>
+          </div>
+          <label class="flex items-start gap-3 text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+            <input type="checkbox" class="mt-1" />
+            <span>I confirm this is original work, I'm OK with editorial review, and I agree to <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">CC BY-SA 4.0</a> licensing on publish.</span>
+          </label>
+          <div class="border-t hairline pt-6 flex flex-wrap items-center justify-between gap-4">
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">Sent as GitHub draft PR · editorial replies in ≤ 7 days</span>
+            <div class="flex items-center gap-3">
+              <button type="button" class="btn-secondary text-sm font-medium px-5 py-2.5 rounded-md">Save draft</button>
+              <button type="submit" class="btn-primary text-sm font-semibold px-6 py-2.5 rounded-md inline-flex items-center gap-2">Send pitch<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <div class="section-label mb-3">FAQ</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-6 leading-tight">Honest answers to common questions.</h3>
+          <div class="space-y-5">
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">What's your acceptance rate?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">~30%. Most rejections are scope, not quality — too broad, too narrow, or already covered.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">Can I write about my own subnet?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Yes, with a conflict declaration. Tone matters — readers can smell a sales pitch.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">Do you publish anonymously?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Yes, in rare cases when there's a real reason (employer policies, security research). Editorial verifies identity even when the byline is a pseudonym.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">Can I republish on my own blog after?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Yes — 30 days after we publish, with a canonical link back. CC BY-SA 4.0 means anyone can re-share.</p></details>
+            <details class="pb-4"><summary class="font-medium cursor-pointer">Do you ever commission?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Occasionally. If you'd be open to commissioned pieces, mention it in the form's "Anything else" field.</p></details>
+          </div>
+        </div>
+        <div>
+          <div class="section-label mb-3">Get a feel for the voice</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-6 leading-tight">Three pieces we're proud of.</h3>
+          <div class="space-y-3">
+            <a href="/community/insights/yuma-walk-through" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Deep dive · 22 min</div>
+              <h4 class="font-serif italic text-lg leading-snug mb-1">Yuma consensus, slowly.</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)]">An example of the rigor + warmth we look for.</p>
+            </a>
+            <a href="/community/insights/why-dtao-changed-everything" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Retrospective · 14 min</div>
+              <h4 class="font-serif italic text-lg leading-snug mb-1">Why dTAO changed everything.</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)]">Numbers-first, claim-driven. No hedging.</p>
+            </a>
+            <a href="/community/insights/sn-18-interview" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Interview · 32 min</div>
+              <h4 class="font-serif italic text-lg leading-snug mb-1">"We almost shipped a centralized API."</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)]">How we structure interviews — Q&amp;A with frame.</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .input, .textarea, .select { width: 100%; background: #ffffff; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: #0c0c10; outline: none; transition: border-color .15s; }
+  .input:focus, .textarea:focus, .select:focus { border-color: rgba(15,15,18,0.4); }
+  .textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #4a4a52; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .step-row { display: grid; grid-template-columns: 28px 1fr auto; gap: 14px; align-items: start; padding: 18px 0; border-top: 1px solid rgba(15,15,18,0.06); }
+  .step-row:first-child { border-top: 0; }
+  .step-row .n { font-family: 'JetBrains Mono', monospace; color: #b8470b; font-size: 11px; padding-top: 2px; letter-spacing: 0.08em; }
+  .step-row .when { font-family: 'JetBrains Mono', monospace; color: #767680; font-size: 11px; padding-top: 3px; }
+  .rate-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); font-size: 14px; align-items: center; }
+  .rate-row:first-child { border-top: 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #767680; letter-spacing: 0.06em; text-transform: uppercase; }
+</style>

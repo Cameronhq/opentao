@@ -1,0 +1,248 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const agenda = [
+  { t: '19:00', title: 'Doors open · drinks & intros', body: 'Hosted by Yuki + Takahiro. Stickers and beer on the side table.' },
+  { t: '19:30', title: "Welcome & what's new from OpenTAO", body: 'Yuki Tanaka — 5 min.' },
+  { t: '19:35', title: "Founder briefs · what we wish we'd known", body: '10 min × 3 — Ke Zhang (SN3), Wei Lin (SN18), Maya Iyer (SN42).' },
+  { t: '20:10', title: 'Moderated panel + audience Q&A', body: '40 min · moderated by Rho Carter (@rho.lab).' },
+  { t: '20:50', title: 'Open drinks · find your people', body: "Until 22:00. We've blocked the venue." },
+  { t: '22:00', title: 'Optional second-venue', body: 'Walk to a nearby izakaya. Self-funded.' },
+];
+
+const speakers = [
+  { name: 'Ke Zhang', handle: 'SN3 · @ke.ng', bio: 'Built a long-form summarization subnet. Currently 4,200 active miners.', grad: 'linear-gradient(135deg, #b8470b, #c2410c)' },
+  { name: 'Wei Lin', handle: 'SN18 · @wei', bio: 'One of the longest-running subnets. Featured in the recent SN-18 deep dive.', grad: 'linear-gradient(135deg, #1c6ea4, #6741d9)' },
+  { name: 'Maya Iyer', handle: 'SN42 · @maya', bio: 'Built the reasoning-trace subnet from scratch in 2025. Wrote our scoring-function field guide.', grad: 'linear-gradient(135deg, #15803d, #c2410c)' },
+];
+
+const sponsors = [
+  { name: 'WeWork', meta: 'venue partner' },
+  { name: 'Lambda Labs', meta: 'compute' },
+  { name: 'HackQuest', meta: 'media' },
+  { name: 'Asahi', meta: 'drinks' },
+];
+---
+<BaseLayout
+  title="Bittensor Tokyo Meetup #03 — Events — OpenTAO"
+  description="Three subnet founders. What they wish they'd known on day one. WeWork Shibuya, June 8."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/events" rightMeta="12 days · Tokyo Chapter" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-12 pb-2">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { href: '/community/events', label: 'Events' },
+        { label: 'Tokyo Meetup #03' },
+      ]} />
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="cover"><div class="city">Tokyo</div></div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-12">
+      <div class="grid lg:grid-cols-[1.5fr_1fr] gap-12 items-start">
+        <div>
+          <div class="flex items-center gap-2 mb-5">
+            <span class="tag" style="color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06);">Upcoming</span>
+            <span class="tag">Meetup</span>
+            <span class="tag">In-person</span>
+            <span class="text-xs text-[color:var(--color-fg-dim)] font-mono">·  hosted by <a href="/community/chapters/tokyo" class="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)]">Tokyo Chapter</a></span>
+          </div>
+          <h1 class="text-[44px] md:text-[56px] leading-[1.04] tracking-[-0.025em] font-semibold mb-6">Bittensor Tokyo Meetup #03</h1>
+          <h2 class="text-lg text-[color:var(--color-fg-muted)] font-serif italic leading-snug max-w-[600px]">Three subnet founders. What they wish they'd known on day one. Drinks after.</h2>
+        </div>
+        <div class="card rounded-md p-6 lg:sticky lg:top-24">
+          <div class="space-y-4 mb-6">
+            <div>
+              <div class="section-label mb-1">When</div>
+              <div class="font-medium">Mon, June 8, 2026 · 19:00–22:00 JST</div>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">06:00 EDT · 12:00 CEST · 18:00 SGT</div>
+            </div>
+            <div>
+              <div class="section-label mb-1">Where</div>
+              <div class="font-medium">WeWork Shibuya Scramble Square</div>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">2-24-12 Shibuya, Tokyo</div>
+            </div>
+            <div>
+              <div class="section-label mb-1">Capacity</div>
+              <div class="font-medium">80 spots · 62 registered</div>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">18 left · usually waitlists 2 days before</div>
+            </div>
+            <div>
+              <div class="section-label mb-1">Cost</div>
+              <div class="font-medium">Free</div>
+            </div>
+          </div>
+          <a href="#" class="btn-accent inline-flex items-center justify-center gap-2 text-sm w-full px-5 py-3 rounded-md">
+            Register on Luma
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </a>
+          <details class="mt-4">
+            <summary class="text-xs font-mono text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)] cursor-pointer add-cal">Add to calendar ▾</summary>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+              <a href="#" class="btn-secondary px-3 py-2 rounded text-center">Google</a>
+              <a href="#" class="btn-secondary px-3 py-2 rounded text-center">Apple</a>
+              <a href="#" class="btn-secondary px-3 py-2 rounded text-center">Outlook</a>
+              <a href="#" class="btn-secondary px-3 py-2 rounded text-center">.ics file</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid lg:grid-cols-[1.5fr_1fr] gap-12">
+
+        <div>
+          <div class="section-label mb-3">About</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-5">What it is.</h2>
+          <p class="text-[color:var(--color-fg)] leading-relaxed mb-5">
+            The third Tokyo Bittensor meetup of 2026. We invited three subnet founders — two from APAC, one from SF — to share what they wish someone had told them in the first 90 days of running a live subnet.
+          </p>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-5">
+            Format: short opening notes from each founder (10 min each), then a moderated panel (40 min), then unstructured drinks. Q&A is welcome throughout. If you've ever wanted to ask a subnet operator "but really, what does <em>your</em> validator do at 3am" — this is the right room.
+          </p>
+
+          <div class="card rounded-md p-5 my-7" style="background: #fafaf9;">
+            <div class="section-label mb-3">Who it's for</div>
+            <ul class="text-sm leading-relaxed space-y-1.5 text-[color:var(--color-fg-muted)]">
+              <li>· Devs considering applying to the next OpenTAO Hackathon</li>
+              <li>· Anyone running a miner / validator and wanting to compare notes</li>
+              <li>· Curious newcomers — bring questions, no expertise expected</li>
+              <li>· Not great for: pure investors looking for tips. We'll redirect those questions.</li>
+            </ul>
+          </div>
+
+          <div class="section-label mb-3 mt-12">Agenda</div>
+          <h3 class="text-xl font-semibold tracking-tight mb-5">Timeline.</h3>
+          <div>
+            {agenda.map((a) => (
+              <div class="agenda-row"><div class="t">{a.t}</div><div><div class="font-medium">{a.title}</div><div class="text-[color:var(--color-fg-muted)] text-xs mt-0.5">{a.body}</div></div></div>
+            ))}
+          </div>
+
+          <div class="section-label mb-3 mt-12">Speakers</div>
+          <h3 class="text-xl font-semibold tracking-tight mb-6">Three founders.</h3>
+          <div class="grid sm:grid-cols-3 gap-4">
+            {speakers.map((s) => (
+              <div class="speaker"><div class="av" style={`background: ${s.grad};`}></div><div><div class="font-medium">{s.name}</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">{s.handle}</div><p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed mt-2">{s.bio}</p></div></div>
+            ))}
+          </div>
+
+          <div class="section-label mb-3 mt-12">Logistics</div>
+          <h3 class="text-xl font-semibold tracking-tight mb-6">Getting there.</h3>
+          <div class="map-box mb-5">
+            <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><defs><pattern id="streets" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(15,15,18,0.08)" stroke-width="1"/></pattern></defs><rect width="800" height="450" fill="url(#streets)" /><circle cx="400" cy="220" r="60" fill="rgba(184,71,11,0.08)" /></svg>
+            <div class="pin-large"></div>
+          </div>
+          <ul class="space-y-2 text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+            <li><strong class="text-[color:var(--color-fg)]">Address.</strong> WeWork Shibuya Scramble Square, 34F · 2-24-12 Shibuya, Shibuya City, Tokyo 150-6134</li>
+            <li><strong class="text-[color:var(--color-fg)]">By train.</strong> Shibuya station, scramble exit. WeWork building is on top of the new tower — direct connection from station.</li>
+            <li><strong class="text-[color:var(--color-fg)]">Check-in.</strong> Lobby reception on 1F. Mention "Bittensor meetup". They'll give you a visitor badge.</li>
+            <li><strong class="text-[color:var(--color-fg)]">Food &amp; drinks.</strong> Light snacks + beer / soft drinks provided. Vegan options labeled.</li>
+            <li><strong class="text-[color:var(--color-fg)]">Accessibility.</strong> Step-free access from station to event floor. Restrooms on same floor.</li>
+          </ul>
+
+          <div class="section-label mb-3 mt-12">Sponsors</div>
+          <div class="grid grid-cols-4 gap-3">
+            {sponsors.map((s) => (
+              <div class="card rounded-md p-5 text-center text-xs font-mono text-[color:var(--color-fg-dim)]">{s.name}<br><span class="text-[10px] mt-1 block">{s.meta}</span></div>
+            ))}
+          </div>
+        </div>
+
+        <aside class="space-y-6">
+          <div class="card rounded-md p-6">
+            <div class="section-label mb-3">Hosted by</div>
+            <a href="/community/chapters/tokyo" class="flex items-center gap-3 group">
+              <div class="w-12 h-12 rounded-full" style="background: linear-gradient(135deg, #b8470b, #c2410c);"></div>
+              <div>
+                <div class="font-medium group-hover:text-[color:var(--color-accent)]">Tokyo Chapter</div>
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">12 events hosted · 412 members</div>
+              </div>
+            </a>
+            <div class="mt-5 border-t hairline pt-4">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Hosts</div>
+              <div class="flex items-center gap-3 text-sm"><span>@yuki</span><span class="text-[color:var(--color-fg-dim)]">·</span><span>@takahiro</span></div>
+            </div>
+          </div>
+
+          <div class="card rounded-md p-6">
+            <div class="section-label mb-3">Recent from Tokyo Chapter</div>
+            <a href="#" class="block py-3 border-b hairline text-sm hover:text-[color:var(--color-accent)]">Tokyo Meetup #02 — Validator night<div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">2026·03·14 · 64 attended</div></a>
+            <a href="#" class="block py-3 border-b hairline text-sm hover:text-[color:var(--color-accent)]">Workshop · Mining your first subnet<div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">2026·02·22 · 38 attended</div></a>
+            <a href="#" class="block py-3 text-sm hover:text-[color:var(--color-accent)]">Tokyo Meetup #01 — Kickoff<div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">2026·01·18 · 87 attended</div></a>
+            <a href="/community/chapters/tokyo" class="text-xs text-[color:var(--color-accent)] hover:underline mt-3 inline-block">All Tokyo events →</a>
+          </div>
+
+          <div class="card rounded-md p-6">
+            <div class="section-label mb-3">Share</div>
+            <div class="flex gap-2">
+              <button class="btn-secondary text-xs px-3 py-2 rounded">Twitter</button>
+              <button class="btn-secondary text-xs px-3 py-2 rounded">Copy link</button>
+              <button class="btn-secondary text-xs px-3 py-2 rounded">QR</button>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-3">Related events</div>
+      <h3 class="text-2xl font-semibold tracking-tight mb-8">More to find your people at.</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a href="#" class="card rounded-md p-5 block">
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Jun 12 · Online</div>
+          <h4 class="font-semibold mb-2 leading-snug">"What we learned running SN3 for a year" — fireside with @ke.ng</h4>
+          <div class="text-xs text-[color:var(--color-fg-muted)]">Same panel of founders, longer format. AMA.</div>
+        </a>
+        <a href="#" class="card rounded-md p-5 block">
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Jun 28 · Berlin</div>
+          <h4 class="font-semibold mb-2 leading-snug">Berlin — Bittensor Garden Edition</h4>
+          <div class="text-xs text-[color:var(--color-fg-muted)]">Sister chapter event. BBQ + brief talks.</div>
+        </a>
+        <a href="#" class="card rounded-md p-5 block">
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">Jul 22 · SF + global</div>
+          <h4 class="font-semibold mb-2 leading-snug">Season 01 Demo Day</h4>
+          <div class="text-xs text-[color:var(--color-fg-muted)]">Hackathon finals. 30 teams pitch. Wei Lin is judging.</div>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 7px; border-radius: 3px; border: 1px solid rgba(15,15,18,0.14); color: #4a4a52; }
+  .cover { aspect-ratio: 21/9; background: linear-gradient(135deg, #fdf3e3 0%, #f5e8d2 50%, #fbcf9e 100%); position: relative; overflow: hidden; }
+  .cover::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(184,71,11,0.18) 1px, transparent 1px); background-size: 24px 24px; opacity: 0.5; }
+  .cover .city { position: absolute; right: 32px; bottom: 28px; font-family: 'Fraunces', serif; font-style: italic; font-size: 56px; color: #b8470b; line-height: 1; letter-spacing: -0.02em; }
+  .agenda-row { display: grid; grid-template-columns: 100px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); font-size: 14px; }
+  .agenda-row:first-child { border-top: 0; }
+  .agenda-row .t { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4a4a52; }
+  .speaker { display: flex; align-items: flex-start; gap: 12px; }
+  .speaker .av { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+  .map-box { aspect-ratio: 16/9; background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; position: relative; overflow: hidden; }
+  .map-box svg { width: 100%; height: 100%; }
+  .pin-large { position: absolute; top: 46%; left: 48%; width: 14px; height: 14px; border-radius: 50%; background: #b8470b; box-shadow: 0 0 0 6px rgba(184,71,11,0.18); }
+  .add-cal { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+</style>

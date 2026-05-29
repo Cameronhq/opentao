@@ -1,0 +1,158 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const upcoming = [
+  { href: '/community/events/2026-sn3-fireside-ke-ng', month: 'Jun', day: '12', tags: [{ label: 'Online · AMA', cls: 'tag tag-online' }], title: '"What we learned running SN3 for a year" — fireside with @ke.ng', meta: 'Discord stage · 09:00 PST · 60 min', when: 'in 16 days' },
+  { href: '/community/events/2026-sf-build-first-subnet', month: 'Jun', day: '15', tags: [{ label: 'Workshop', cls: 'tag' }, { label: 'In-person', cls: 'tag' }], title: 'San Francisco — "Build your first subnet in 4 hours"', meta: '📍 Mission · 10:00 PST · hosted by SF Chapter', when: 'in 19 days' },
+  { href: '/community/events/2026-hackathon-mid-checkpoint', month: 'Jun', day: '22', tags: [{ label: 'Hackathon · kick-off', cls: 'tag tag-hackathon' }], title: 'Mid-checkpoint demos · Season 01 hackathon', meta: 'Hybrid · 6 cities · 18:00 local · open to spectators', when: 'in 26 days' },
+  { href: '/community/events/2026-berlin-garden-edition', month: 'Jun', day: '28', tags: [{ label: 'Meetup', cls: 'tag' }, { label: 'In-person', cls: 'tag' }], title: 'Berlin — Bittensor Garden Edition', meta: '📍 Kreuzberg · 17:00 CEST · BBQ + brief talks', when: 'in 32 days' },
+  { href: '/community/events/2026-validator-night-bonding', month: 'Jul', day: '06', tags: [{ label: 'Online · Workshop', cls: 'tag tag-online' }], title: 'Validator night — bonding & trust calibration', meta: 'Discord stage · 18:00 UTC · 90 min · for experienced validators', when: 'in 40 days' },
+];
+---
+<BaseLayout
+  title="Events — Community — OpenTAO"
+  description="Meetups, AMAs, workshops, demo days across 12 OpenTAO chapters."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/events" rightMeta="12 upcoming · in 6 cities" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-14">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { label: 'Events' },
+      ]} />
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">Find </span>your people<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">Meetups, AMAs, workshops, demo days. Register on Luma — we just keep the list updated. Twelve events this quarter, across six cities.</p>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+      <div><div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-1">This month</div><div class="font-semibold text-2xl tracking-tight">8 events</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono mt-0.5">3 in-person · 5 online</div></div>
+      <div><div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-1">Active chapters</div><div class="font-semibold text-2xl tracking-tight">12 cities</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono mt-0.5">+2 founding</div></div>
+      <div><div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-1">YTD attendance</div><div class="font-semibold text-2xl tracking-tight">3,180</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono mt-0.5">avg 68 / event</div></div>
+      <div class="flex flex-col">
+        <div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-1">Subscribe</div>
+        <div class="flex gap-1.5 mt-1 flex-wrap">
+          <a href="#" class="pill text-xs">📅 iCal</a>
+          <a href="#" class="pill text-xs">RSS</a>
+          <a href="#" class="pill text-xs">✉ Email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-5">
+      <div class="flex items-center gap-6 flex-wrap">
+        <div class="flex border hairline rounded-md overflow-hidden text-sm">
+          <button class="px-4 py-2 bg-[color:var(--color-paper)] border-r hairline text-[color:var(--color-fg)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>List</button>
+          <button class="px-4 py-2 text-[color:var(--color-fg-muted)] border-r hairline hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-paper)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</button>
+          <button class="px-4 py-2 text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-paper)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map</button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 ml-auto">
+          <button class="pill active">All</button>
+          <button class="pill">In-person</button>
+          <button class="pill">Online</button>
+          <button class="pill">Hackathon</button>
+          <button class="pill">Workshop</button>
+          <button class="pill">AMA</button>
+          <button class="pill">📍 All cities ▾</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-5">Up next</div>
+      <a href="/community/events/2026-tokyo-meetup-03" class="card rounded-md p-8 grid lg:grid-cols-[auto_1fr_auto] gap-8 items-center">
+        <div class="date-block"><div class="month">Jun</div><div class="day">08</div></div>
+        <div>
+          <div class="flex items-center gap-2 mb-3"><span class="tag">Meetup</span><span class="tag">In-person</span><span class="text-xs text-[color:var(--color-fg-dim)] font-mono">· hosted by <span class="text-[color:var(--color-fg)]">Tokyo Chapter</span></span></div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-2">Bittensor Tokyo Meetup #03</h2>
+          <p class="text-[color:var(--color-fg-muted)] text-sm leading-relaxed max-w-[600px]">Three subnet founders talking about what they wish they'd known on day one. Drinks after. WeWork Shibuya, 19:00 JST.</p>
+          <div class="mt-4 flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)]"><span>📍 Shibuya, Tokyo</span><span>🕒 19:00 – 22:00 JST</span><span>👥 80 / 120 registered</span></div>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+          <span class="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-md" style="background: #b8470b; color: #ffffff;">
+            Register on Luma
+            <svg class="external-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </span>
+          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">in 12 days</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">All upcoming</div>
+      <div class="space-y-3">
+        {upcoming.map((e) => (
+          <a href={e.href} class="card rounded-md p-5 flex items-center gap-6 block">
+            <div class="date-block"><div class="month">{e.month}</div><div class="day">{e.day}</div></div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1.5">{e.tags.map((t) => <span class={t.cls}>{t.label}</span>)}</div>
+              <h3 class="font-semibold tracking-tight">{e.title}</h3>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1.5">{e.meta}</div>
+            </div>
+            <div class="text-sm text-[color:var(--color-fg-muted)] font-mono whitespace-nowrap">{e.when}</div>
+          </a>
+        ))}
+        <a href="/community/events/2026-sf-demo-day-season-01" class="card rounded-md p-5 flex items-center gap-6 block" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.03);">
+          <div class="date-block" style="background: rgba(184,71,11,0.06); border-color: rgba(184,71,11,0.2);"><div class="month" style="color: #b8470b;">Jul</div><div class="day" style="color: #b8470b;">22</div></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1.5"><span class="tag tag-hackathon">Demo day</span><span class="tag">In-person + livestream</span></div>
+            <h3 class="font-semibold tracking-tight">Season 01 Demo Day · SF</h3>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1.5">📍 SF + global stream · 10:00 PT · 30 finalists pitch</div>
+          </div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] font-mono whitespace-nowrap">in 56 days</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-[1.4fr_1fr] gap-10 items-center">
+        <div>
+          <div class="section-label mb-3">No event in your city?</div>
+          <h3 class="text-3xl font-serif italic font-medium leading-snug max-w-[480px]">Become a host. Apply in one paragraph.</h3>
+          <p class="text-[color:var(--color-fg-muted)] text-sm mt-4 max-w-[480px] leading-relaxed">We give you brand assets, a host playbook, and reimbursement for food/venue. You give it three months of trying.</p>
+        </div>
+        <a href="/community/chapters" class="card rounded-md p-6 block">
+          <div class="section-label mb-2">→ Become a host</div>
+          <h4 class="font-semibold mb-1">12 active chapters today</h4>
+          <p class="text-sm text-[color:var(--color-fg-muted)]">Tokyo · SF · Berlin · Singapore · Shenzhen · NYC · London · Bangalore · São Paulo · Seoul · + 2 more</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .date-block { font-family: 'JetBrains Mono', monospace; text-align: center; padding: 12px 14px; background: #fafaf9; border-radius: 6px; min-width: 64px; border: 1px solid rgba(15,15,18,0.07); }
+  .date-block .month { font-size: 10px; color: #767680; letter-spacing: 0.15em; text-transform: uppercase; }
+  .date-block .day { font-size: 22px; font-weight: 600; color: #0c0c10; line-height: 1; margin-top: 4px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; background: transparent; }
+  .pill:hover { border-color: rgba(15,15,18,0.28); color: #0c0c10; }
+  .pill.active { color: #b8470b; border-color: rgba(184,71,11,0.4); background: rgba(184,71,11,0.06); }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid rgba(15,15,18,0.14); color: #4a4a52; }
+  .tag-online { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .tag-hackathon { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .external-icon { display: inline-block; vertical-align: middle; margin-left: 4px; opacity: 0.6; }
+</style>

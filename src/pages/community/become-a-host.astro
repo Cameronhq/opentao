@@ -1,0 +1,252 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/community/events', label: 'Events' },
+  { href: '/community/chapters', label: 'Chapters' },
+  { href: '/community/insights', label: 'Insights' },
+];
+
+const provides = [
+  { title: '$500/event reimbursement', body: 'Food, venue, printing. Receipts in, money out.' },
+  { title: 'Brand kit', body: 'Logo, poster template, slide template, sticker artwork.' },
+  { title: 'Host playbook', body: 'A 14-page guide for running your first event end-to-end.' },
+  { title: 'Merch shipments', body: 'Stickers + tees every quarter. Goodies to hand out.' },
+  { title: 'Listing on OpenTAO', body: 'Chapter page, events on the global calendar, hosts on the public roster.' },
+  { title: 'Mentorship from senior hosts', body: 'A buddy from another chapter for the first 90 days.' },
+];
+
+const eligibility = [
+  { title: 'Curious about Bittensor', body: 'No need to be an expert. We provide the educational scaffolding.' },
+  { title: '~5 hours / month', body: 'Realistic time commitment. Less in slow months, more around events.' },
+  { title: 'A reachable audience', body: 'A group chat, a workplace, a uni club — somewhere your first 12 attendees come from.' },
+  { title: 'Code of Conduct agreement', bodyHtml: 'Inclusive, no shilling, no investment talks. <a href="https://github.com/opentao-ai/opentao/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-[color:var(--color-accent)]">Read in full</a>.' },
+];
+
+const steps = [
+  { n: '01 · day 0', title: 'Submit the form', body: 'Below. Five fields. Five minutes.' },
+  { n: '02 · day 1-7', title: 'Editorial review', body: 'Editorial team + 2 senior hosts read together.' },
+  { n: '03 · day 7-14', title: '30-min video call', body: 'Both sides. We see if there\'s fit.' },
+  { n: '04 · day 14-21', title: 'Lead Host offer', body: 'Charter signed, onboarding email sent.' },
+  { n: '05 · week 3-4', title: 'Brand kit + buddy', body: 'Materials shipped. Senior-host buddy paired.' },
+];
+---
+<BaseLayout
+  title="Become a host — Community — OpenTAO"
+  description="One paragraph. No deck. Apply to lead a Bittensor chapter in your city."
+  section="community"
+>
+  <SubNav items={subnav} active="/community/chapters" rightMeta="apply · 5 min" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/community/events', label: 'Community' },
+        { href: '/community/chapters', label: 'Chapters' },
+        { label: 'Become a host' },
+      ]} />
+      <div class="flex items-center gap-3 mb-5">
+        <span class="section-label" style="color: #b8470b;">Open application · rolling</span>
+      </div>
+      <h1 class="text-[56px] md:text-[68px] leading-[1.02] tracking-[-0.03em] font-semibold max-w-[840px]">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">Show up </span>for your city.<br>We'll cover the room<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">
+        Twelve chapters, six languages, one job: gather the local Bittensor people regularly. If your city isn't here, start it — we provide the brand, the playbook, and the budget. You bring the willingness to host one event a quarter.
+      </p>
+      <div class="mt-9 flex flex-wrap items-center gap-3">
+        <a href="#apply" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">Apply now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="/community/chapters" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">See active chapters</a>
+        <span class="ml-2 text-xs text-[color:var(--color-fg-dim)] font-mono">we reply within 1 week</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-3 gap-10">
+
+        <div>
+          <div class="section-label mb-3">Why host</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">Three reasons people say yes.</h2>
+          <ol class="space-y-5 text-sm leading-relaxed">
+            <li><span class="font-mono text-xs text-[color:var(--color-fg-dim)] mr-2">01</span><span class="text-[color:var(--color-fg)]">Pull a local network together</span><span class="text-[color:var(--color-fg-muted)] block mt-1">The people in your city building this are scattered. You become the obvious place to find them.</span></li>
+            <li><span class="font-mono text-xs text-[color:var(--color-fg-dim)] mr-2">02</span><span class="text-[color:var(--color-fg)]">Front-row access to new subnets</span><span class="text-[color:var(--color-fg-muted)] block mt-1">Subnet founders show up to chapter events before they show up to mainnet. You meet them first.</span></li>
+            <li><span class="font-mono text-xs text-[color:var(--color-fg-dim)] mr-2">03</span><span class="text-[color:var(--color-fg)]">Brand-building, locally</span><span class="text-[color:var(--color-fg-muted)] block mt-1">"Hosts Bittensor Tokyo" sits on your bio for as long as you keep showing up.</span></li>
+          </ol>
+        </div>
+
+        <div>
+          <div class="section-label mb-3">What hosts do</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">Four jobs. None of them are hard.</h2>
+          <ul class="space-y-4 text-sm leading-relaxed">
+            <li class="flex gap-3"><span class="font-mono text-xs text-[color:var(--color-accent)]">·</span><span><strong class="text-[color:var(--color-fg)]">One event a quarter, minimum.</strong><span class="text-[color:var(--color-fg-muted)] block">Meetup, AMA, watch party — your call. Twelve people in a room counts.</span></span></li>
+            <li class="flex gap-3"><span class="font-mono text-xs text-[color:var(--color-accent)]">·</span><span><strong class="text-[color:var(--color-fg)]">Keep a chat alive.</strong><span class="text-[color:var(--color-fg-muted)] block">Discord channel, Telegram, WeChat — wherever your people are.</span></span></li>
+            <li class="flex gap-3"><span class="font-mono text-xs text-[color:var(--color-accent)]">·</span><span><strong class="text-[color:var(--color-fg)]">Write a recap after each event.</strong><span class="text-[color:var(--color-fg-muted)] block">200 words. Photo or two. We help publish.</span></span></li>
+            <li class="flex gap-3"><span class="font-mono text-xs text-[color:var(--color-accent)]">·</span><span><strong class="text-[color:var(--color-fg)]">Show up to the host sync.</strong><span class="text-[color:var(--color-fg-muted)] block">Once a quarter, 45 min on a call with other hosts.</span></span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="section-label mb-3">What we provide</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">All the boring infrastructure.</h2>
+          <div>
+            {provides.map((p) => (
+              <div class="provide-row"><span class="icon">●</span><div><div class="font-medium">{p.title}</div><div class="text-[color:var(--color-fg-muted)] text-xs mt-1">{p.body}</div></div></div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">Eligibility</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-3 max-w-[640px]">Four checkboxes. We don't gate on expertise.</h2>
+      <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-12 leading-relaxed">You don't need to be a subnet owner or a validator. You need to care, show up reliably, and treat people well.</p>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {eligibility.map((e) => (
+          <div class="card rounded-md p-6">
+            <div class="text-2xl mb-3">●</div>
+            <h4 class="font-semibold mb-2">{e.title}</h4>
+            {e.bodyHtml
+              ? <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed" set:html={e.bodyHtml}></p>
+              : <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{e.body}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">From application to first event</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[640px]">Six steps. Six weeks. Usually less.</h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        {steps.map((s) => (
+          <div class="step"><div class="n">{s.n}</div><h4 class="font-semibold mb-1">{s.title}</h4><p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{s.body}</p></div>
+        ))}
+        <div class="step" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.04);"><div class="n" style="color: #b8470b;">06 · week 4-8</div><h4 class="font-semibold mb-1">First event</h4><p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Goes on the global calendar. You're listed.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="apply" class="border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-[1fr_1.4fr] gap-12">
+
+        <div class="lg:sticky lg:top-24 lg:self-start">
+          <div class="section-label mb-3" style="color: #b8470b;">Application form</div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-5 leading-tight">One paragraph. No deck.</h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6">We don't read deeper than this — promise. Be honest, be specific, be brief.</p>
+          <ul class="text-sm text-[color:var(--color-fg-muted)] space-y-2 leading-relaxed">
+            <li>· No application fees, ever.</li>
+            <li>· You can save this form locally before submitting (browser-side).</li>
+            <li>· If we decline, you'll get a short written reason and can re-apply after 90 days.</li>
+            <li>· You're under no obligation after applying.</li>
+          </ul>
+        </div>
+
+        <form action="mailto:cameron@moonshotcommons.com" method="post" enctype="text/plain" class="card rounded-md p-8 space-y-6">
+          <p class="text-xs text-[color:var(--color-fg-dim)] font-mono mb-4">v1 stopgap: submitting opens your email client. We're wiring a real GitHub PR flow next.</p>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div><label class="label">Name</label><input class="input" placeholder="e.g. Yuki Tanaka" /></div>
+            <div><label class="label">Twitter / GitHub handle</label><input class="input" placeholder="@yourhandle" /></div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div><label class="label">City</label><input class="input" placeholder="e.g. Tokyo" /></div>
+            <div><label class="label">Timezone</label><input class="input" placeholder="e.g. JST (UTC+9)" /></div>
+          </div>
+          <div>
+            <label class="label">A short intro (100-300 words)</label>
+            <textarea class="textarea" rows="4" placeholder="Who you are, what you do, why Bittensor pulls at you. Skip the corporate bio."></textarea>
+          </div>
+          <div>
+            <label class="label">Why this city, and why now?</label>
+            <textarea class="textarea" rows="3" placeholder="What's the scene like? Why does it need a chapter? Why are you the person to start it?"></textarea>
+          </div>
+          <div>
+            <label class="label">Your first event — pitch it in 2-3 sentences</label>
+            <textarea class="textarea" rows="3" placeholder="Format, rough date, where you'd host, who you'd invite first."></textarea>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label class="label">Existing audience</label>
+              <input class="input" placeholder="e.g. ~80 in a WeChat group" />
+            </div>
+            <div>
+              <label class="label">Cadence you can commit to</label>
+              <select class="input">
+                <option>One event / quarter</option>
+                <option>One event / month</option>
+                <option>Bi-weekly</option>
+                <option>Other (explain below)</option>
+              </select>
+            </div>
+          </div>
+          <label class="flex items-start gap-3 text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+            <input type="checkbox" class="mt-1" />
+            <span>I've read and agree to the <a href="https://github.com/opentao-ai/opentao/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">Code of Conduct</a>, and I'm willing to commit to at least 6 months as a host.</span>
+          </label>
+          <div class="border-t hairline pt-6 flex flex-wrap items-center justify-between gap-4">
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">Submission is via GitHub PR · we reply within 7 days</span>
+            <div class="flex items-center gap-3">
+              <button type="button" class="btn-secondary text-sm font-medium px-5 py-2.5 rounded-md">Save draft</button>
+              <button type="submit" class="btn-primary text-sm font-semibold px-6 py-2.5 rounded-md inline-flex items-center gap-2">Submit application<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <div class="section-label mb-3">FAQ</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-6 leading-tight">Things people ask twice.</h3>
+          <div class="space-y-5">
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">Do I need to be a Bittensor expert?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">No. You need to be curious and willing to learn alongside the people you host. Many of our best hosts started knowing very little.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">Can two people apply as co-hosts?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Yes — encouraged actually. One of you signs the charter as Lead, the other as Co-host. Both get listed.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">What if my city already has a chapter?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Apply anyway — we'll connect you to that chapter as a co-host. One city, one chapter as a rule. Sometimes that means we'll fast-track you onto an existing team.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">Is the reimbursement upfront or after?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">After. Submit receipts via the host form, money in 14 days. For larger venues we can arrange direct payment to the venue.</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">What if I miss my quarterly event?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">One missed quarter is fine, life happens. Two in a row and we'll check in. Three and we mark the chapter "paused" and look for a new lead.</p></details>
+            <details class="pb-4"><summary class="font-medium cursor-pointer">Can I sponsor through a company or get reimbursed by them?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">Local sponsors are fine and we'll display their logo on the chapter page. You can stack their support with our $500. Just declare the conflict openly.</p></details>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label mb-3">Talk to a current host</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-6 leading-tight">Hear the unvarnished version.</h3>
+          <p class="text-[color:var(--color-fg-muted)] text-sm mb-6 leading-relaxed">Not sold? Ask one of the people already doing this. They'll tell you what's hard and what's not.</p>
+          <div class="space-y-3">
+            <a href="/community/chapters/tokyo" class="card rounded-md p-4 flex items-center gap-4 block"><div class="w-10 h-10 rounded-full" style="background: linear-gradient(135deg, #b8470b, #c2410c);"></div><div class="flex-1"><div class="font-medium">Yuki Tanaka</div><div class="text-xs font-mono text-[color:var(--color-fg-dim)]">Tokyo · since 2025-09</div></div><span class="text-xs text-[color:var(--color-accent)]">Message →</span></a>
+            <a href="mailto:cameron@moonshotcommons.com?subject=Talk%20to%20Ke%20Zhang%20(SF%20chapter%20host)" class="card rounded-md p-4 flex items-center gap-4 block"><div class="w-10 h-10 rounded-full" style="background: linear-gradient(135deg, #1c6ea4, #6741d9);"></div><div class="flex-1"><div class="font-medium">Ke Zhang</div><div class="text-xs font-mono text-[color:var(--color-fg-dim)]">San Francisco · since 2025-06</div></div><span class="text-xs text-[color:var(--color-accent)]">Message →</span></a>
+            <a href="mailto:cameron@moonshotcommons.com?subject=Talk%20to%20Carlos%20Müller%20(Berlin%20chapter%20host)" class="card rounded-md p-4 flex items-center gap-4 block"><div class="w-10 h-10 rounded-full" style="background: linear-gradient(135deg, #15803d, #16a34a);"></div><div class="flex-1"><div class="font-medium">Carlos Müller</div><div class="text-xs font-mono text-[color:var(--color-fg-dim)]">Berlin · since 2025-11</div></div><span class="text-xs text-[color:var(--color-accent)]">Message →</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .input, .textarea { width: 100%; background: #ffffff; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: #0c0c10; outline: none; transition: border-color .15s; }
+  .input:focus, .textarea:focus { border-color: rgba(15,15,18,0.4); }
+  .textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #4a4a52; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .step { padding: 18px 22px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #ffffff; }
+  .step .n { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #b8470b; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .provide-row { display: grid; grid-template-columns: 28px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); }
+  .provide-row:first-child { border-top: 0; }
+  .provide-row .icon { font-family: 'JetBrains Mono', monospace; color: #b8470b; font-size: 11px; padding-top: 2px; }
+</style>

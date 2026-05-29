@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/mine/general-setup', label: 'General setup' },
+  { href: '/mine/playbooks', label: 'Subnet playbooks' },
+  { href: '/mine/resources', label: 'Resources' },
+];
+
+type Trust = 'foundation' | 'community' | 'listed';
+interface Resource {
+  name: string;
+  trust: Trust;
+  trustLabel: string;
+  blurb: string;
+  meta: string;
+  href?: string;
+}
+
+interface Section {
+  label: string;
+  title: string;
+  count: string;
+  items: Resource[];
+  footnote?: string;
+}
+
+const sections: Section[] = [
+  {
+    label: 'Wallets',
+    title: 'Where you keep your TAO and your hotkey.',
+    count: '5 entries',
+    items: [
+      { name: 'bittensor-cli (btcli)', trust: 'foundation', trustLabel: 'Foundation', blurb: 'Official CLI. Self-custody. The most direct way to manage cold/hotkeys.', meta: 'macOS · Linux · WSL · open source' },
+      { name: 'Bittensor Wallet (browser)', trust: 'community', trustLabel: 'Community', blurb: 'Browser extension fork. Friendly UI for sending and staking — not for mining setup.', meta: 'Chrome · Brave · Edge' },
+      { name: 'Ledger (via Polkadot.js)', trust: 'community', trustLabel: 'Community', blurb: 'Hardware coldkey storage. Slower workflow but the safest for long-term holding.', meta: 'Nano S+, Nano X' },
+    ],
+  },
+  {
+    label: 'Exchanges',
+    title: 'Where to buy TAO.',
+    count: '6 entries',
+    items: [
+      { name: 'Binance', trust: 'community', trustLabel: 'Community', blurb: 'Largest TAO/USDT and TAO/BTC pairs. Bittensor network withdrawals supported.', meta: 'CEX · KYC · US restricted' },
+      { name: 'Kraken', trust: 'community', trustLabel: 'Community', blurb: 'TAO/USD and TAO/EUR. US-friendly. Slightly higher fees, faster fiat ramp.', meta: 'CEX · KYC · US ok' },
+      { name: 'MEXC', trust: 'listed', trustLabel: 'Listed', blurb: 'TAO/USDT. Light KYC, asia-friendly. Verify withdrawal network before sending.', meta: 'CEX · light KYC' },
+    ],
+    footnote: "⚠ After buying, transfer TAO to your own coldkey. Don't mine from an exchange wallet — they can't sign for your hotkey.",
+  },
+  {
+    label: 'Compute',
+    title: 'Where to rent GPU.',
+    count: '8 entries',
+    items: [
+      { name: 'Lambda Labs', trust: 'community', trustLabel: 'Community', blurb: 'H100, A100, 4090. Reliable provisioning, hourly billing, clean Ubuntu images.', meta: 'on-demand · $$ · US/EU' },
+      { name: 'RunPod', trust: 'community', trustLabel: 'Community', blurb: 'Per-second billing, container-first, lots of GPU options. Spot tier ~50% cheaper.', meta: 'on-demand + spot · $$ · global' },
+      { name: 'Vast.ai', trust: 'listed', trustLabel: 'Listed', blurb: 'P2P GPU marketplace. Cheapest but variable quality. Good for one-off experiments.', meta: 'p2p · $ · global' },
+    ],
+  },
+  {
+    label: 'Tools',
+    title: 'Block explorers, monitoring, dashboards.',
+    count: '9 entries',
+    items: [
+      { name: 'Taostats', trust: 'community', trustLabel: 'Community', blurb: 'The de-facto block explorer. Subnet stats, validator leaderboards, emission charts.', meta: 'free · explorer' },
+      { name: 'btcli-tui', trust: 'listed', trustLabel: 'Listed', blurb: 'Curses-style TUI wrapper around btcli. Faster for power users with many hotkeys.', meta: 'open source · CLI' },
+      { name: 'Grafana exporter', trust: 'listed', trustLabel: 'Listed', blurb: 'Prometheus metrics from your miner process. Plug into existing infra monitoring.', meta: 'open source · monitoring' },
+    ],
+  },
+];
+---
+<BaseLayout
+  title="Resources — Start Mining — OpenTAO"
+  description="A curated directory of wallets, exchanges, compute, and tools that miners actually use. No affiliate links, no paid placements."
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/resources" rightMeta="curated · no referral links" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-14 pb-12">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/mine/playbooks', label: 'Start mining' },
+        { label: 'Resources' },
+      ]} />
+      <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">Wallets, exchanges, compute, tools.</h1>
+      <p class="text-[color:var(--color-fg-muted)] mt-3 max-w-[600px]">A curated directory of what miners actually use. No affiliate links, no paid placements. Trust signal explains how each entry got on the list.</p>
+      <div class="mt-6 flex items-center gap-6 text-xs font-mono text-[color:var(--color-fg-dim)] flex-wrap">
+        <span><span class="trust trust-foundation">Foundation</span> backed by OTF</span>
+        <span><span class="trust trust-community">Community</span> widely used &amp; reliable</span>
+        <span><span class="trust trust-listed">Listed</span> in the directory, not endorsed</span>
+      </div>
+    </div>
+  </section>
+
+  {sections.map((sec) => (
+    <section class="border-b hairline">
+      <div class="max-w-[1200px] mx-auto px-6 py-16">
+        <div class="flex items-baseline justify-between mb-8">
+          <div>
+            <div class="section-label mb-2">{sec.label}</div>
+            <h2 class="text-2xl font-semibold tracking-tight">{sec.title}</h2>
+          </div>
+          <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{sec.count}</span>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {sec.items.map((it) => (
+            <a href={it.href ?? '#'} class="card rounded-md p-5 block">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold">{it.name}</h3>
+                <span class={`trust trust-${it.trust}`}>{it.trustLabel}</span>
+              </div>
+              <p class="text-sm text-[color:var(--color-fg-muted)] mb-3">{it.blurb}</p>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">{it.meta}</div>
+            </a>
+          ))}
+        </div>
+        {sec.footnote && (
+          <div class="mt-5 text-xs font-mono text-[color:var(--color-fg-dim)] border-l-2 pl-3" style="border-color: #b8470b">{sec.footnote}</div>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+        <div>
+          <div class="section-label mb-2">Submit a resource</div>
+          <h3 class="text-2xl font-semibold tracking-tight">Found something useful that's missing? Open a PR.</h3>
+          <p class="text-[color:var(--color-fg-muted)] text-sm mt-2 max-w-[500px]">All entries are markdown files in the OpenTAO repo. Default badge: Listed. Promotion to Community / Foundation requires editor review.</p>
+        </div>
+        <a href="#" class="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md border hairline-strong hover:border-[color:var(--color-fg-muted)]">Submit on GitHub</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .trust {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+  .trust-foundation {
+    color: #15803d;
+    border-color: rgba(21, 128, 61, 0.3);
+    background: rgba(21, 128, 61, 0.06);
+  }
+  .trust-community {
+    color: #1c6ea4;
+    border-color: rgba(28, 110, 164, 0.3);
+    background: rgba(28, 110, 164, 0.06);
+  }
+  .trust-listed {
+    color: #4a4a52;
+    border-color: rgba(15, 15, 18, 0.15);
+  }
+</style>

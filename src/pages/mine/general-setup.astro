@@ -1,0 +1,242 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/mine/general-setup', label: 'General setup' },
+  { href: '/mine/playbooks', label: 'Subnet playbooks' },
+  { href: '/mine/resources', label: 'Resources' },
+];
+
+interface Step {
+  n: string;
+  title: string;
+  time: string;
+  body: string;
+  status?: 'done' | 'current';
+  bullets?: string[];
+  code?: { lines: { kind: 'comment' | 'prompt' | 'ok' | 'spacer'; text?: string }[] };
+  callout?: { tip: string; html: string };
+  faded?: boolean;
+}
+
+const steps: Step[] = [
+  {
+    n: '01 / 08 ✓',
+    status: 'done',
+    title: 'System requirements',
+    time: '~2 min',
+    body: "Confirm your machine has what's needed. Most modern laptops do; servers usually need a Python upgrade.",
+    bullets: [
+      'Python ≥ 3.10 · disk ≥ 50GB · RAM ≥ 16GB',
+      'macOS 12+ / Ubuntu 20.04+ / Windows 11 with WSL2',
+      'Stable broadband (chain communication during registration)',
+    ],
+  },
+  {
+    n: '02 / 08 ✓',
+    status: 'done',
+    title: 'Install dependencies',
+    time: '~4 min',
+    body: "Python, git, build essentials. If you're on macOS, Homebrew is the easiest path.",
+    code: {
+      lines: [
+        { kind: 'comment', text: '# macOS' },
+        { kind: 'prompt', text: 'brew install python@3.12 git' },
+        { kind: 'prompt', text: 'python3 --version' },
+        { kind: 'ok', text: 'Python 3.12.4' },
+      ],
+    },
+  },
+  {
+    n: '03 / 08 ←',
+    status: 'current',
+    title: 'Install bittensor CLI',
+    time: '~3 min',
+    body: 'Install the official btcli into a Python virtual environment. Keeps your global Python clean.',
+    code: {
+      lines: [
+        { kind: 'prompt', text: 'python3 -m venv ~/.venv-bittensor' },
+        { kind: 'prompt', text: 'source ~/.venv-bittensor/bin/activate' },
+        { kind: 'prompt', text: 'pip install bittensor-cli' },
+        { kind: 'spacer' },
+        { kind: 'prompt', text: 'btcli --version' },
+        { kind: 'ok', text: 'bittensor-cli 8.4.2' },
+      ],
+    },
+    callout: {
+      tip: '⚠ tip',
+      html: '— Add <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">source ~/.venv-bittensor/bin/activate</code> to your <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">~/.zshrc</code> so the venv loads in new terminals.',
+    },
+  },
+  {
+    n: '04 / 08',
+    faded: true,
+    title: 'Create wallet',
+    time: '~5 min',
+    body: 'Generate a coldkey + hotkey. Coldkey holds your TAO; hotkey is the identity you stake from.',
+  },
+  {
+    n: '05 / 08',
+    faded: true,
+    title: 'Get TAO',
+    time: '~8 min',
+    body: 'Mainnet: buy on a CEX and withdraw to your coldkey. Testnet: use the faucet.',
+  },
+  {
+    n: '06 / 08',
+    faded: true,
+    title: 'Register on a subnet',
+    time: '~5 min',
+    body: 'Claim a UID slot in the subnet you want to mine. Cost floats — watch the meter.',
+  },
+  {
+    n: '07 / 08',
+    faded: true,
+    title: 'Verify your setup',
+    time: '~2 min',
+    body: 'Confirm your hotkey shows up in the metagraph and you can query stake.',
+  },
+  {
+    n: '08 / 08',
+    faded: true,
+    title: 'Common errors',
+    time: 'reference',
+    body: 'Five things that usually go wrong, and the one-line fixes.',
+  },
+];
+---
+<BaseLayout
+  title="General Setup — Start Mining — OpenTAO"
+  description="Set up once, mine many. Eight steps every subnet playbook assumes — Python, btcli, wallet, TAO, registration, verification."
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/general-setup" rightMeta="~30 min total · OS-aware" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-12 pb-10">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/mine/playbooks', label: 'Start mining' },
+        { label: 'General setup' },
+      ]} />
+      <div class="flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">Set up once. Mine many.</h1>
+          <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[600px]">Every subnet playbook assumes you've done these eight things. Run them once, save the wallet, and skip straight to whichever subnet you want to mine.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="os-tabs"><button class="active">macOS</button><button>Linux</button><button>WSL</button></div>
+          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">est. 30 min · fresh install</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[900px] mx-auto px-6 py-16 space-y-6">
+      {steps.map((s) => (
+        <div class={`step ${s.faded ? 'opacity-70' : ''}`}>
+          <div class={`flex items-center justify-between ${s.bullets || s.code || s.callout ? 'mb-5' : 'mb-1'}`}>
+            <div class="flex items-baseline gap-3">
+              <span class={`step-num ${s.status ?? ''}`}>{s.n}</span>
+              <h3 class="text-xl font-semibold">{s.title}</h3>
+            </div>
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">{s.time}</span>
+          </div>
+          <p class={`text-[color:var(--color-fg-muted)] text-sm ${s.bullets || s.code ? 'mb-5' : 'mt-3'}`}>{s.body}</p>
+          {s.bullets && (
+            <ul class="text-sm text-[color:var(--color-fg-muted)] space-y-1.5 ml-4 list-disc marker:text-[color:var(--color-fg-dim)]">
+              {s.bullets.map((b) => <li>{b}</li>)}
+            </ul>
+          )}
+          {s.code && (
+            <div class="code-block p-4 mb-3 relative">
+              <div class="absolute top-3 right-3 copy-btn">copy</div>
+              {s.code.lines.map((l) => {
+                if (l.kind === 'spacer') return <div class="mt-2"></div>;
+                if (l.kind === 'comment') return <div><span class="comment">{l.text}</span></div>;
+                if (l.kind === 'ok') return <div><span class="ok">{l.text}</span></div>;
+                return <div><span class="prompt">$</span> {l.text}</div>;
+              })}
+            </div>
+          )}
+          {s.callout && (
+            <div class="callout text-sm text-[color:var(--color-fg-muted)]">
+              <span class="font-mono text-xs uppercase tracking-wider" style="color: #b8470b;">{s.callout.tip}</span>
+              <span set:html={s.callout.html}></span>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <div class="max-w-[900px] mx-auto px-6 pb-16">
+      <div class="flex items-center justify-between border-t hairline pt-6 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <span>Last verified 2026·05·26 against btcli 8.4.x</span>
+        <a href="/mine/playbooks" class="hover:text-[color:var(--color-accent)] text-sm">After setup → pick a subnet to mine →</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .step {
+    background: #ffffff;
+    border: 1px solid rgba(15, 15, 18, 0.08);
+    border-radius: 8px;
+    padding: 28px;
+    transition: border-color 0.15s;
+  }
+  .step:hover { border-color: rgba(15, 15, 18, 0.22); }
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #767680;
+  }
+  .step-num.done { color: #15803d; }
+  .step-num.current { color: #b8470b; }
+  .code-block {
+    background: #faf8f4;
+    color: #0c0c10;
+    border: 1px solid rgba(15, 15, 18, 0.1);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    border-radius: 5px;
+  }
+  .code-block .prompt { color: #b8470b; }
+  .code-block .comment { color: #767680; }
+  .code-block .ok { color: #15803d; }
+  .os-tabs {
+    display: inline-flex;
+    border: 1px solid rgba(15, 15, 18, 0.14);
+    border-radius: 5px;
+    padding: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .os-tabs button {
+    padding: 4px 10px;
+    border-radius: 3px;
+    color: #4a4a52;
+  }
+  .os-tabs button.active {
+    background: rgba(184, 71, 11, 0.1);
+    color: #b8470b;
+  }
+  .callout {
+    background: rgba(184, 71, 11, 0.05);
+    border-left: 3px solid #b8470b;
+    padding: 14px 18px;
+    border-radius: 4px;
+  }
+  .copy-btn {
+    color: #767680;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { color: #0c0c10; }
+</style>

@@ -1,0 +1,204 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { playbooks, type Playbook } from '../../../data/playbooks';
+
+export async function getStaticPaths() {
+  return playbooks.map((p) => ({ params: { slug: p.slug }, props: { playbook: p } }));
+}
+
+interface Props {
+  playbook: Playbook;
+}
+const { playbook } = Astro.props;
+
+const subnav = [
+  { href: '/mine/general-setup', label: 'General setup' },
+  { href: '/mine/playbooks', label: 'Subnet playbooks' },
+  { href: '/mine/resources', label: 'Resources' },
+];
+
+const isVerified = playbook.status === 'verified';
+
+// Related playbooks: same category, exclude self, take 3
+const related = playbooks
+  .filter((p) => p.category === playbook.category && p.slug !== playbook.slug)
+  .slice(0, 3);
+---
+<BaseLayout
+  title={`SN${playbook.netuid} · ${playbook.name} — Mining Playbook — OpenTAO`}
+  description={`Mining playbook for subnet ${playbook.netuid} (${playbook.name}). ${playbook.blurb}`}
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/playbooks" rightMeta={`SN${playbook.netuid} · ${playbook.name}`} />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/mine/playbooks', label: 'Start mining' },
+        { href: '/mine/playbooks', label: 'Playbooks' },
+        { label: `${playbook.netuid} · ${playbook.name}` },
+      ]} />
+
+      <div class="flex items-end justify-between gap-8 flex-wrap mb-10">
+        <div>
+          <div class="flex items-center gap-3 mb-4 flex-wrap">
+            <span class={`cat cat-${playbook.category}`}>{playbook.categoryLabel}</span>
+            <span class={`text-xs font-mono pb-${playbook.status}`}>{playbook.statusText}</span>
+          </div>
+          <div class="flex items-baseline gap-5 mb-3">
+            <span class="font-mono text-[color:var(--color-fg-dim)] text-sm">netuid</span>
+            <span class="font-mono text-[64px] leading-none font-semibold tracking-tight">{playbook.netuid}</span>
+          </div>
+          <h1 class="font-serif text-[44px] font-medium leading-tight tracking-[-0.015em]">{playbook.name}</h1>
+          <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{playbook.blurb}</p>
+        </div>
+
+        <div class="flex flex-col items-end gap-2">
+          <a href={`/beginner/subnets/${playbook.slug}`} class="inline-flex items-center gap-2 text-sm font-semibold px-5 py-3 rounded-md btn-primary">
+            View subnet page
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">emission · {playbook.emission}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 py-16 grid lg:grid-cols-[1fr_320px] gap-12">
+      <div class="prose">
+        {!isVerified ? (
+          <div class="stub-banner">
+            <div class="label">Playbook missing</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
+              We don't have a verified playbook for SN{playbook.netuid} {playbook.name} yet. If you've mined this subnet for &gt;7 days,
+              you're qualified to write the first one. <a class="inline" href="#" style="color: #b8470b">Start a draft on GitHub →</a>
+            </p>
+          </div>
+        ) : (
+          <div class="stub-banner verified">
+            <div class="label">Editor's note</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
+              This playbook is being expanded. Operational basics are covered below — full step-by-step (install, validator config, monitoring, troubleshooting) is being added.
+            </p>
+          </div>
+        )}
+
+        <h2 id="prereqs">Prerequisites</h2>
+        <p>Before opening this playbook:</p>
+        <ul>
+          <li>Run through <a class="inline" href="/mine/general-setup" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;">General setup</a> — wallet, coldkey/hotkey, btcli, Bittensor SDK.</li>
+          <li>Have funds for registration burn (currently ~0.4 τ for most subnets; see chain).</li>
+          <li>Decide hardware: rented (Lambda / Runpod / Coreweave) or owned.</li>
+        </ul>
+
+        <h2 id="what-it-does">What this subnet does</h2>
+        <p class="lead">{playbook.blurb}</p>
+        <p>Read the <a class="inline" href={`/beginner/subnets/${playbook.slug}`} style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;">subnet page</a> for the validator scoring logic and what the miner is actually expected to produce.</p>
+
+        <h2 id="quickstart">Quick start</h2>
+        <pre class="terminal"><span class="prompt">$</span> btcli wallet new_coldkey --wallet.name miner
+<span class="prompt">$</span> btcli wallet new_hotkey  --wallet.name miner --wallet.hotkey default
+<span class="prompt">$</span> btcli subnet register    --netuid {playbook.netuid} --wallet.name miner
+<span class="muted">  → registration cost displayed before confirm</span>
+<span class="prompt">$</span> git clone https://github.com/&lt;subnet-org&gt;/&lt;subnet-repo&gt; &amp;&amp; cd &lt;subnet-repo&gt;
+<span class="prompt">$</span> python neurons/miner.py --netuid {playbook.netuid} --wallet.name miner --wallet.hotkey default</pre>
+        <p class="text-sm text-[color:var(--color-fg-muted)]">Above is the generic miner-launch shape. The actual subnet repo URL, runtime flags, and any required env vars are part of the full playbook (being added).</p>
+
+        <h2 id="reference">Reference playbook</h2>
+        <p>For a fully written, end-to-end playbook with verifier setup, monitoring dashboard, and known-issue troubleshooting, see <a class="inline" href="/mine/playbooks/42-cortex" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;">SN42 Cortex playbook</a>. Every playbook will reach that depth.</p>
+      </div>
+
+      <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
+        <div>
+          <div class="section-label mb-3">At a glance</div>
+          <div class="card rounded-md p-5 space-y-3 text-sm">
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">netuid</span><span class="text-[color:var(--color-fg)] font-mono">{playbook.netuid}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Category</span><span class="text-[color:var(--color-fg)]">{playbook.categoryLabel}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Emission</span><span class="text-[color:var(--color-fg)] font-mono">{playbook.emission}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Status</span><span class={`pb-${playbook.status}`}>{playbook.status}</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label mb-3">Help complete this</div>
+          <div class="card rounded-md p-4 text-sm text-[color:var(--color-fg-muted)]">
+            If you've successfully mined SN{playbook.netuid}, share your install steps. We attribute every playbook to its first verified author.
+            <a href="#" class="block mt-3 text-[color:var(--color-accent)]">Submit playbook on GitHub →</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 py-14">
+        <div class="section-label mb-6">Related playbooks · {playbook.categoryLabel}</div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {related.map((r) => (
+            <a href={r.href} class="card rounded-md p-5">
+              <div class="flex items-baseline justify-between mb-3">
+                <span class="font-mono text-2xl font-semibold">{r.netuid}</span>
+                <span class={`cat cat-${r.category}`}>{r.categoryLabel}</span>
+              </div>
+              <div class="font-medium mb-1">{r.name}</div>
+              <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed line-clamp-2">{r.blurb}</p>
+              <div class={`mt-3 text-[10px] font-mono pb-${r.status}`}>{r.statusText}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="border-b hairline">
+    <div class="max-w-[1400px] mx-auto px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <div class="flex items-center gap-5">
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Submit yours</a>
+        </div>
+        <span>{isVerified ? 'Stub · expanding into full guide' : 'Stub · awaiting first verified author'}</span>
+      </div>
+      <div class="mt-6 text-center"><a href="/mine/playbooks" class="text-sm hover:text-[color:var(--color-accent)] text-[color:var(--color-fg-muted)]">← All 128 playbooks</a></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+  .cat-llm     { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision  { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio   { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics{ color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data    { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason  { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-storage { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+  .cat-compute { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
+
+  .pb-verified { color: #15803d; }
+  .pb-stale    { color: #b8470b; }
+  .pb-missing  { color: #b91c1c; opacity: 0.85; }
+
+  .prose { max-width: 720px; }
+  .prose p { color: #1c1c22; line-height: 1.75; margin: 18px 0; font-size: 17px; }
+  .prose p.lead { font-size: 19px; color: #0c0c10; }
+  .prose h2 { font-family: var(--font-serif); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin: 48px 0 12px; color: #0c0c10; }
+  .prose ul { padding-left: 1.2rem; margin: 14px 0; }
+  .prose li { margin: 8px 0; line-height: 1.7; }
+
+  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 28px 0; }
+  .stub-banner.verified { background: linear-gradient(180deg, rgba(21,128,61,0.05), rgba(21,128,61,0)); border-left-color: #15803d; }
+  .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+  .stub-banner.verified .label { color: #15803d; }
+
+  .terminal { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; padding: 16px 18px; border-radius: 6px; overflow-x: auto; white-space: pre; margin: 20px 0; }
+  .terminal .prompt { color: #b8470b; }
+  .terminal .muted { color: #767680; }
+
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+</style>

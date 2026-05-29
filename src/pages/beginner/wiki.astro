@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const cluster1 = [
+  { n: '04', slug: 'subtensor', title: 'Subtensor, the chain', body: "A Substrate-based blockchain that keeps everyone's books and pays out emissions every tempo." },
+  { n: '05', slug: 'block-tempo-epoch', title: 'Block · Tempo · Epoch', body: 'The three time units of Bittensor — 12 seconds, 72 minutes, ~1 day — and what happens on each.' },
+  { n: '06', slug: 'what-is-a-subnet', title: 'What is a subnet', body: 'A self-contained market for one kind of intelligence — text, image, reasoning, motor control.' },
+  { n: '07', slug: 'registration-immunity', title: 'Registration & immunity', body: 'How you get a UID slot inside a subnet, what it costs, and what protects you while you set up.' },
+];
+const cluster2 = [
+  { n: '08', slug: 'miner', title: 'Miner', body: 'The contributor role. Submits work; earns when validators rank you well.' },
+  { n: '09', slug: 'validator', title: 'Validator', body: 'The scorer role. Submits weights; earns proportional to stake and to agreeing with consensus.' },
+  { n: '10', slug: 'subnet-owner', title: 'Subnet owner', body: 'Designs the task, the scoring, and takes a fee. The founder role.' },
+  { n: '11', slug: 'delegator', title: 'Delegator', body: 'Stakes TAO behind a validator you trust. Passive — you take their cut and earn the rest.' },
+];
+const cluster3 = [
+  { n: '12', slug: 'tao', title: 'TAO, the token', body: '21M cap, halving schedule, the unit everything is paid in.' },
+  { n: '13', slug: 'dtao', title: 'dTAO, the 2024 upgrade', body: 'Why subnet-level token markets changed how emission flows.' },
+  { n: '14', slug: 'emission-curve', title: 'Emission curve', body: 'How TAO emits per block and what halving means in practice.' },
+  { n: '15', slug: 'staking-nomination', title: 'Staking & nomination', body: 'Locking TAO behind a validator and getting your share back.' },
+  { n: '16', slug: 'registration-cost', title: 'Registration cost', body: 'The price of a UID slot, why it floats, and how to time it.' },
+];
+const cluster4 = [
+  { n: '17', slug: 'yuma-consensus', title: 'Yuma consensus', body: 'The aggregation rule. Validator weights weighted by stake → emission.' },
+  { n: '18', slug: 'weights-setting', title: 'Weights setting', body: "What a validator actually submits, how often, and what's on chain." },
+  { n: '19', slug: 'bonding-ema', title: 'Bonding & EMA', body: 'How memory and lag are baked into the scoring to prevent flicker.' },
+  { n: '20', slug: 'validator-trust', title: 'Validator trust', body: 'Why disagreeing too much with the median is expensive.' },
+];
+const cluster5 = [
+  { n: '21', slug: 'registering-new-subnet', title: 'Registering a new subnet', body: 'What it costs, what you commit to, and what happens on day one.' },
+  { n: '22', slug: 'subnet-validator-selection', title: 'Subnet validator selection', body: 'Why only the top-N stake-weighted validators are paid.' },
+  { n: '23', slug: 'subnet-hyperparameters', title: 'Subnet hyperparameters', body: 'Tempo, rho, kappa — the knobs every subnet has, and what they do.' },
+];
+const cluster6 = [
+  { n: '24', slug: 'senate', title: 'Senate', body: 'The top validators by stake have a small governance role.' },
+  { n: '25', slug: 'hyperparameter-votes', title: 'Hyperparameter votes', body: 'How chain-wide constants get changed.' },
+  { n: '26', slug: 'network-upgrade-flow', title: 'Network upgrade flow', body: 'How runtime upgrades go from a PR to production.' },
+];
+---
+<BaseLayout
+  title="Wiki — OpenTAO"
+  description="Twenty-six things to know about Bittensor — from the network underneath, to the roles inside it, to the math that keeps it honest."
+  section="beginner"
+>
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-50"></div>
+    <div class="hero-glow"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { label: 'Wiki' },
+      ]} />
+      <h1 class="text-[64px] md:text-[80px] leading-[0.96] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic text-[color:var(--color-fg-muted)] font-normal">The </span>concepts<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-8 text-lg text-[color:var(--color-fg-muted)] max-w-[600px] leading-relaxed">Twenty-six things to know about Bittensor — from the network underneath, to the roles inside it, to the math that keeps it honest. Read in any order.</p>
+      <div class="mt-9 flex items-center gap-3 max-w-md">
+        <div class="flex items-center gap-2 px-4 py-2.5 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] flex-1 bg-[color:var(--color-surface)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" placeholder="Search 26 concepts…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+          <kbd class="font-mono text-[10px] text-[color:var(--color-fg-dim)] border hairline rounded px-1.5 py-0.5">⌘K</kbd>
+        </div>
+      </div>
+      <div class="mt-12 flex flex-wrap items-center gap-6 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <span><span class="text-[color:var(--color-fg)]">26</span> concepts</span><span class="opacity-30">·</span>
+        <span><span class="text-[color:var(--color-fg)]">6</span> clusters</span><span class="opacity-30">·</span>
+        <span>bilingual · EN <span class="opacity-30">/</span> 中</span><span class="opacity-30">·</span>
+        <span>last reviewed 2026·05·27</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="cluster-rule mb-12">
+        <span class="section-label">Start here</span>
+        <span class="line"></span>
+        <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">three concepts that unlock the rest</span>
+      </div>
+      <div class="grid lg:grid-cols-3 gap-4">
+        <a href="/beginner/concepts/what-is-bittensor" class="featured rounded-md p-7 block group">
+          <div class="flex items-baseline justify-between mb-7">
+            <span class="num text-5xl">01</span>
+            <span class="pill-tag" style="border-color: rgba(184,71,11,0.3); color: #b8470b;">Foundational</span>
+          </div>
+          <div class="section-label mb-2">Network basics</div>
+          <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">What is Bittensor</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">The whole network in 800 words. A single chain underneath, 128 competing intelligence markets on top, paid in TAO.</p>
+          <div class="flex items-center text-sm text-[color:var(--color-fg)] gap-2">Read this first <span class="arrow">→</span></div>
+        </a>
+        <a href="/beginner/concepts/miners-and-validators" class="ccard rounded-md p-7 block group">
+          <div class="flex items-baseline justify-between mb-7"><span class="num text-5xl">02</span><span class="pill-tag">Roles</span></div>
+          <div class="section-label mb-2">Roles</div>
+          <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">Miners &amp; validators</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">One submits work, the other scores it. Almost everything else in Bittensor is a consequence of how this two-sided market is wired.</p>
+          <div class="flex items-center text-sm text-[color:var(--color-fg-muted)] gap-2">Read <span class="arrow">→</span></div>
+        </a>
+        <a href="/beginner/concepts/yuma-consensus" class="ccard rounded-md p-7 block group">
+          <div class="flex items-baseline justify-between mb-7"><span class="num text-5xl">03</span><span class="pill-tag">Consensus</span></div>
+          <div class="section-label mb-2">Consensus</div>
+          <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">Yuma, intuitively</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">The aggregation rule that turns validator opinions into real emissions. Read this once and 80% of the rest makes sense.</p>
+          <div class="flex items-center text-sm text-[color:var(--color-fg-muted)] gap-2">Read <span class="arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {[
+    { roman: 'I.', title: 'Network basics', count: '4 concepts · ~20 min', intro: 'How the chain underneath actually works — blocks, tempos, the registration mechanism that lets a subnet exist in the first place.', items: cluster1, cols: 'md:grid-cols-2' },
+    { roman: 'II.', title: 'Roles', count: '4 concepts · ~12 min', intro: 'Four kinds of participants. Most newcomers will pick one and stick with it; understanding the others helps you reason about how the network behaves.', items: cluster2, cols: 'md:grid-cols-2' },
+    { roman: 'III.', title: 'Economics', count: '5 concepts · ~25 min', intro: 'Where TAO comes from, where it goes, and how the 2024 dTAO upgrade changed everything about how subnets compete for it.', items: cluster3, cols: 'md:grid-cols-2 lg:grid-cols-3' },
+    { roman: 'IV.', title: 'Consensus', count: '4 concepts · ~20 min', intro: 'The math that turns thousands of opinions into one reward vector. Skip these if you only want to mine; read them if you want to validate or build a subnet.', items: cluster4, cols: 'md:grid-cols-2' },
+  ].map((c) => (
+    <section class="border-b hairline">
+      <div class="max-w-[1200px] mx-auto px-6 py-20">
+        <div class="cluster-rule mb-12">
+          <div class="flex items-baseline gap-4"><span class="num text-2xl">{c.roman}</span><h2 class="cluster-title text-2xl text-[color:var(--color-fg)]">{c.title}</h2></div>
+          <span class="line"></span>
+          <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">{c.count}</span>
+        </div>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">{c.intro}</p>
+        <div class={`grid ${c.cols} gap-3`}>
+          {c.items.map((it) => (
+            <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4">
+              <span class="num text-3xl shrink-0 w-10">{it.n}</span>
+              <div class="flex-1">
+                <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
+                <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{it.body}</p>
+              </div>
+              <span class="arrow text-[color:var(--color-fg-dim)] mt-1">→</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <div>
+          <div class="cluster-rule mb-10">
+            <div class="flex items-baseline gap-4"><span class="num text-2xl">V.</span><h2 class="cluster-title text-2xl text-[color:var(--color-fg)]">Subnets</h2></div>
+            <span class="line"></span>
+            <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">3 concepts</span>
+          </div>
+          <div class="space-y-3">
+            {cluster5.map((it) => (
+              <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4 block">
+                <span class="num text-3xl shrink-0 w-10">{it.n}</span>
+                <div class="flex-1">
+                  <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
+                  <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{it.body}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="cluster-rule mb-10">
+            <div class="flex items-baseline gap-4"><span class="num text-2xl">VI.</span><h2 class="cluster-title text-2xl text-[color:var(--color-fg)]">Governance</h2></div>
+            <span class="line"></span>
+            <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">3 concepts</span>
+          </div>
+          <div class="space-y-3">
+            {cluster6.map((it) => (
+              <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4 block">
+                <span class="num text-3xl shrink-0 w-10">{it.n}</span>
+                <div class="flex-1">
+                  <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
+                  <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{it.body}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+        <div>
+          <div class="section-label mb-3">Public knowledge</div>
+          <h3 class="text-2xl font-serif italic font-medium leading-snug max-w-[560px]">Every concept page is editable. Spot something stale or missing? Open a PR.</h3>
+        </div>
+        <a href="#" class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md border hairline-strong hover:border-[color:var(--color-fg-muted)]">Edit on GitHub</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ccard { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); transition: all .15s; }
+  .ccard:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; transform: translateY(-1px); }
+  .ccard:hover .num { color: #b8470b; }
+  .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; transition: color .15s; }
+  .cluster-rule { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; }
+  .cluster-rule .line { height: 1px; background: rgba(15,15,18,0.1); }
+  .cluster-title { font-family: var(--font-serif); font-weight: 500; font-style: italic; letter-spacing: -0.01em; }
+  .featured { background: linear-gradient(180deg, rgba(184,71,11,0.04), rgba(184,71,11,0) 60%), #ffffff; border: 1px solid rgba(184,71,11,0.22); transition: all .15s; }
+  .featured:hover { border-color: rgba(184,71,11,0.4); transform: translateY(-1px); }
+  .pill-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(15,15,18,0.12); color: #767680; }
+  .arrow { transition: transform .15s; }
+  a:hover .arrow { transform: translateX(3px); }
+</style>

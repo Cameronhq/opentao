@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { concepts, getAdjacent, relatedConcepts, type Concept } from '../../../data/concepts';
+
+export async function getStaticPaths() {
+  // Only generate stub pages here. Rich concept pages (rich === true) live as
+  // their own .astro files in this same folder and take precedence — listing
+  // them here would conflict.
+  return concepts
+    .filter((c) => !c.rich)
+    .map((c) => ({ params: { slug: c.slug }, props: { concept: c } }));
+}
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const { prev, next } = getAdjacent(concept.slug);
+const related = relatedConcepts(concept.slug, 3);
+---
+<BaseLayout
+  title={`${concept.title} — Wiki — OpenTAO`}
+  description={concept.lead}
+  section="beginner"
+>
+  <header class="border-b hairline">
+    <div class="article px-6 pt-16 pb-12">
+      <div class="flex items-baseline gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-8 flex-wrap">
+        <a href="/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
+        <a href="/beginner/wiki" class="hover:text-[color:var(--color-fg)]">Wiki</a><span>/</span>
+        <span>{concept.clusterShort}</span><span>/</span>
+        <span class="text-[color:var(--color-fg)]">{concept.title}</span>
+      </div>
+      <div class="section-label mb-4">{concept.cluster} · concept {concept.num}</div>
+      <h1 class="font-serif font-medium text-[52px] md:text-[58px] leading-[1.05] tracking-[-0.025em]">{concept.title}</h1>
+      <p class="font-serif italic font-normal text-2xl text-[color:var(--color-fg-muted)] mt-6 leading-[1.45]">{concept.lead}</p>
+      <div class="mt-10 flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)] flex-wrap">
+        <span>{concept.readTime}</span>
+        <span class="opacity-30">·</span>
+        <span>last verified 2026·05·27</span>
+        <span class="opacity-30">·</span>
+        <span>stub — being expanded</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="border-b hairline">
+    <article class="article px-6 py-16">
+      <p class="lead">{concept.lead}</p>
+
+      <div class="stub-banner">
+        <div class="label">Editor's note</div>
+        <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">This concept's full essay is being written by the editorial team. Below is the short version — the full 5–15 minute treatment will land here as soon as it's reviewed. <a class="inline" href="#">Open the GitHub draft →</a></p>
+      </div>
+
+      <h2 id="why"><span class="index">I.</span>Why this matters</h2>
+      <p>{concept.body}</p>
+
+      <h2 id="related"><span class="index">II.</span>Related concepts</h2>
+      <div class="grid sm:grid-cols-2 gap-3 mt-6">
+        {related.map((r) => (
+          <a href={`/beginner/concepts/${r.slug}`} class="related-card">
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="num text-2xl">{r.num}</span>
+              <span class="section-label">{r.clusterShort}</span>
+            </div>
+            <div class="text-[color:var(--color-fg)] font-medium mb-1">{r.title}</div>
+            <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{r.lead}</div>
+          </a>
+        ))}
+        <a href="/beginner/wiki" class="related-card" style="border-style: dashed;">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">→</span><span class="section-label">Browse</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">All 26 concepts</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">Go back to the concept gallery.</div>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <section class="border-b hairline">
+    <div class="article px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <div class="flex items-center gap-5">
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Help write this concept</a>
+          <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
+        </div>
+        <span>Stub · {concept.clusterShort}</span>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 mt-8">
+        {prev ? (
+          <a href={`/beginner/concepts/${prev.slug}`} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1">← Previous</div>
+            <div class="text-[color:var(--color-fg)] text-sm font-medium">{prev.title}</div>
+          </a>
+        ) : (
+          <div class="border hairline rounded-md p-4 opacity-50">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1">← Previous</div>
+            <div class="text-[color:var(--color-fg-muted)] text-sm">(first concept)</div>
+          </div>
+        )}
+        {next ? (
+          <a href={`/beginner/concepts/${next.slug}`} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1 text-right">Next →</div>
+            <div class="text-[color:var(--color-fg)] text-sm text-right font-medium">{next.title}</div>
+          </a>
+        ) : (
+          <div class="border hairline rounded-md p-4 opacity-50">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1 text-right">Next →</div>
+            <div class="text-[color:var(--color-fg-muted)] text-sm text-right">(last concept)</div>
+          </div>
+        )}
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href="/beginner/wiki" class="text-sm text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-accent)]">← All 26 concepts</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .article { max-width: 680px; margin: 0 auto; }
+  .article p { color: #1c1c22; line-height: 1.75; margin: 22px 0; font-size: 18px; }
+  .article p.lead { font-family: var(--font-serif); font-weight: 400; font-size: 24px; line-height: 1.55; color: #0c0c10; margin: 32px 0 40px; letter-spacing: -0.005em; }
+  .article p.lead::first-letter { font-size: 56px; line-height: 0.95; float: left; padding: 6px 12px 0 0; font-weight: 500; color: #b8470b; }
+  .article h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.015em; margin: 64px 0 16px; color: #0c0c10; }
+  .article h2 .index { font-family: var(--font-mono); font-size: 13px; color: #b8b8be; letter-spacing: 0.06em; vertical-align: middle; margin-right: 14px; font-weight: 400; }
+  .article a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .article a.inline:hover { text-decoration-color: #b8470b; }
+
+  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 28px 0; }
+  .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+
+  .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); padding: 18px 20px; border-radius: 6px; transition: all .15s; display: block; }
+  .related-card:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; }
+  .related-card .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; }
+</style>

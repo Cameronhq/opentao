@@ -1,0 +1,23 @@
+# Cloudflare Pages headers config
+# Hot HTML — short cache so content updates surface fast
+/*
+  Cache-Control: public, max-age=60, s-maxage=300
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Astro fingerprinted assets — immutable for 1yr
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Pagefind index — hashed assets safe to cache forever
+/pagefind/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts proxy — long cache (we load via google fonts CDN currently, but keep policy ready for self-hosted)
+*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# Logo / favicon
+/opentaoai.jpeg
+  Cache-Control: public, max-age=604800
