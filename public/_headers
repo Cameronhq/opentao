@@ -1,5 +1,8 @@
-# Cloudflare Pages headers config
-# Hot HTML — short cache so content updates surface fast
+# Cloudflare Workers Assets — _headers config
+# Path patterns must start with `/`. Glob-style `*.ext` (allowed in legacy
+# Pages) is rejected by Workers Assets — keep all rules path-rooted.
+
+# Hot HTML — short cache so content updates surface fast on the edge
 /*
   Cache-Control: public, max-age=60, s-maxage=300
   X-Content-Type-Options: nosniff
@@ -14,9 +17,9 @@
 /pagefind/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Fonts proxy — long cache (we load via google fonts CDN currently, but keep policy ready for self-hosted)
-*.woff2
-  Cache-Control: public, max-age=31536000, immutable
+# OG cards — they only change when content changes; safe to long-cache
+/og/*
+  Cache-Control: public, max-age=2592000
 
 # Logo / favicon
 /opentaoai.jpeg
