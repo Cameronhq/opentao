@@ -16,6 +16,7 @@ export interface EventItem {
   location: string;       // "Discord stage" or "📍 Mission, SF"
   host?: string;          // "@ke.ng" or "Tokyo Chapter"
   when: string;           // "in 16 days"
+  lumaUrl?: string;       // real Luma RSVP URL — Register button hides if missing
   rich?: boolean;
 }
 

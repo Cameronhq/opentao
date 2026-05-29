@@ -1,5 +1,11 @@
 # OpenTAO
 
+[![Live](https://img.shields.io/badge/site-opentao.ai-b8470b)](https://opentao.ai)
+[![License](https://img.shields.io/badge/content-CC%20BY--SA%204.0-blue)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![Code](https://img.shields.io/badge/code-MIT-green)](#license)
+[![Astro](https://img.shields.io/badge/astro-6.3-ff5d01)](https://astro.build)
+[![Pages](https://img.shields.io/badge/pages-318+-0c0c10)](https://opentao.ai)
+
 Builder's Gateway to Bittensor — docs / community / build / mine.
 
 Independent, community-built, CC BY-SA 4.0. Not affiliated with the Opentensor Foundation.
