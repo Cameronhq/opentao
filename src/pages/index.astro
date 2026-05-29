@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import chainStats from '../data/chain-stats.json';
 
 const paths = [
   {
@@ -42,11 +43,18 @@ const paths = [
 ];
 
 const stats = [
-  { label: 'Live subnets', value: '128', caption: '+3 in last 30d' },
-  { label: 'Active miners', value: '52,184', caption: 'across 128 subnets' },
-  { label: 'TAO staked', value: '7.42M', unit: 'τ', caption: '~$2.1B notional' },
-  { label: 'Validators', value: '1,248', caption: 'top 64 receive emission' },
+  { label: 'Live subnets',  value: chainStats.subnets.totalText,    caption: chainStats.subnets.deltaText },
+  { label: 'Active miners', value: chainStats.miners.totalText,     caption: chainStats.miners.deltaText },
+  { label: 'TAO staked',    value: chainStats.tao.stakedText,        unit: chainStats.tao.unit, caption: chainStats.tao.deltaText },
+  { label: 'Validators',    value: chainStats.validators.totalText, caption: chainStats.validators.deltaText },
 ];
+
+// "2026·05·29 13:35 UTC" — match the existing dotted date style on the page.
+const _f = new Date(chainStats.fetchedAt);
+const _pad = (n: number) => String(n).padStart(2, '0');
+const lastSyncText =
+  `${_f.getUTCFullYear()}·${_pad(_f.getUTCMonth() + 1)}·${_pad(_f.getUTCDate())} ` +
+  `${_pad(_f.getUTCHours())}:${_pad(_f.getUTCMinutes())} UTC`;
 ---
 <BaseLayout
   title="OpenTAO — Builder's Gateway to Bittensor"
@@ -233,7 +241,7 @@ const stats = [
         ))}
       </div>
       <div class="mt-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
-        Data refreshed from chain · last sync 2026·05·27 14:08 UTC · methodology coming
+        Data refreshed from chain · last sync {lastSyncText} · methodology coming
       </div>
     </div>
   </section>

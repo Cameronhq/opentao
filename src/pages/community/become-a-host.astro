@@ -154,36 +154,35 @@ const steps = [
           </ul>
         </div>
 
-        <form action="mailto:cameron@moonshotcommons.com" method="post" enctype="text/plain" class="card rounded-md p-8 space-y-6">
-          <p class="text-xs text-[color:var(--color-fg-dim)] font-mono mb-4">v1 stopgap: submitting opens your email client. We're wiring a real GitHub PR flow next.</p>
+        <form id="host-form" class="card rounded-md p-8 space-y-6" novalidate>
           <div class="grid sm:grid-cols-2 gap-5">
-            <div><label class="label">Name</label><input class="input" placeholder="e.g. Yuki Tanaka" /></div>
-            <div><label class="label">Twitter / GitHub handle</label><input class="input" placeholder="@yourhandle" /></div>
+            <div><label class="label" for="hf-name">Name</label><input id="hf-name" name="name" class="input" placeholder="e.g. Yuki Tanaka" required /></div>
+            <div><label class="label" for="hf-twitter">Twitter / GitHub handle</label><input id="hf-twitter" name="twitter" class="input" placeholder="@yourhandle" /></div>
           </div>
           <div class="grid sm:grid-cols-2 gap-5">
-            <div><label class="label">City</label><input class="input" placeholder="e.g. Tokyo" /></div>
-            <div><label class="label">Timezone</label><input class="input" placeholder="e.g. JST (UTC+9)" /></div>
+            <div><label class="label" for="hf-city">City</label><input id="hf-city" name="city" class="input" placeholder="e.g. Tokyo" required /></div>
+            <div><label class="label" for="hf-tz">Timezone</label><input id="hf-tz" name="timezone" class="input" placeholder="e.g. JST (UTC+9)" /></div>
           </div>
           <div>
-            <label class="label">A short intro (100-300 words)</label>
-            <textarea class="textarea" rows="4" placeholder="Who you are, what you do, why Bittensor pulls at you. Skip the corporate bio."></textarea>
+            <label class="label" for="hf-intro">A short intro (100-300 words)</label>
+            <textarea id="hf-intro" name="intro" class="textarea" rows="4" placeholder="Who you are, what you do, why Bittensor pulls at you. Skip the corporate bio." required></textarea>
           </div>
           <div>
-            <label class="label">Why this city, and why now?</label>
-            <textarea class="textarea" rows="3" placeholder="What's the scene like? Why does it need a chapter? Why are you the person to start it?"></textarea>
+            <label class="label" for="hf-why">Why this city, and why now?</label>
+            <textarea id="hf-why" name="whyThisCity" class="textarea" rows="3" placeholder="What's the scene like? Why does it need a chapter? Why are you the person to start it?"></textarea>
           </div>
           <div>
-            <label class="label">Your first event — pitch it in 2-3 sentences</label>
-            <textarea class="textarea" rows="3" placeholder="Format, rough date, where you'd host, who you'd invite first."></textarea>
+            <label class="label" for="hf-first">Your first event — pitch it in 2-3 sentences</label>
+            <textarea id="hf-first" name="firstEvent" class="textarea" rows="3" placeholder="Format, rough date, where you'd host, who you'd invite first."></textarea>
           </div>
           <div class="grid sm:grid-cols-2 gap-5">
             <div>
-              <label class="label">Existing audience</label>
-              <input class="input" placeholder="e.g. ~80 in a WeChat group" />
+              <label class="label" for="hf-audience">Existing audience</label>
+              <input id="hf-audience" name="audience" class="input" placeholder="e.g. ~80 in a WeChat group" />
             </div>
             <div>
-              <label class="label">Cadence you can commit to</label>
-              <select class="input">
+              <label class="label" for="hf-cadence">Cadence you can commit to</label>
+              <select id="hf-cadence" name="cadence" class="input">
                 <option>One event / quarter</option>
                 <option>One event / month</option>
                 <option>Bi-weekly</option>
@@ -192,17 +191,29 @@ const steps = [
             </div>
           </div>
           <label class="flex items-start gap-3 text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
-            <input type="checkbox" class="mt-1" />
+            <input type="checkbox" name="cocAgreed" class="mt-1" required />
             <span>I've read and agree to the <a href="https://github.com/opentao-ai/opentao/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">Code of Conduct</a>, and I'm willing to commit to at least 6 months as a host.</span>
           </label>
+
+          <!-- TODO: replace data-sitekey with your real Turnstile site key (see opentao-api/README.md step 3) -->
+          <div class="cf-turnstile" data-sitekey="TURNSTILE_SITE_KEY" data-theme="light"></div>
+
+          <p id="host-form-error" class="text-sm text-red-700 hidden" role="alert"></p>
+
           <div class="border-t hairline pt-6 flex flex-wrap items-center justify-between gap-4">
-            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">Submission is via GitHub PR · we reply within 7 days</span>
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">Filed as a GitHub Issue · we reply within 7 days</span>
             <div class="flex items-center gap-3">
-              <button type="button" class="btn-secondary text-sm font-medium px-5 py-2.5 rounded-md">Save draft</button>
-              <button type="submit" class="btn-primary text-sm font-semibold px-6 py-2.5 rounded-md inline-flex items-center gap-2">Submit application<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+              <button type="submit" id="host-form-submit" class="btn-primary text-sm font-semibold px-6 py-2.5 rounded-md inline-flex items-center gap-2">Submit application<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
             </div>
           </div>
         </form>
+
+        <div id="host-form-success" class="card rounded-md p-8 hidden">
+          <div class="section-label mb-3" style="color: #b8470b;">Application received</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-3">Got it — thank you.</h3>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-4">We've filed your application. Editorial + two senior hosts will read it together within 7 days.</p>
+          <p class="text-sm text-[color:var(--color-fg-muted)]">Tracking on GitHub: <a id="host-form-issue-link" href="#" target="_blank" rel="noopener" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">view your issue</a>.</p>
+        </div>
 
       </div>
     </div>
@@ -238,6 +249,104 @@ const steps = [
     </div>
   </section>
 </BaseLayout>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script is:inline>
+  (function () {
+    // TODO: if your deployed worker URL differs, update API_BASE here.
+    var API_BASE = 'https://opentao-api.cameron-530.workers.dev';
+    var form = document.getElementById('host-form');
+    if (!form) return;
+    var errEl = document.getElementById('host-form-error');
+    var submitBtn = document.getElementById('host-form-submit');
+    var successEl = document.getElementById('host-form-success');
+    var linkEl = document.getElementById('host-form-issue-link');
+
+    function showError(msg) {
+      if (!errEl) return;
+      errEl.textContent = msg;
+      errEl.classList.remove('hidden');
+    }
+    function clearError() {
+      if (!errEl) return;
+      errEl.textContent = '';
+      errEl.classList.add('hidden');
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      clearError();
+
+      var fd = new FormData(form);
+      var payload = {
+        name: (fd.get('name') || '').toString().trim(),
+        twitter: (fd.get('twitter') || '').toString().trim(),
+        city: (fd.get('city') || '').toString().trim(),
+        timezone: (fd.get('timezone') || '').toString().trim(),
+        intro: (fd.get('intro') || '').toString().trim(),
+        whyThisCity: (fd.get('whyThisCity') || '').toString().trim(),
+        firstEvent: (fd.get('firstEvent') || '').toString().trim(),
+        audience: (fd.get('audience') || '').toString().trim(),
+        cadence: (fd.get('cadence') || '').toString().trim(),
+        cocAgreed: fd.get('cocAgreed') === 'on' || fd.get('cocAgreed') === 'true',
+        turnstileToken: '',
+      };
+
+      if (!payload.name || !payload.city || !payload.intro) {
+        showError('Name, city, and intro are required.');
+        return;
+      }
+      if (!payload.cocAgreed) {
+        showError('Please confirm the Code of Conduct checkbox.');
+        return;
+      }
+
+      try {
+        if (typeof window.turnstile !== 'undefined' && window.turnstile.getResponse) {
+          payload.turnstileToken = window.turnstile.getResponse() || '';
+        }
+      } catch (_e) {}
+      if (!payload.turnstileToken) {
+        showError('Please complete the spam check.');
+        return;
+      }
+
+      submitBtn.setAttribute('disabled', 'true');
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        var res = await fetch(API_BASE + '/host-application', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) {
+          var msg = data && data.error ? data.error : 'submit_failed';
+          if (msg === 'rate_limited') msg = "You've hit the submission limit. Try again in an hour.";
+          else if (msg === 'spam_check_failed') msg = 'Spam check failed — please refresh and try again.';
+          else msg = 'Something went wrong (' + msg + '). Your input is still here; try again.';
+          showError(msg);
+          submitBtn.removeAttribute('disabled');
+          submitBtn.textContent = 'Submit application';
+          try { window.turnstile && window.turnstile.reset(); } catch (_e) {}
+          return;
+        }
+        if (linkEl && data.issueUrl) {
+          linkEl.setAttribute('href', data.issueUrl);
+          linkEl.textContent = data.issueUrl;
+        }
+        form.classList.add('hidden');
+        if (successEl) successEl.classList.remove('hidden');
+      } catch (err) {
+        showError('Network error — please retry.');
+        submitBtn.removeAttribute('disabled');
+        submitBtn.textContent = 'Submit application';
+      }
+    });
+  })();
+</script>
 
 <style>
   .input, .textarea { width: 100%; background: #ffffff; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: #0c0c10; outline: none; transition: border-color .15s; }

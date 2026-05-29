@@ -1,0 +1,53 @@
+name: Refresh chain stats
+
+# Pulls live numbers from Taostats every 6 hours and commits the updated
+# src/data/chain-stats.json to main. The commit triggers Cloudflare's
+# auto-deploy of opentao.ai.
+
+on:
+  schedule:
+    # Every 6 hours, on the hour (UTC).
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-chain-stats
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # We need to push back to main.
+          persist-credentials: true
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Fetch latest Taostats numbers
+        env:
+          TAOSTATS_API_KEY: ${{ secrets.TAOSTATS_API_KEY }}
+        run: bun run scripts/fetch-chain-stats.ts
+
+      - name: Commit & push if changed
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- src/data/chain-stats.json; then
+            echo "chain-stats.json unchanged — nothing to commit."
+            exit 0
+          fi
+
+          git add src/data/chain-stats.json
+          git commit -m "chore: refresh chain stats (auto)"
+          git push

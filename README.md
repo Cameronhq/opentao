@@ -80,6 +80,22 @@ To add a new entry:
 
 For content-heavy pages (long-form articles, hero subnets), add a standalone `.astro` file at the same slug and mark the data entry as `rich: true` so the dynamic route skips it.
 
+## Live data
+
+The landing page Section [03] "Bittensor at a glance" reads from `src/data/chain-stats.json`, refreshed every 6 hours by GitHub Actions.
+
+- **Workflow** — `.github/workflows/refresh-chain-stats.yml` (cron `0 */6 * * *`, plus `workflow_dispatch` for manual runs from the Actions tab).
+- **Script** — `scripts/fetch-chain-stats.ts` calls Taostats (`/api/stats/latest`, `/api/stats/history`, `/api/subnet/latest`, `/api/price/latest`) and writes the JSON. If the API fails the JSON is **not** overwritten and the job exits non-zero.
+- **Repo secret to add** (one-time): GitHub → Settings → Secrets and variables → Actions → New repository secret → name `TAOSTATS_API_KEY`, value from `taostats.io/pro`. Without this secret the workflow run will fail loudly and the on-site numbers stay at the last good snapshot.
+- **Local refresh**:
+  ```sh
+  source ~/.claude/credentials/taostats.env
+  bun run scripts/fetch-chain-stats.ts
+  ```
+  Then commit `src/data/chain-stats.json`.
+
+The push to main from the Action triggers Cloudflare's auto-deploy — the site rebuilds with the new numbers automatically.
+
 ## Deploy
 
 ### Cloudflare Pages (recommended)
@@ -108,10 +124,9 @@ Pagefind generates the search index into `dist/pagefind/` during `bun run build`
 
 ## v1 known gaps
 
-- No backend for forms — submit opens `mailto:cameron@moonshotcommons.com` as a v1 stopgap. Wire to GitHub PR / Formspree / Cloudflare Worker before scaling.
+- Forms (host application, insights pitch) POST to the `opentao-api` Cloudflare Worker, which files them as GitHub Issues on this repo. See `../opentao-api/README.md` for one-time setup (PAT, Turnstile, KV namespace, deploy).
 - No `/zh/` content yet — i18n routing config is in place, no translated pages exist.
-- Live chain stats (landing) are hardcoded — wire to a Cloudflare Worker cron pulling from Taostats or chain RPC.
-- Luma "Register" buttons on event pages are `#` — drop in real Luma URLs per event in `src/data/events.ts`.
+- Luma "Register" buttons read `lumaUrl` from `src/data/events.ts` per event — events without a URL show a disabled "RSVP link · adding soon" state.
 - `/mine/playbooks/{slug}` detail pages don't exist — playbooks listing links them but they 404. Stub or remove anchors.
 
 ## License
