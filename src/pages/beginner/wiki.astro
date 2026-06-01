@@ -58,10 +58,11 @@ const cluster6 = [
       <div class="mt-9 flex items-center gap-3 max-w-md">
         <div class="flex items-center gap-2 px-4 py-2.5 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] flex-1 bg-[color:var(--color-surface)]">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input type="text" placeholder="Search 26 concepts…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
-          <kbd class="font-mono text-[10px] text-[color:var(--color-fg-dim)] border hairline rounded px-1.5 py-0.5">⌘K</kbd>
+          <input id="wiki-search" type="text" placeholder="Filter 26 concepts…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+          <span id="wiki-count" class="font-mono text-[10px] text-[color:var(--color-fg-dim)] tabular">26</span>
         </div>
       </div>
+      <div id="wiki-empty" class="hidden mt-6 text-sm text-[color:var(--color-fg-muted)]">No matches. Try <button type="button" class="underline" id="wiki-search-global">global search ⌘K</button> across the whole site.</div>
       <div class="mt-12 flex flex-wrap items-center gap-6 text-xs font-mono text-[color:var(--color-fg-dim)]">
         <span><span class="text-[color:var(--color-fg)]">26</span> concepts</span><span class="opacity-30">·</span>
         <span><span class="text-[color:var(--color-fg)]">6</span> clusters</span><span class="opacity-30">·</span>
@@ -79,7 +80,7 @@ const cluster6 = [
         <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">three concepts that unlock the rest</span>
       </div>
       <div class="grid lg:grid-cols-3 gap-4">
-        <a href="/beginner/concepts/what-is-bittensor" class="featured rounded-md p-7 block group">
+        <a href="/beginner/concepts/what-is-bittensor" class="featured rounded-md p-7 block group" data-wiki-card data-wiki-text="what is bittensor network basics foundational 800 words single chain 128 markets tao">
           <div class="flex items-baseline justify-between mb-7">
             <span class="num text-5xl">01</span>
             <span class="pill-tag" style="border-color: rgba(184,71,11,0.3); color: #b8470b;">Foundational</span>
@@ -89,14 +90,14 @@ const cluster6 = [
           <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">The whole network in 800 words. A single chain underneath, 128 competing intelligence markets on top, paid in TAO.</p>
           <div class="flex items-center text-sm text-[color:var(--color-fg)] gap-2">Read this first <span class="arrow">→</span></div>
         </a>
-        <a href="/beginner/concepts/miners-and-validators" class="ccard rounded-md p-7 block group">
+        <a href="/beginner/concepts/miners-and-validators" class="ccard rounded-md p-7 block group" data-wiki-card data-wiki-text="miners validators roles two-sided market work scoring">
           <div class="flex items-baseline justify-between mb-7"><span class="num text-5xl">02</span><span class="pill-tag">Roles</span></div>
           <div class="section-label mb-2">Roles</div>
           <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">Miners &amp; validators</h3>
           <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">One submits work, the other scores it. Almost everything else in Bittensor is a consequence of how this two-sided market is wired.</p>
           <div class="flex items-center text-sm text-[color:var(--color-fg-muted)] gap-2">Read <span class="arrow">→</span></div>
         </a>
-        <a href="/beginner/concepts/yuma-consensus" class="ccard rounded-md p-7 block group">
+        <a href="/beginner/concepts/yuma-consensus" class="ccard rounded-md p-7 block group" data-wiki-card data-wiki-text="yuma consensus aggregation validator weights emission">
           <div class="flex items-baseline justify-between mb-7"><span class="num text-5xl">03</span><span class="pill-tag">Consensus</span></div>
           <div class="section-label mb-2">Consensus</div>
           <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">Yuma, intuitively</h3>
@@ -123,7 +124,7 @@ const cluster6 = [
         <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">{c.intro}</p>
         <div class={`grid ${c.cols} gap-3`}>
           {c.items.map((it) => (
-            <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4">
+            <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4" data-wiki-card data-wiki-text={(it.title + ' ' + it.body).toLowerCase()}>
               <span class="num text-3xl shrink-0 w-10">{it.n}</span>
               <div class="flex-1">
                 <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
@@ -148,7 +149,7 @@ const cluster6 = [
           </div>
           <div class="space-y-3">
             {cluster5.map((it) => (
-              <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4 block">
+              <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4 block" data-wiki-card data-wiki-text={(it.title + ' ' + it.body).toLowerCase()}>
                 <span class="num text-3xl shrink-0 w-10">{it.n}</span>
                 <div class="flex-1">
                   <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
@@ -166,7 +167,7 @@ const cluster6 = [
           </div>
           <div class="space-y-3">
             {cluster6.map((it) => (
-              <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4 block">
+              <a href={`/beginner/concepts/${it.slug}`} class="ccard rounded-md p-5 flex items-start gap-4 block" data-wiki-card data-wiki-text={(it.title + ' ' + it.body).toLowerCase()}>
                 <span class="num text-3xl shrink-0 w-10">{it.n}</span>
                 <div class="flex-1">
                   <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
@@ -187,10 +188,37 @@ const cluster6 = [
           <div class="section-label mb-3">Public knowledge</div>
           <h3 class="text-2xl font-serif italic font-medium leading-snug max-w-[560px]">Every concept page is editable. Spot something stale or missing? Open a PR.</h3>
         </div>
-        <a href="#" class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md border hairline-strong hover:border-[color:var(--color-fg-muted)]">Edit on GitHub</a>
+        <a href="https://github.com/opentao-ai/opentao/tree/main/src/pages/beginner/concepts" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md border hairline-strong hover:border-[color:var(--color-fg-muted)]">Edit on GitHub ↗</a>
       </div>
     </div>
   </section>
+
+  <script>
+    const input = document.getElementById('wiki-search');
+    const cards = Array.from(document.querySelectorAll('[data-wiki-card]'));
+    const counter = document.getElementById('wiki-count');
+    const empty = document.getElementById('wiki-empty');
+    const globalBtn = document.getElementById('wiki-search-global');
+
+    function apply() {
+      const q = (input && input.value || '').trim().toLowerCase();
+      let shown = 0;
+      for (const c of cards) {
+        const t = c.getAttribute('data-wiki-text') || '';
+        const match = !q || t.includes(q);
+        c.style.display = match ? '' : 'none';
+        if (match) shown++;
+      }
+      if (counter) counter.textContent = String(shown);
+      if (empty) empty.classList.toggle('hidden', shown !== 0 || q === '');
+    }
+
+    if (input) input.addEventListener('input', apply);
+    if (globalBtn) globalBtn.addEventListener('click', () => {
+      const e = new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true });
+      window.dispatchEvent(e);
+    });
+  </script>
 </BaseLayout>
 
 <style>

@@ -20,18 +20,25 @@ interface Resource {
 }
 
 interface Section {
+  id: string;
   label: string;
   title: string;
   count: string;
   items: Resource[];
   footnote?: string;
+  usedIn?: { label: string; href: string }[];   // back-links into General Setup steps
 }
 
 const sections: Section[] = [
   {
+    id: 'wallets',
     label: 'Wallets',
     title: 'Where you keep your TAO and your hotkey.',
     count: '5 entries',
+    usedIn: [
+      { label: 'Step 03 · Install btcli', href: '/mine/general-setup#step-03' },
+      { label: 'Step 04 · Create wallet', href: '/mine/general-setup#step-04' },
+    ],
     items: [
       { name: 'bittensor-cli (btcli)', trust: 'foundation', trustLabel: 'Foundation', blurb: 'Official CLI. Self-custody. The most direct way to manage cold/hotkeys.', meta: 'macOS · Linux · WSL · open source' },
       { name: 'Bittensor Wallet (browser)', trust: 'community', trustLabel: 'Community', blurb: 'Browser extension fork. Friendly UI for sending and staking — not for mining setup.', meta: 'Chrome · Brave · Edge' },
@@ -39,9 +46,13 @@ const sections: Section[] = [
     ],
   },
   {
+    id: 'exchanges',
     label: 'Exchanges',
     title: 'Where to buy TAO.',
     count: '6 entries',
+    usedIn: [
+      { label: 'Step 05 · Get TAO', href: '/mine/general-setup#step-05' },
+    ],
     items: [
       { name: 'Binance', trust: 'community', trustLabel: 'Community', blurb: 'Largest TAO/USDT and TAO/BTC pairs. Bittensor network withdrawals supported.', meta: 'CEX · KYC · US restricted' },
       { name: 'Kraken', trust: 'community', trustLabel: 'Community', blurb: 'TAO/USD and TAO/EUR. US-friendly. Slightly higher fees, faster fiat ramp.', meta: 'CEX · KYC · US ok' },
@@ -50,9 +61,14 @@ const sections: Section[] = [
     footnote: "⚠ After buying, transfer TAO to your own coldkey. Don't mine from an exchange wallet — they can't sign for your hotkey.",
   },
   {
+    id: 'compute',
     label: 'Compute',
     title: 'Where to rent GPU.',
     count: '8 entries',
+    usedIn: [
+      { label: 'Step 06 · Register on a subnet', href: '/mine/general-setup#step-06' },
+      { label: 'Playbooks · subnet hardware specs',  href: '/mine/playbooks' },
+    ],
     items: [
       { name: 'Lambda Labs', trust: 'community', trustLabel: 'Community', blurb: 'H100, A100, 4090. Reliable provisioning, hourly billing, clean Ubuntu images.', meta: 'on-demand · $$ · US/EU' },
       { name: 'RunPod', trust: 'community', trustLabel: 'Community', blurb: 'Per-second billing, container-first, lots of GPU options. Spot tier ~50% cheaper.', meta: 'on-demand + spot · $$ · global' },
@@ -60,9 +76,14 @@ const sections: Section[] = [
     ],
   },
   {
+    id: 'tools',
     label: 'Tools',
     title: 'Block explorers, monitoring, dashboards.',
     count: '9 entries',
+    usedIn: [
+      { label: 'Step 06 · Live burn-cost & burn check',  href: '/mine/general-setup#step-06' },
+      { label: 'Step 07 · Verify setup',                  href: '/mine/general-setup#step-07' },
+    ],
     items: [
       { name: 'Taostats', trust: 'community', trustLabel: 'Community', blurb: 'The de-facto block explorer. Subnet stats, validator leaderboards, emission charts.', meta: 'free · explorer' },
       { name: 'btcli-tui', trust: 'listed', trustLabel: 'Listed', blurb: 'Curses-style TUI wrapper around btcli. Faster for power users with many hotkeys.', meta: 'open source · CLI' },
@@ -96,15 +117,23 @@ const sections: Section[] = [
   </section>
 
   {sections.map((sec) => (
-    <section class="border-b hairline">
+    <section class="border-b hairline scroll-mt-16" id={sec.id}>
       <div class="max-w-[1200px] mx-auto px-6 py-16">
-        <div class="flex items-baseline justify-between mb-8">
+        <div class="flex items-baseline justify-between mb-4 gap-6 flex-wrap">
           <div>
             <div class="section-label mb-2">{sec.label}</div>
             <h2 class="text-2xl font-semibold tracking-tight">{sec.title}</h2>
           </div>
           <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{sec.count}</span>
         </div>
+        {sec.usedIn && sec.usedIn.length > 0 && (
+          <div class="used-in mb-8">
+            <span class="used-in-label">Used in →</span>
+            {sec.usedIn.map((u) => (
+              <a href={u.href} class="used-in-link">{u.label}</a>
+            ))}
+          </div>
+        )}
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {sec.items.map((it) => (
             <a href={it.href ?? '#'} class="card rounded-md p-5 block">
@@ -161,5 +190,32 @@ const sections: Section[] = [
   .trust-listed {
     color: #4a4a52;
     border-color: rgba(15, 15, 18, 0.15);
+  }
+  .used-in {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .used-in-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #767680;
+  }
+  .used-in-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(184, 71, 11, 0.22);
+    color: #b8470b;
+    background: rgba(184, 71, 11, 0.04);
+    transition: all 0.12s;
+  }
+  .used-in-link:hover {
+    background: rgba(184, 71, 11, 0.1);
+    border-color: rgba(184, 71, 11, 0.5);
   }
 </style>

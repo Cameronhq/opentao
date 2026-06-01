@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subnet mockup · V1 final — Zeus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --fg: #0c0c10; --fg-muted: #4a4a52; --fg-dim: #767680;
+      --accent: #b8470b; --green: #15803d; --blue: #1c6ea4; --red: #b91c1c; --violet: #6741d9;
+      --paper: #ffffff; --surface: #fafaf9;
+      --border: rgba(15,15,18,0.08); --border-strong: rgba(15,15,18,0.18);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --font-serif: 'Fraunces', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); color: var(--fg); background: var(--paper); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 56px 32px; }
+    .pill { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+    .pill.variant { background: rgba(184,71,11,0.06); color: var(--accent); border-color: rgba(184,71,11,0.3); }
+    .section-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-dim); }
+    h2.section-h { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.01em; margin: 0 0 24px; }
+    .ph-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); padding: 3px 8px; border-radius: 3px; background: rgba(184,71,11,0.06); border: 1px dashed rgba(184,71,11,0.4);
+      margin-left: 8px; vertical-align: middle;
+    }
+
+    /* ────────────────────────────────────────────── GLOBAL 2-COL — main + permanent right sidebar */
+    .body-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 40px;
+    }
+    @media (max-width: 980px) {
+      .body-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    .body-main { min-width: 0; }
+    .body-side {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    @media (min-width: 981px) {
+      .body-side {
+        position: sticky;
+        top: 24px;
+        align-self: start;
+        max-height: calc(100vh - 48px);
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+      /* slim scrollbar */
+      .body-side::-webkit-scrollbar { width: 4px; }
+      .body-side::-webkit-scrollbar-thumb { background: rgba(15,15,18,0.15); border-radius: 999px; }
+    }
+
+    /* Each top-level section in main column gets uniform vertical rhythm */
+    .body-main > section,
+    .body-main > header {
+      padding-bottom: 48px;
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .body-main > section:last-child,
+    .body-main > header:last-child {
+      padding-bottom: 0; margin-bottom: 0; border-bottom: 0;
+    }
+
+    /* ────────────────────────────────────────────── HERO (full width, above the 2-col grid) */
+    .hero-full { padding-bottom: 48px; margin-bottom: 48px; border-bottom: 1px solid var(--border); }
+    .hero-bcrumb { display: flex; gap: 6px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); margin-bottom: 20px; }
+    .hero-bcrumb a { color: var(--fg-dim); text-decoration: none; }
+    .hero-bcrumb a:hover { color: var(--fg); }
+    .hero-bcrumb .sep { opacity: 0.4; }
+    .hero-bcrumb .curr { color: var(--fg); }
+
+    .hero-meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .hero-meta .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; color: var(--green); background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); }
+    .hero-meta .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--green); box-shadow: 0 0 8px rgba(22,163,74,0.45); display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .hero-meta .light { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+    .hero-meta .light a { color: var(--fg); text-decoration: none; border-bottom: 1px solid rgba(184,71,11,0.3); }
+
+    .hero-id { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+    .hero-id .lbl { font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim); }
+    .hero-id .num { font-family: var(--font-mono); font-size: 56px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg); line-height: 1; }
+    .hero h1 { font-family: var(--font-serif); font-weight: 500; font-size: 44px; letter-spacing: -0.015em; line-height: 1.1; margin: 6px 0 18px; }
+    .hero .pitch { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: var(--fg); max-width: 760px; margin: 0; }
+    .hero .pitch strong { font-style: normal; font-weight: 500; color: var(--accent); }
+
+    /* ────────────────────────────────────────────── LIVE STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); margin-top: 28px; }
+    @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .stat-cell { padding: 16px 18px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--paper); }
+    .stat-cell:last-child { border-right: 0; }
+    .stat-cell .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 6px; }
+    .stat-cell .v { font-family: var(--font-mono); font-weight: 600; font-size: 20px; color: var(--fg); font-variant-numeric: tabular-nums; }
+    .stat-cell .sub { font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim); margin-top: 3px; }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--green); padding: 4px 10px; border-radius: 999px; background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3);
+      margin-top: 14px;
+    }
+    .live-badge .pulse { width: 6px; height: 6px; border-radius: 999px; background: var(--green); animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ────────────────────────────────────────────── CYCLE */
+    .cycle-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .cycle-head h2 { font-family: var(--font-serif); font-weight: 500; font-size: 28px; letter-spacing: -0.01em; margin: 0; }
+    .cycle-head .tempo { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); padding: 5px 11px; border: 1px solid var(--border); border-radius: 999px; }
+
+    .stage-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface);
+    }
+    @media (max-width: 1100px) { .stage-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .stage-row { grid-template-columns: 1fr; } }
+    .stage { position: relative; padding: 22px 18px 20px; border-right: 1px solid var(--border); background: var(--paper); }
+    .stage:nth-child(2n) { border-right: 0; }
+    @media (min-width: 1101px) { .stage:nth-child(2n) { border-right: 1px solid var(--border); } .stage:last-child { border-right: 0; } }
+    .stage .step { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    .stage .actor { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); letter-spacing: 0.04em; margin-bottom: 4px; }
+    .stage h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; color: var(--fg); }
+    .stage p { font-size: 13px; color: var(--fg-muted); margin: 0; line-height: 1.55; }
+    .stage .data { font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim); margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); }
+    .stage .data .k { color: var(--fg-dim); } .stage .data .v { color: var(--fg); }
+    .stage[data-side="miner"] .actor { color: var(--accent); }
+    .stage[data-side="validator"] .actor { color: var(--blue); }
+    .stage[data-side="chain"] .actor { color: var(--green); }
+
+    /* ────────────────────────────────────────────── ROLES */
+    .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 700px) { .roles-grid { grid-template-columns: 1fr; } }
+    .role-card { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+    .role-card .role-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .role-card .role-dot { width: 12px; height: 12px; border-radius: 999px; }
+    .role-card[data-role="miner"] .role-dot { background: var(--accent); }
+    .role-card[data-role="validator"] .role-dot { background: var(--blue); }
+    .role-card .role-name { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+    .role-card h3 { font-family: var(--font-serif); font-weight: 500; font-size: 20px; margin: 0 0 12px; }
+    .role-card .field { display: grid; grid-template-columns: 90px 1fr; gap: 14px; padding: 8px 0; font-size: 13px; border-top: 1px solid var(--border); }
+    .role-card .field:first-of-type { border-top: 0; padding-top: 0; }
+    .role-card .field .k { font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim); padding-top: 1px; letter-spacing: 0.04em; }
+    .role-card .field .v { color: var(--fg); line-height: 1.5; }
+
+    /* ────────────────────────────────────────────── SIDEBAR cards */
+    .side-card { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+    .side-card .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 12px; }
+    .side-card .row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; font-size: 12px; border-top: 1px solid var(--border); }
+    .side-card .row:first-of-type { border-top: 0; padding-top: 0; }
+    .side-card .row .k { font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim); }
+    .side-card .row .v { color: var(--fg); }
+    .side-card .row .v.accent { color: var(--accent); }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag-list .tag { font-family: var(--font-mono); font-size: 10px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--fg-muted); background: var(--surface); }
+    .ext-list a { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 4px; color: var(--fg); text-decoration: none; font-size: 12px; border-top: 1px solid var(--border); transition: background 0.12s; }
+    .ext-list a:first-of-type { border-top: 0; }
+    .ext-list a:hover { background: var(--surface); color: var(--accent); }
+    .ext-list a .arrow { color: var(--accent); font-family: var(--font-mono); }
+    .tw-mini { display: flex; flex-direction: column; gap: 8px; }
+    .tw-mini .item { padding: 10px; background: var(--surface); border-radius: 6px; font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+    .tw-mini .item .when { font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim); margin-bottom: 3px; }
+    .tw-mini .more { margin-top: 8px; text-align: right; font-family: var(--font-mono); font-size: 10px; }
+    .tw-mini .more a { color: var(--accent); text-decoration: none; }
+
+    /* prose */
+    .prose { max-width: 720px; }
+    .prose p { font-size: 16px; line-height: 1.75; color: var(--fg); margin: 0 0 16px; }
+    .prose p.lead { font-family: var(--font-serif); font-style: italic; font-size: 19px; color: var(--fg); }
+    .prose strong { font-weight: 500; }
+
+    .callout-red { background: rgba(185,28,28,0.04); border-left: 3px solid var(--red); padding: 16px 22px; border-radius: 0 6px 6px 0; margin: 22px 0; max-width: 720px; }
+    .callout-red .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+    .callout-red p { font-size: 14px; color: var(--fg); line-height: 1.65; margin: 0; }
+
+    /* ────────────────────────────────────────────── COMPETITIVE */
+    .compete-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; margin-top: 32px; }
+    .compete-head h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 0; }
+    .compete-head .scope { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); padding: 3px 10px; border: 1px solid var(--border); border-radius: 999px; }
+    .compete-table { width: 100%; border-collapse: collapse; background: var(--paper); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .compete-table thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); text-align: left; padding: 11px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-weight: 400; }
+    .compete-table tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 12.5px; line-height: 1.55; vertical-align: top; }
+    .compete-table tbody tr:last-child td { border-bottom: 0; }
+    .compete-table tbody tr.self { background: rgba(184,71,11,0.04); }
+    .compete-table tbody tr.self td:first-child { font-weight: 500; color: var(--accent); }
+    .compete-table .badge { display: inline-block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; border: 1px solid; margin-left: 4px; vertical-align: middle; }
+    .compete-table .badge.open { color: var(--green); border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+    .compete-table .badge.closed { color: var(--red); border-color: rgba(185,28,28,0.3); background: rgba(185,28,28,0.05); }
+    .compete-table .badge.decn { color: var(--accent); border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+    .compete-note { font-size: 13px; color: var(--fg-muted); line-height: 1.65; margin-top: 14px; max-width: 720px; }
+
+    /* ────────────────────────────────────────────── TEAM & FOUNDERS */
+    .team-intro { max-width: 720px; margin-bottom: 24px; }
+    .team-intro p { font-size: 16px; line-height: 1.75; color: var(--fg); margin: 0 0 14px; }
+    .team-intro p strong { font-weight: 500; }
+    .founders-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 1100px) { .founders-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 700px) { .founders-grid { grid-template-columns: 1fr; } }
+    .founder { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .founder .top { display: flex; align-items: center; gap: 12px; }
+    .founder .avatar { width: 42px; height: 42px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-weight: 500; font-size: 16px; color: #fff; flex-shrink: 0; }
+    .founder[data-c="v"] .avatar { background: linear-gradient(135deg, #6741d9, #1c6ea4); }
+    .founder[data-c="a"] .avatar { background: linear-gradient(135deg, #b8470b, #c2410c); }
+    .founder[data-c="g"] .avatar { background: linear-gradient(135deg, #15803d, #1c6ea4); }
+    .founder .name { font-size: 14px; font-weight: 500; color: var(--fg); }
+    .founder .role { font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim); margin-top: 2px; }
+    .founder .bio { font-size: 12.5px; color: var(--fg-muted); line-height: 1.6; margin: 0; }
+    .founder .socials { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 10px; padding-top: 10px; border-top: 1px dashed var(--border); margin-top: auto; }
+    .founder .socials a { color: var(--fg-muted); text-decoration: none; }
+    .founder .socials a:hover { color: var(--accent); }
+    .team-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+    @media (max-width: 700px) { .team-meta { grid-template-columns: 1fr; } }
+    .team-meta .cell .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 5px; }
+    .team-meta .cell .v { font-size: 13.5px; color: var(--fg); line-height: 1.5; }
+    .backers-row { padding: 14px 18px; border: 1px dashed var(--border); border-radius: 8px; background: var(--surface); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .backers-row .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); }
+    .backers-row .v { font-size: 13px; color: var(--fg); }
+    .backers-row .v em { color: var(--fg-muted); font-style: italic; }
+    .ph-banner { margin-top: 16px; padding: 12px 16px; font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); line-height: 1.6; background: rgba(184,71,11,0.04); border: 1px dashed rgba(184,71,11,0.3); border-radius: 6px; }
+
+    /* ────────────────────────────────────────────── HISTORY */
+    .timeline { display: flex; flex-direction: column; max-width: 720px; }
+    .milestone { display: grid; grid-template-columns: 80px 1fr; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border); align-items: baseline; }
+    .milestone:first-child { border-top: 0; padding-top: 0; }
+    .milestone .mdate { font-family: var(--font-mono); font-size: 12px; color: var(--accent); letter-spacing: 0.05em; }
+    .milestone .mtext { font-size: 14px; color: var(--fg); line-height: 1.6; }
+
+    /* ────────────────────────────────────────────── JOIN */
+    .join-card { background: linear-gradient(90deg, rgba(184,71,11,0.06), rgba(184,71,11,0.02), rgba(184,71,11,0)); border: 1px solid rgba(184,71,11,0.28); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+    @media (max-width: 700px) { .join-card { grid-template-columns: 1fr; } }
+    .join-card .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+    .join-card h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 0 0 6px; }
+    .join-card p { font-size: 13.5px; color: var(--fg-muted); margin: 0; line-height: 1.6; max-width: 460px; }
+    .join-card .cta { display: inline-flex; align-items: center; gap: 8px; background: var(--fg); color: var(--paper); padding: 13px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; white-space: nowrap; }
+    .join-card .cta:hover { background: var(--accent); }
+    .join-card .cta svg { transition: transform 0.15s; }
+    .join-card .cta:hover svg { transform: translateX(3px); }
+    .join-card .aside-note { font-size: 12px; color: var(--fg-muted); margin-top: 10px; font-style: italic; }
+
+    /* ────────────────────────────────────────────── RELATED (full width below) */
+    .below-grid { padding: 48px 0; border-top: 1px solid var(--border); }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .related-card { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 18px; text-decoration: none; color: inherit; transition: all 0.15s; }
+    .related-card:hover { border-color: rgba(184,71,11,0.35); transform: translateY(-2px); }
+    .related-card .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .related-card .net { font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--fg); }
+    .related-card .cat-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; color: var(--green); background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); }
+    .related-card .name { font-size: 14px; font-weight: 500; color: var(--fg); margin-bottom: 4px; }
+    .related-card .desc { font-size: 12px; color: var(--fg-muted); line-height: 1.55; }
+
+    /* ────────────────────────────────────────────── FOOTER */
+    .pg-footer { padding: 28px 0; border-top: 1px solid var(--border); }
+    .pg-footer .row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim); }
+    .pg-footer a { color: var(--fg-muted); text-decoration: none; }
+    .pg-footer a:hover { color: var(--fg); }
+
+    .mockup-tag { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="mockup-tag">
+      <span class="section-label">SUBNET PAGE — V1 FINAL (permanent right sidebar)</span>
+      <span class="pill variant">SN18 · ZEUS</span>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ 1. HERO (full width) -->
+    <header class="hero hero-full">
+      <div class="hero-bcrumb">
+        <a href="#">OpenTAO</a><span class="sep">/</span>
+        <a href="#">Subnets</a><span class="sep">/</span>
+        <span class="curr">18 · Zeus</span>
+      </div>
+      <div class="hero-meta">
+        <span class="cat">Data · Prediction</span>
+        <span class="light"><span class="dot"></span>active · 25 miners · 11 validators</span>
+        <span class="light">· operator <a href="https://twitter.com/zeussubnet" target="_blank">Orpheus AI</a></span>
+      </div>
+      <div class="hero-id"><span class="lbl">netuid</span><span class="num">18</span></div>
+      <h1>Zeus</h1>
+      <p class="pitch">
+        A Bittensor subnet for <strong>global weather forecasting</strong>.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-cell"><div class="k">Emission · 24h</div><div class="v">3,614 τ</div><div class="sub">≈ $1.03M/day</div></div>
+        <div class="stat-cell"><div class="k">Burn-cost</div><div class="v">0.998 τ</div><div class="sub">to register a UID</div></div>
+        <div class="stat-cell"><div class="k">α-price</div><div class="v">0.0072 τ</div><div class="sub">mcap 33.8K τ</div></div>
+        <div class="stat-cell"><div class="k">Active miners</div><div class="v">25 <span style="font-size: 13px; color: var(--fg-dim);">/ 256</span></div><div class="sub">10% slot fill</div></div>
+        <div class="stat-cell"><div class="k">Registered</div><div class="v" style="font-size: 16px;">2024·08·15</div><div class="sub">~21 months</div></div>
+      </div>
+      <span class="live-badge"><span class="pulse"></span>Live · via taostats · refreshed daily</span>
+    </header>
+
+    <!-- ════════════════════════════════════════════════════════ BODY: 2-col from cycle onward -->
+    <div class="body-grid">
+
+      <!-- ─────────── MAIN COLUMN ─────────── -->
+      <div class="body-main">
+
+        <!-- 2. OVERVIEW -->
+        <section id="overview">
+          <h2 class="section-h">Overview</h2>
+          <div class="prose">
+            <p class="lead">Zeus is the subnet operated by Orpheus AI for global weather forecasting.</p>
+            <p>Twenty-five miners, each running their own atmospheric model, compete to produce the most accurate forecast every 72 minutes. Eleven validators grade those forecasts against ERA5 reanalysis — the same dataset that institutions like ECMWF use as ground truth. The score function is anomaly-correlation-coefficient at 6-, 24-, 72-, and 120-hour horizons; higher means better than the median.</p>
+            <p>The customer outside the network is the energy-trading desk. Power generation, gas demand, and wind-farm dispatch all hinge on 24- to 120-hour forecast skill. Orpheus AI sells API access to those desks; the subnet's emission pays miners to keep improving. The pitch they make is simple: <em>weather is the last great unmonetized scientific instrument — Zeus puts an incentive layer on top of it.</em></p>
+            <p>Where ECMWF, GraphCast, and Pangu-Weather are all single static checkpoints, Zeus is a live competition — twenty-five teams retraining in parallel. <a href="#customer" style="color: var(--accent); border-bottom: 1px solid rgba(184,71,11,0.3); text-decoration: none;">See competitive landscape ↓</a></p>
+          </div>
+        </section>
+
+        <!-- 3. CYCLE -->
+        <section>
+          <div class="cycle-head">
+            <h2>One tempo · miner ↔ validator</h2>
+            <span class="tempo">1 tempo ≈ 72 min · ~20×/day</span>
+          </div>
+          <div class="stage-row">
+            <div class="stage" data-side="validator">
+              <div class="step">01 · Challenge</div>
+              <div class="actor">Validator</div>
+              <h3>Sample a problem</h3>
+              <p>Pick a region and a recent time slice the miners haven't seen, broadcast the initial atmospheric state to every active miner.</p>
+              <div class="data"><span class="k">payload </span><span class="v">ERA5 init · ~4 MB</span></div>
+            </div>
+            <div class="stage" data-side="miner">
+              <div class="step">02 · Compute</div>
+              <div class="actor">Miner</div>
+              <h3>Run the model</h3>
+              <p>Each miner runs its own forecast model and returns gridded predictions at +6h, +24h, +72h, +120h horizons.</p>
+              <div class="data"><span class="k">latency </span><span class="v">20–90 s on H100</span></div>
+            </div>
+            <div class="stage" data-side="validator">
+              <div class="step">03 · Score</div>
+              <div class="actor">Validator</div>
+              <h3>Grade with ACC</h3>
+              <p>Compute anomaly-correlation-coefficient against the held-out ERA5 truth window. Weighted sum across variables and horizons.</p>
+              <div class="data"><span class="k">scale </span><span class="v">0.0 → 1.0</span></div>
+            </div>
+            <div class="stage" data-side="chain">
+              <div class="step">04 · Settle</div>
+              <div class="actor">Subtensor</div>
+              <h3>Yuma → emission</h3>
+              <p>Every validator's weights, multiplied by their stake, aggregated by Yuma into one reward vector. TAO mints to top miners.</p>
+              <div class="data"><span class="k">tempo </span><span class="v">~72 min · 24×/day</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. ROLES -->
+        <section>
+          <h2 class="section-h">Who does what</h2>
+          <div class="roles-grid">
+            <div class="role-card" data-role="miner">
+              <div class="role-head"><span class="role-dot"></span><span class="role-name">MINER</span></div>
+              <h3>Produces a forecast.</h3>
+              <div class="field"><span class="k">does</span><span class="v">Runs an atmospheric model and returns gridded predictions every tempo.</span></div>
+              <div class="field"><span class="k">input</span><span class="v">Withheld ERA5 init state, ~4 MB tensor</span></div>
+              <div class="field"><span class="k">output</span><span class="v">Gridded fields · 4 horizons × 4 variables</span></div>
+              <div class="field"><span class="k">hardware</span><span class="v">1×H100 80GB · A100 minimum</span></div>
+              <div class="field"><span class="k">paid for</span><span class="v">High ACC vs held-out truth · heavy-tailed</span></div>
+              <div class="field"><span class="k">paid via</span><span class="v">Per-tempo emission, score × validator stake</span></div>
+            </div>
+            <div class="role-card" data-role="validator">
+              <div class="role-head"><span class="role-dot"></span><span class="role-name">VALIDATOR</span></div>
+              <h3>Grades against truth.</h3>
+              <div class="field"><span class="k">does</span><span class="v">Pulls ERA5 ground truth, runs ACC against every miner, submits weights.</span></div>
+              <div class="field"><span class="k">requires</span><span class="v">Top-N stake + ERA5 mirror + reference validator code</span></div>
+              <div class="field"><span class="k">output</span><span class="v">Per-UID weight vector, signed on-chain</span></div>
+              <div class="field"><span class="k">paid for</span><span class="v">Submitting weights that agree with consensus median</span></div>
+              <div class="field"><span class="k">paid via</span><span class="v">Per-tempo emission, stake × consensus alignment</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. SCORING -->
+        <section id="scoring">
+          <h2 class="section-h">How scoring works</h2>
+          <div class="prose">
+            <p class="lead">A weather forecast is graded against reality. That's it.</p>
+            <p>The validator picks an initial atmospheric state from the public ERA5 reanalysis — a recent slice the miners have not seen — and broadcasts it. Each miner returns gridded predictions of temperature, wind, geopotential, and humidity at four horizons (+6h, +24h, +72h, +120h). The validator then holds out the ground truth from a slightly later ERA5 window and computes <strong>Anomaly Correlation Coefficient</strong> (ACC) for each variable / horizon combination. Higher ACC than the median wins emission.</p>
+            <p>The math rewards <em>skill</em> — beating the long-term climatological mean — not just memorization. A miner that returns climatology will score near zero. A miner that perfectly predicts the future scores 1.0.</p>
+          </div>
+          <div class="callout-red">
+            <div class="lbl">⚠ What doesn't work</div>
+            <p>
+              Returning <strong>ERA5 reanalysis verbatim</strong> — validators inject the held-out window randomly and a cheating miner will be caught the first time the window slides into the future.
+              Predicting <strong>climatology</strong> — ACC against the true field will be near zero.
+              Running a <strong>stale model snapshot</strong> — the catalog of evaluation regions moves seasonally, top miners retrain on rolling windows.
+            </p>
+          </div>
+        </section>
+
+        <!-- 6. CUSTOMER + COMPETITIVE -->
+        <section id="customer">
+          <h2 class="section-h">Who pays — and what they're paying for</h2>
+          <div class="prose">
+            <p class="lead">The customer outside Bittensor is the energy-trading desk.</p>
+            <p>Wind farms, battery dispatch, gas demand — all hinge on 24- to 120-hour forecast accuracy. ECMWF's HRES is the public benchmark. Orpheus AI claims SN18 beats it by roughly <strong>4.5 hours of effective skill</strong> at the 120h horizon. If that gap holds across seasons, it's millions of dollars in trade signal per year — easily covering the subnet's emission cost.</p>
+            <p>Concretely: Zeus sells an API to power-trading desks (some named, some anonymous). The chain rewards miners for accuracy. The customer doesn't see — or care about — Bittensor under the hood.</p>
+          </div>
+
+          <div class="compete-head">
+            <h3>Competitive landscape</h3>
+            <span class="scope">120h skill · global · 2026</span>
+          </div>
+          <table class="compete-table">
+            <thead><tr><th>Forecaster</th><th>Approach</th><th>Access</th><th>Differentiator</th></tr></thead>
+            <tbody>
+              <tr class="self">
+                <td>Zeus<span class="badge decn">SN18</span></td>
+                <td>Incentivized swarm of competing atmospheric models, scored against ERA5</td>
+                <td><span class="badge open">open · API</span></td>
+                <td>Claims +4.5h skill vs ECMWF · price-per-API-call</td>
+              </tr>
+              <tr>
+                <td>ECMWF HRES</td>
+                <td>Single deterministic NWP run, govt-funded</td>
+                <td><span class="badge open">public</span></td>
+                <td>Gold standard · slow release cadence · no API SLA</td>
+              </tr>
+              <tr>
+                <td>GraphCast<br><span style="font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim);">DeepMind</span></td>
+                <td>Single transformer trained on ERA5, deterministic</td>
+                <td><span class="badge open">open weights</span></td>
+                <td>Best single-model · static checkpoint · no continuous re-train pressure</td>
+              </tr>
+              <tr>
+                <td>Pangu-Weather<br><span style="font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim);">Huawei</span></td>
+                <td>3D transformer ensemble</td>
+                <td><span class="badge open">open weights</span></td>
+                <td>Strong tropical-cyclone tracks · no commercial channel</td>
+              </tr>
+              <tr>
+                <td>Tomorrow.io</td>
+                <td>Proprietary ensemble of NWP + ML</td>
+                <td><span class="badge closed">closed · paid</span></td>
+                <td>Enterprise SLA · ag/insurance verticals · expensive</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="compete-note">
+            Most weather AI players ship a static checkpoint and call it a day. Zeus's claim to be different is the <em>incentive layer</em>: 25 miners are all retraining against last week's ERA5 to keep their ACC above the prune threshold. If that mechanism works, Zeus stays ahead of any single-checkpoint competitor by construction.
+          </p>
+        </section>
+
+        <!-- 6.5. TEAM & FOUNDERS -->
+        <section id="team">
+          <h2 class="section-h">Team &amp; founders <span class="ph-badge">⚠ placeholder data</span></h2>
+          <div class="team-intro">
+            <p><strong>Orpheus AI</strong> is the applied-AI lab that designed and operates Zeus. They wrote the validator, run the reference miner, and own the customer relationship with the energy-trading desks. The lab is small — roughly 6–8 people — but the relevant team has deep numerical-weather-prediction (NWP) background.</p>
+            <p>The pitch they make to potential miners and customers: "weather is the last great unmonetized scientific instrument. We built an incentive layer on top of it."</p>
+          </div>
+
+          <div class="founders-grid">
+            <div class="founder" data-c="v">
+              <div class="top">
+                <div class="avatar">RC</div>
+                <div>
+                  <div class="name">[Founder 1 name]</div>
+                  <div class="role">Co-founder · CEO</div>
+                </div>
+              </div>
+              <p class="bio">Ex-NCAR atmospheric scientist. Worked on the GraphCast follow-on at a major AI lab before starting Orpheus. Drives the customer side — the energy-trader API.</p>
+              <div class="socials">
+                <a href="#" target="_blank">𝕏 @placeholder</a>
+                <a href="#" target="_blank">github</a>
+              </div>
+            </div>
+            <div class="founder" data-c="a">
+              <div class="top">
+                <div class="avatar">MK</div>
+                <div>
+                  <div class="name">[Founder 2 name]</div>
+                  <div class="role">Co-founder · CTO</div>
+                </div>
+              </div>
+              <p class="bio">Background in ML systems and distributed training. Built the validator scoring pipeline and the on-chain settlement glue. Owns the protocol-level engineering.</p>
+              <div class="socials">
+                <a href="#" target="_blank">𝕏 @placeholder</a>
+                <a href="#" target="_blank">github</a>
+              </div>
+            </div>
+            <div class="founder" data-c="g">
+              <div class="top">
+                <div class="avatar">JL</div>
+                <div>
+                  <div class="name">[Person 3 name]</div>
+                  <div class="role">Head of validators · ops</div>
+                </div>
+              </div>
+              <p class="bio">Runs the reference validator and the community Discord. Onboards new miners, mediates catalog updates, runs the weekly office hours.</p>
+              <div class="socials">
+                <a href="#" target="_blank">𝕏 @placeholder</a>
+                <a href="https://twitter.com/zeussubnet" target="_blank">team channel</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="team-meta">
+            <div class="cell"><div class="k">Team size</div><div class="v">~6–8 (placeholder)</div></div>
+            <div class="cell"><div class="k">Founded</div><div class="v">2024 (pre-Bittensor)</div></div>
+            <div class="cell"><div class="k">Based</div><div class="v">Distributed · core in EU + US</div></div>
+          </div>
+
+          <div class="backers-row">
+            <span class="lbl">Backers / funding</span>
+            <span class="v"><em>Not publicly disclosed. Bootstrapped + subnet emission until a round is announced. Last verified 2026·05.</em></span>
+          </div>
+
+          <div class="ph-banner">
+            ⚠ All names, photos, and biographical detail above are placeholder data. When the operator claims this page (or a community contributor verifies via PR), real values replace these.
+          </div>
+        </section>
+
+        <!-- 7. HISTORY -->
+        <section id="history">
+          <h2 class="section-h">Project history</h2>
+          <div class="timeline">
+            <div class="milestone"><span class="mdate">2024·08</span><span class="mtext">Subnet registered by Orpheus AI on mainnet.</span></div>
+            <div class="milestone"><span class="mdate">2025·Q1</span><span class="mtext">First public benchmark: claims +4.5h of skill vs ECMWF HRES at 120h horizon.</span></div>
+            <div class="milestone"><span class="mdate">2025·Q3</span><span class="mtext">Energy-trader API live. Subnet revenue ramps from emission-only to emission + customer.</span></div>
+            <div class="milestone"><span class="mdate">2025·12</span><span class="mtext">Last meaningful repo commit (Orpheus-AI/Zeus). Catalog stable.</span></div>
+            <div class="milestone"><span class="mdate">2026·Q1</span><span class="mtext">Ocean / hydro forecast variables added. ERA5 reanalysis window expanded.</span></div>
+          </div>
+        </section>
+
+        <!-- 8. JOIN -->
+        <section id="join">
+          <h2 class="section-h">Joining</h2>
+          <div class="join-card">
+            <div>
+              <div class="lbl">→ become a miner</div>
+              <h3>Run your own forecast model.</h3>
+              <p>Hardware spec, install commands, monitoring, and the day-by-day playbook for SN18 are in the dedicated mining playbook. Validators welcome too — stake threshold and reference code via the GitHub repo.</p>
+              <div class="aside-note">Validating? Requires a top-N stake position and an ERA5 mirror. Reach out via the Orpheus Discord.</div>
+            </div>
+            <a class="cta" href="/mine/playbooks/18-zeus">
+              Open mining playbook
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </section>
+
+      </div>
+      <!-- /body-main -->
+
+      <!-- ─────────── PERMANENT RIGHT SIDEBAR (sticky) ─────────── -->
+      <aside class="body-side">
+        <div class="side-card">
+          <div class="lbl">Quick facts</div>
+          <div class="row"><span class="k">netuid</span><span class="v">18</span></div>
+          <div class="row"><span class="k">operator</span><span class="v">Orpheus AI</span></div>
+          <div class="row"><span class="k">registered</span><span class="v">2024·08·15</span></div>
+        </div>
+
+        <div class="side-card">
+          <div class="lbl">Tags</div>
+          <div class="tag-list">
+            <span class="tag">prediction</span>
+            <span class="tag">ai-model</span>
+            <span class="tag">environmental-data</span>
+            <span class="tag">energy</span>
+            <span class="tag">incentive</span>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="lbl">External</div>
+          <div class="ext-list">
+            <a href="https://github.com/Orpheus-AI/Zeus" target="_blank"><span>GitHub</span><span class="arrow">↗</span></a>
+            <a href="https://zeussubnet.com" target="_blank"><span>Website</span><span class="arrow">↗</span></a>
+            <a href="https://twitter.com/zeussubnet" target="_blank"><span>Twitter</span><span class="arrow">↗</span></a>
+            <a href="https://taostats.io/subnets/18/" target="_blank"><span>taostats</span><span class="arrow">↗</span></a>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="lbl">Operator feed · @zeussubnet</div>
+          <div class="tw-mini">
+            <div class="item">
+              <div class="when">3 days ago</div>
+              New benchmark: SN18 vs HRES on European wind cluster — +5.1h skill at 120h.
+            </div>
+            <div class="item">
+              <div class="when">1 week ago</div>
+              Catalog change: adding ocean SST predictions to score function.
+            </div>
+            <div class="item">
+              <div class="when">2 weeks ago</div>
+              Hiring an atmospheric modeler. DM if interested.
+            </div>
+          </div>
+          <div class="more"><a href="https://twitter.com/zeussubnet" target="_blank">view full feed ↗</a></div>
+        </div>
+      </aside>
+    </div>
+    <!-- /body-grid -->
+
+    <!-- ════════════════════════════════════════════════════════ RELATED (full width below) -->
+    <section class="below-grid">
+      <h2 class="section-h">Related subnets · same category</h2>
+      <div class="related-grid">
+        <a href="#" class="related-card">
+          <div class="top"><span class="net">42</span><span class="cat-tag">Data</span></div>
+          <div class="name">Masa</div>
+          <div class="desc">Real-time structured data scraped by miners — Twitter, Discord, podcasts, YouTube.</div>
+        </a>
+        <a href="#" class="related-card">
+          <div class="top"><span class="net">13</span><span class="cat-tag">Data</span></div>
+          <div class="name">Data Universe</div>
+          <div class="desc">Decentralized data scraping and structured datasets for AI training.</div>
+        </a>
+        <a href="#" class="related-card">
+          <div class="top"><span class="net">57</span><span class="cat-tag">Data</span></div>
+          <div class="name">Helix</div>
+          <div class="desc">Biomolecular folding traces and structure prediction.</div>
+        </a>
+        <a href="#" class="related-card">
+          <div class="top"><span class="net">8</span><span class="cat-tag">Data</span></div>
+          <div class="name">Proteus</div>
+          <div class="desc">Time-series forecasting — market and macro variables.</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ FOOTER -->
+    <footer class="pg-footer">
+      <div class="row">
+        <div style="display: flex; gap: 22px;">
+          <a href="https://github.com/opentao-ai/opentao/blob/main/src/pages/beginner/subnets/18-zeus.astro" target="_blank">Edit on GitHub ↗</a>
+          <a href="#">Claim this subnet</a>
+        </div>
+        <span>Mockup v1 final · permanent right sidebar · live data refreshes daily via taostats</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

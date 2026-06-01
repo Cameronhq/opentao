@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subnet mockup · V2 orbit — Zeus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --fg: #0c0c10; --fg-muted: #4a4a52; --fg-dim: #767680;
+      --accent: #b8470b; --green: #15803d; --blue: #1c6ea4;
+      --paper: #ffffff; --surface: #fafaf9;
+      --border: rgba(15,15,18,0.08); --border-strong: rgba(15,15,18,0.18);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --font-serif: 'Fraunces', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); color: var(--fg); background: var(--paper); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 56px 32px; }
+    .pill { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+    .pill.variant { background: rgba(184,71,11,0.06); color: var(--accent); border-color: rgba(184,71,11,0.3); }
+    .section-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-dim); }
+
+    /* hero (reused) */
+    .hero { padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .hero-meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .hero-meta .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; color: var(--green); background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); }
+    .hero-meta .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--green); box-shadow: 0 0 8px rgba(22,163,74,0.45); display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .hero-meta .light { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+    .hero-id { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+    .hero-id .lbl { font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim); }
+    .hero-id .num { font-family: var(--font-mono); font-size: 56px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg); line-height: 1; }
+    .hero h1 { font-family: var(--font-serif); font-weight: 500; font-size: 44px; letter-spacing: -0.015em; line-height: 1.1; margin: 6px 0 18px; }
+    .hero .pitch { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: var(--fg); max-width: 760px; margin: 0; }
+    .hero .pitch strong { font-style: normal; font-weight: 500; color: var(--accent); }
+    .hero .pitch-sub { font-size: 14px; color: var(--fg-muted); max-width: 720px; margin-top: 8px; }
+
+    /* orbit viz */
+    .orbit-section { padding: 64px 0 56px; border-bottom: 1px solid var(--border); }
+    .orbit-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .orbit-head h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.01em; margin: 0; }
+    .orbit-head .legend { display: flex; gap: 20px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); }
+    .orbit-head .legend .swatch { width: 10px; height: 10px; border-radius: 999px; vertical-align: middle; margin-right: 6px; display: inline-block; }
+    .orbit-head .legend .v { background: var(--blue); }
+    .orbit-head .legend .m { background: var(--accent); }
+
+    .orbit-container {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .orbit {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      aspect-ratio: 1.2 / 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .orbit svg { width: 100%; height: 100%; display: block; }
+
+    .orbit-side {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .side-card { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+    .side-card .role-line { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); letter-spacing: 0.04em; margin-bottom: 4px; }
+    .side-card .role-line .swatch { width: 10px; height: 10px; border-radius: 999px; }
+    .side-card.m .swatch { background: var(--accent); }
+    .side-card.v .swatch { background: var(--blue); }
+    .side-card .who { font-size: 13px; font-weight: 500; color: var(--fg); margin-bottom: 8px; }
+    .side-card .does { font-size: 13px; color: var(--fg-muted); line-height: 1.6; margin: 0 0 10px; }
+    .side-card .specs { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+    .side-card .specs .row { display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px dashed var(--border); }
+    .side-card .specs .row:first-child { border-top: 0; }
+    .side-card .specs .row .v-fg { color: var(--fg); }
+
+    .arrow-card { background: rgba(184,71,11,0.04); border: 1px dashed rgba(184,71,11,0.3); border-radius: 10px; padding: 14px 18px; font-size: 12px; color: var(--fg-muted); line-height: 1.6; }
+    .arrow-card .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+
+    /* pulse animation on edges */
+    @keyframes pulse-line { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -16; } }
+    .edge { stroke-dasharray: 4 4; animation: pulse-line 1.6s linear infinite; }
+    .miner { fill: var(--accent); }
+    .validator { fill: var(--blue); }
+    .miner-stroke { stroke: var(--accent); }
+    .validator-stroke { stroke: var(--blue); }
+    .label-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--fg-dim); text-anchor: middle; }
+    .label-name { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--fg); text-anchor: middle; }
+
+    /* below */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 32px; background: var(--paper); }
+    .stat { padding: 16px 20px; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: 0; }
+    .stat .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 6px; }
+    .stat .v { font-family: var(--font-mono); font-weight: 600; font-size: 22px; color: var(--fg); }
+
+    .footer { padding: 28px 0; border-top: 1px solid var(--border); margin-top: 24px; }
+    .footer-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;">
+      <span class="section-label">SUBNET PAGE MOCKUP</span>
+      <span class="pill variant">V2 · ORBIT</span>
+    </div>
+
+    <header class="hero">
+      <div class="hero-meta">
+        <span class="cat">Data · Prediction</span>
+        <span class="light"><span class="dot"></span>active · 25 miners · 11 validators</span>
+        <span class="light">· operator <span style="color:var(--fg)">Orpheus AI</span></span>
+      </div>
+      <div class="hero-id"><span class="lbl">netuid</span><span class="num">18</span></div>
+      <h1>Zeus</h1>
+      <p class="pitch">
+        Zeus is a subnet that <strong>forecasts the weather</strong> — miners run global atmospheric models, validators score their predictions against ground-truth ERA5 reanalysis, and the customer outside the network is the energy-trading desk.
+      </p>
+      <p class="pitch-sub">
+        Read once and you know what's being made (a global forecast), how it's judged (anomaly-correlation-coefficient against the held-out ground truth), and who's paying for it in the real world.
+      </p>
+    </header>
+
+    <section class="orbit-section">
+      <div class="orbit-head">
+        <h2>Who talks to whom</h2>
+        <div class="legend">
+          <span><span class="swatch v"></span>11 validators · stake-weighted</span>
+          <span><span class="swatch m"></span>25 miners · scored each tempo</span>
+        </div>
+      </div>
+
+      <div class="orbit-container">
+        <div class="orbit">
+          <svg viewBox="0 0 800 660" preserveAspectRatio="xMidYMid meet">
+            <!-- background grid dots -->
+            <defs>
+              <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="rgba(15,15,18,0.06)" />
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="800" height="660" fill="url(#dots)" />
+
+            <!-- center cluster: validators ring -->
+            <!-- 11 validators arranged in inner ring at radius 70 around (400,330) -->
+            <g id="edges" stroke-width="1.2" opacity="0.45">
+              <!-- representative edges from selected validators to selected miners -->
+              <line class="edge miner-stroke" x1="400" y1="330" x2="120" y2="180" />
+              <line class="edge miner-stroke" x1="400" y1="330" x2="180" y2="500" />
+              <line class="edge miner-stroke" x1="400" y1="330" x2="700" y2="220" />
+              <line class="edge miner-stroke" x1="400" y1="330" x2="640" y2="540" />
+              <line class="edge miner-stroke" x1="450" y1="300" x2="350" y2="100" />
+              <line class="edge miner-stroke" x1="370" y1="310" x2="540" y2="100" />
+              <line class="edge miner-stroke" x1="420" y1="370" x2="100" y2="380" />
+              <line class="edge miner-stroke" x1="430" y1="350" x2="700" y2="380" />
+              <line class="edge miner-stroke" x1="380" y1="290" x2="420" y2="560" />
+              <line class="edge miner-stroke" x1="390" y1="340" x2="260" y2="600" />
+            </g>
+
+            <!-- Miner ring (outer) — 25 miners arranged on a circle of radius 260 -->
+            <g id="miners">
+              <!-- generated below -->
+            </g>
+
+            <!-- Validator cluster (inner) — 11 validators arranged on a circle of radius 60 -->
+            <g id="validators">
+              <!-- generated below -->
+            </g>
+
+            <!-- Central label -->
+            <g transform="translate(400 335)">
+              <text class="label-text" y="-92" font-size="9">SUBNET 18</text>
+              <text class="label-text" y="-78" font-size="9" fill="#0c0c10" font-weight="500">Zeus core</text>
+              <text class="label-text" y="100" font-size="10" fill="#1c6ea4">11 validators · top-N stake</text>
+              <text class="label-text" y="116" font-size="9" fill="#767680">aggregate weights via Yuma each tempo</text>
+            </g>
+
+            <!-- Outer ring label -->
+            <text class="label-text" x="400" y="40" font-size="10" fill="#b8470b" font-weight="500">25 miners · 1 hotkey per UID</text>
+            <text class="label-text" x="400" y="56" font-size="9" fill="#767680">each scored every tempo against the held-out ERA5 truth</text>
+
+            <!-- Inject miners + validators with simple script-free static circles -->
+          </svg>
+          <!-- Static circles via HTML so we get keyboard-accessible tooltips -->
+          <div style="position:absolute;inset:0;pointer-events:none;">
+            <!-- Will render with inline JS for cleaner code below -->
+          </div>
+        </div>
+
+        <div class="orbit-side">
+          <div class="side-card m">
+            <div class="role-line"><span class="swatch"></span>MINER</div>
+            <div class="who">Produces a forecast.</div>
+            <p class="does">Each miner runs an atmospheric model and returns gridded predictions at four horizons every tempo.</p>
+            <div class="specs">
+              <div class="row"><span>hardware</span><span class="v-fg">1×H100</span></div>
+              <div class="row"><span>inputs</span><span class="v-fg">ERA5 init slice</span></div>
+              <div class="row"><span>output</span><span class="v-fg">gridded fields</span></div>
+              <div class="row"><span>paid for</span><span class="v-fg">ACC vs truth</span></div>
+            </div>
+          </div>
+
+          <div class="arrow-card">
+            <div class="lbl">↑ interaction</div>
+            Validators broadcast a withheld initial state. Miners reply with predictions. Validators score and submit weights. Yuma aggregates into emission.
+          </div>
+
+          <div class="side-card v">
+            <div class="role-line"><span class="swatch"></span>VALIDATOR</div>
+            <div class="who">Grades against truth.</div>
+            <p class="does">Pulls the held-out ERA5 window, computes ACC per miner, submits weights every tempo.</p>
+            <div class="specs">
+              <div class="row"><span>requires</span><span class="v-fg">top-N stake</span></div>
+              <div class="row"><span>verifier</span><span class="v-fg">ACC vs ERA5</span></div>
+              <div class="row"><span>output</span><span class="v-fg">weight vector</span></div>
+              <div class="row"><span>paid for</span><span class="v-fg">consensus median</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat"><div class="k">Edges per tempo</div><div class="v">275</div></div>
+        <div class="stat"><div class="k">Top miner ACC</div><div class="v">0.847</div></div>
+        <div class="stat"><div class="k">Median ACC</div><div class="v">0.621</div></div>
+        <div class="stat"><div class="k">Settlement</div><div class="v">~72 min</div></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-meta">
+        <span>Mockup v2 — orbit. The bipartite graph generalizes: every subnet has N miners on an outer ring scored by K validators in the center.</span>
+        <span>Zeus · SN18 · @zeussubnet</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Render miners (outer ring) and validators (inner cluster) into the SVG.
+    // Pure JS so we can iterate counts without hand-positioning.
+    const svg = document.querySelector('.orbit svg');
+    const minerGroup = svg.querySelector('#miners');
+    const validatorGroup = svg.querySelector('#validators');
+    const cx = 400, cy = 335;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    // 25 miners on outer ring
+    const M = 25, Rm = 260;
+    for (let i = 0; i < M; i++) {
+      const a = (i / M) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + Rm * Math.cos(a);
+      const y = cy + Rm * Math.sin(a);
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y);
+      c.setAttribute('r', 9);
+      c.setAttribute('class', 'miner');
+      c.setAttribute('opacity', '0.92');
+      minerGroup.appendChild(c);
+
+      // top miner highlight (index 5, just for narrative)
+      if (i === 5) {
+        const ring = document.createElementNS(NS, 'circle');
+        ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+        ring.setAttribute('r', 16);
+        ring.setAttribute('fill', 'none');
+        ring.setAttribute('stroke', '#b8470b');
+        ring.setAttribute('stroke-width', 1.5);
+        ring.setAttribute('opacity', '0.5');
+        minerGroup.appendChild(ring);
+
+        const tag = document.createElementNS(NS, 'text');
+        tag.setAttribute('x', x); tag.setAttribute('y', y - 24);
+        tag.setAttribute('class', 'label-name');
+        tag.setAttribute('fill', '#b8470b');
+        tag.textContent = 'top · UID 8';
+        minerGroup.appendChild(tag);
+      }
+    }
+
+    // 11 validators in inner cluster
+    const V = 11, Rv = 62;
+    for (let i = 0; i < V; i++) {
+      const a = (i / V) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + Rv * Math.cos(a);
+      const y = cy + Rv * Math.sin(a);
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y);
+      c.setAttribute('r', 7);
+      c.setAttribute('class', 'validator');
+      validatorGroup.appendChild(c);
+    }
+
+    // Central core circle
+    const core = document.createElementNS(NS, 'circle');
+    core.setAttribute('cx', cx); core.setAttribute('cy', cy);
+    core.setAttribute('r', 18);
+    core.setAttribute('fill', '#ffffff');
+    core.setAttribute('stroke', 'rgba(15,15,18,0.15)');
+    core.setAttribute('stroke-width', 1);
+    validatorGroup.appendChild(core);
+
+    // Outer ring guide
+    const ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
+    ring.setAttribute('r', 260);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', 'rgba(184,71,11,0.18)');
+    ring.setAttribute('stroke-width', 1);
+    ring.setAttribute('stroke-dasharray', '2 4');
+    svg.insertBefore(ring, minerGroup);
+  </script>
+</body>
+</html>

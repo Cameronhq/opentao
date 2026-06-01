@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subnet mockup · V1 cycle — Zeus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --fg: #0c0c10; --fg-muted: #4a4a52; --fg-dim: #767680;
+      --accent: #b8470b; --green: #15803d; --blue: #1c6ea4;
+      --paper: #ffffff; --surface: #fafaf9;
+      --border: rgba(15,15,18,0.08); --border-strong: rgba(15,15,18,0.18);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --font-serif: 'Fraunces', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); color: var(--fg); background: var(--paper); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 56px 32px; }
+    .pill { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+    .pill.variant { background: rgba(184,71,11,0.06); color: var(--accent); border-color: rgba(184,71,11,0.3); }
+    .section-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-dim); }
+
+    /* ── Hero / one-line pitch ───────────────────────── */
+    .hero { padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .hero-meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .hero-meta .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; color: var(--green); background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); }
+    .hero-meta .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--green); box-shadow: 0 0 8px rgba(22,163,74,0.45); display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .hero-meta .light { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+    .hero-id { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+    .hero-id .lbl { font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim); }
+    .hero-id .num { font-family: var(--font-mono); font-size: 56px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg); line-height: 1; }
+    .hero h1 { font-family: var(--font-serif); font-weight: 500; font-size: 44px; letter-spacing: -0.015em; line-height: 1.1; margin: 6px 0 18px; }
+    .hero .pitch {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 22px;
+      line-height: 1.45;
+      color: var(--fg);
+      max-width: 760px;
+      margin: 0 0 6px;
+    }
+    .hero .pitch strong { font-style: normal; font-weight: 500; color: var(--accent); }
+    .hero .pitch-sub { font-size: 14px; color: var(--fg-muted); max-width: 720px; margin-top: 8px; }
+
+    /* ── How it works — the tempo cycle ──────────────── */
+    .cycle-wrap { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    .cycle-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; }
+    .cycle-head h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.01em; margin: 0; }
+    .cycle-head .tempo { font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim); padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; }
+
+    .stage-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .stage { position: relative; padding: 28px 22px 24px; border-right: 1px solid var(--border); background: #ffffff; }
+    .stage:last-child { border-right: 0; }
+    .stage .step {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .stage .actor {
+      font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .stage h3 { font-size: 17px; font-weight: 500; margin: 0 0 10px; color: var(--fg); }
+    .stage p { font-size: 13px; color: var(--fg-muted); margin: 0; line-height: 1.6; }
+    .stage .data {
+      font-family: var(--font-mono); font-size: 10px; color: var(--fg-dim);
+      margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border);
+    }
+    .stage .data .k { color: var(--fg-dim); }
+    .stage .data .v { color: var(--fg); }
+
+    /* Step icon — circle with the number */
+    .stage::before {
+      content: ""; position: absolute; top: 28px; right: 22px;
+      width: 24px; height: 24px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+    }
+    .stage[data-side="miner"] .actor { color: var(--accent); }
+    .stage[data-side="validator"] .actor { color: var(--blue); }
+    .stage[data-side="chain"] .actor { color: var(--green); }
+
+    /* Flow arrow between stages */
+    .stage + .stage::after {
+      content: ""; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 12px solid var(--accent);
+      opacity: 0.5;
+    }
+
+    /* ── Below: per-tempo cycle ribbon ──────────────── */
+    .cycle-ribbon { margin-top: 36px; }
+    .ribbon-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 12px; }
+    .ribbon { position: relative; height: 36px; border-radius: 6px; overflow: hidden; background: var(--surface); border: 1px solid var(--border); display: flex; }
+    .ribbon .slice { flex: 1; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border-right: 1px dashed var(--border); }
+    .ribbon .slice:last-child { border-right: 0; }
+    .ribbon .slice .dot { width: 6px; height: 6px; border-radius: 999px; }
+    .ribbon .slice .dot.m { background: var(--accent); }
+    .ribbon .slice .dot.v { background: var(--blue); }
+    .ribbon .slice .dot.c { background: var(--green); }
+
+    /* ── Roles compare ─────────────────────────────── */
+    .roles { padding: 48px 0; }
+    .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .role-card { background: var(--paper); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .role-card .role-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .role-card .role-dot { width: 12px; height: 12px; border-radius: 999px; }
+    .role-card[data-role="miner"] .role-dot { background: var(--accent); }
+    .role-card[data-role="validator"] .role-dot { background: var(--blue); }
+    .role-card .role-name { font-size: 14px; font-weight: 500; }
+    .role-card h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 0 0 14px; }
+    .role-card .field { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 9px 0; font-size: 13px; border-top: 1px solid var(--border); }
+    .role-card .field:first-of-type { border-top: 0; padding-top: 0; }
+    .role-card .field .k { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); padding-top: 1px; }
+    .role-card .field .v { color: var(--fg); line-height: 1.55; }
+
+    .footer { padding: 28px 0; border-top: 1px solid var(--border); margin-top: 32px; }
+    .footer-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;">
+      <span class="section-label">SUBNET PAGE MOCKUP</span>
+      <span class="pill variant">V1 · CYCLE</span>
+    </div>
+
+    <!-- ─── Hero ──────────────────────────────────── -->
+    <header class="hero">
+      <div class="hero-meta">
+        <span class="cat">Data · Prediction</span>
+        <span class="light"><span class="dot"></span>active · 25 miners · 11 validators</span>
+        <span class="light">· operator <span style="color:var(--fg)">Orpheus AI</span></span>
+      </div>
+      <div class="hero-id"><span class="lbl">netuid</span><span class="num">18</span></div>
+      <h1>Zeus</h1>
+      <p class="pitch">
+        Zeus is a subnet that <strong>forecasts the weather</strong> — miners run global atmospheric models, validators score their predictions against ground-truth ERA5 reanalysis, and the customer outside the network is the energy-trading desk.
+      </p>
+      <p class="pitch-sub">
+        Read once and you know what's being made (a global forecast), how it's judged (anomaly-correlation-coefficient against the held-out ground truth), and who's paying for it in the real world.
+      </p>
+    </header>
+
+    <!-- ─── How it works — tempo cycle ───────────── -->
+    <section class="cycle-wrap">
+      <div class="cycle-head">
+        <h2>One tempo · what happens between miner and validator</h2>
+        <span class="tempo">1 tempo ≈ 72 min · ~20 cycles per day</span>
+      </div>
+
+      <div class="stage-row">
+        <div class="stage" data-side="validator">
+          <div class="step">Step 01 · Challenge</div>
+          <div class="actor">Validator</div>
+          <h3>Sample a problem</h3>
+          <p>Pick a region, pick a recent time slice the miners haven't seen, broadcast the initial atmospheric state to every active miner.</p>
+          <div class="data">
+            <span class="k">payload </span><span class="v">ERA5 init tensor · ~4 MB</span>
+          </div>
+        </div>
+
+        <div class="stage" data-side="miner">
+          <div class="step">Step 02 · Compute</div>
+          <div class="actor">Miner</div>
+          <h3>Run the model</h3>
+          <p>Each miner runs its own forecast model and returns gridded predictions at +6h, +24h, +72h, +120h horizons.</p>
+          <div class="data">
+            <span class="k">latency </span><span class="v">20–90 s on H100</span>
+          </div>
+        </div>
+
+        <div class="stage" data-side="validator">
+          <div class="step">Step 03 · Score</div>
+          <div class="actor">Validator</div>
+          <h3>Grade with ACC</h3>
+          <p>Compute anomaly-correlation-coefficient against the held-out ERA5 truth window. Weighted sum across variables and horizons.</p>
+          <div class="data">
+            <span class="k">scale </span><span class="v">0.0 → 1.0 · higher = better</span>
+          </div>
+        </div>
+
+        <div class="stage" data-side="chain">
+          <div class="step">Step 04 · Settle</div>
+          <div class="actor">Subtensor</div>
+          <h3>Yuma → emission</h3>
+          <p>Every validator's weights, multiplied by their stake, aggregated by Yuma into one reward vector. TAO mints to top miners.</p>
+          <div class="data">
+            <span class="k">tempo </span><span class="v">~72 min · 24× daily</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cycle-ribbon">
+        <div class="ribbon-label">A single tempo, end to end</div>
+        <div class="ribbon">
+          <div class="slice"><span class="dot v"></span>t=0 · validator broadcasts</div>
+          <div class="slice"><span class="dot m"></span>t=2m · miners compute</div>
+          <div class="slice"><span class="dot v"></span>t=3m · validators score</div>
+          <div class="slice"><span class="dot c"></span>t=72m · chain settles</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Roles ──────────────────────────────────── -->
+    <section class="roles">
+      <h2 style="font-family:var(--font-serif);font-weight:500;font-size:30px;letter-spacing:-0.01em;margin:0 0 24px;">Who does what</h2>
+      <div class="roles-grid">
+        <div class="role-card" data-role="miner">
+          <div class="role-head"><span class="role-dot"></span><span class="role-name">MINER</span></div>
+          <h3>Produces a forecast.</h3>
+          <div class="field"><span class="k">does</span><span class="v">Runs an atmospheric model and returns gridded predictions every tempo.</span></div>
+          <div class="field"><span class="k">hardware</span><span class="v">1×H100 80GB (recommended) · 1×A100 minimum</span></div>
+          <div class="field"><span class="k">paid for</span><span class="v">High ACC against the held-out truth. Heavy-tailed: top 10% earn 5–10× median.</span></div>
+          <div class="field"><span class="k">paid via</span><span class="v">Per-tempo emission, proportional to validator score × validator stake.</span></div>
+        </div>
+        <div class="role-card" data-role="validator">
+          <div class="role-head"><span class="role-dot"></span><span class="role-name">VALIDATOR</span></div>
+          <h3>Grades against truth.</h3>
+          <div class="field"><span class="k">does</span><span class="v">Pulls the held-out ERA5 window, runs ACC against every miner's response, submits weights.</span></div>
+          <div class="field"><span class="k">requires</span><span class="v">Top-N stake position + an ERA5 mirror + reference validator code.</span></div>
+          <div class="field"><span class="k">paid for</span><span class="v">Submitting weights that agree with the consensus median across other validators.</span></div>
+          <div class="field"><span class="k">paid via</span><span class="v">Per-tempo emission, proportional to (stake × consensus alignment).</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-meta">
+        <span>Mockup v1 — cycle. Subnet model generalizes: replace ERA5/ACC with any subnet's input/scoring function.</span>
+        <span>Zeus · SN18 · @zeussubnet</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

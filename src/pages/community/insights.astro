@@ -40,22 +40,25 @@ const latest = [
           <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[580px] leading-relaxed">Deep dives, retrospectives, and interviews from people doing the work — written for people who already know the basics.</p>
         </div>
         <div class="card rounded-md p-5">
-          <div class="section-label mb-2">Subscribe</div>
+          <div class="section-label mb-2 flex items-center gap-3">
+            <span>Subscribe</span>
+            <span class="coming-soon">coming soon</span>
+          </div>
           <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">One email every other Friday. New essays, never spam.</p>
-          <div class="flex gap-2">
-            <input class="flex-1 px-3 py-2 bg-[color:var(--color-surface)] border hairline rounded text-sm text-[color:var(--color-fg)] outline-none focus:border-[color:var(--color-fg-muted)]" placeholder="you@example.com" />
-            <button class="btn-primary px-4 py-2 text-sm font-medium rounded">Subscribe</button>
+          <div class="flex gap-2 opacity-60 pointer-events-none">
+            <input class="flex-1 px-3 py-2 bg-[color:var(--color-surface)] border hairline rounded text-sm text-[color:var(--color-fg)] outline-none focus:border-[color:var(--color-fg-muted)]" placeholder="you@example.com" disabled />
+            <button class="btn-primary px-4 py-2 text-sm font-medium rounded" disabled>Subscribe</button>
           </div>
         </div>
       </div>
       <div class="mt-12 flex flex-wrap items-center gap-2">
-        <button class="pill active">All</button>
-        <button class="pill">Deep dive</button>
-        <button class="pill">Retrospective</button>
-        <button class="pill">Interview</button>
-        <button class="pill">Tutorial</button>
-        <button class="pill">Field notes</button>
-        <button class="pill ml-auto">RSS</button>
+        <button class="pill active" data-filter-type="all">All</button>
+        <button class="pill" data-filter-type="Deep dive">Deep dive</button>
+        <button class="pill" data-filter-type="Retrospective">Retrospective</button>
+        <button class="pill" data-filter-type="Interview">Interview</button>
+        <button class="pill" data-filter-type="Tutorial">Tutorial</button>
+        <button class="pill" data-filter-type="Field notes">Field notes</button>
+        <a href="/feed.xml" class="pill ml-auto">RSS</a>
       </div>
     </div>
   </section>
@@ -63,7 +66,7 @@ const latest = [
   <section class="border-b hairline">
     <div class="max-w-[1200px] mx-auto px-6 py-14">
       <div class="section-label mb-6">Featured</div>
-      <a href="/community/insights/yuma-walk-through" class="grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center group">
+      <a href="/community/insights/yuma-walk-through" class="grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center group" data-type="Deep dive">
         <div class="cover cover-1 rounded-md">cover · yuma-walkthrough.svg</div>
         <div>
           <div class="flex items-center gap-3 mb-4"><span class="type-tag" style="color: #b8470b;">Deep dive · 22 min</span><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">2026·05·19</span></div>
@@ -83,9 +86,9 @@ const latest = [
   <section class="border-b hairline">
     <div class="max-w-[1200px] mx-auto px-6 py-14">
       <div class="section-label mb-6">Latest</div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="insights-grid">
         {latest.map((p) => (
-          <a href={p.href} class="block">
+          <a href={p.href} class="block" data-type={p.type.split('·')[0].trim()}>
             <div class={`cover ${p.cover} rounded-md mb-4`}>{p.coverText}</div>
             <div class="flex items-center gap-3 mb-2"><span class="type-tag">{p.type}</span></div>
             <h3 class="text-xl font-serif italic font-medium tracking-tight leading-snug mb-2">{p.title}</h3>
@@ -94,8 +97,9 @@ const latest = [
           </a>
         ))}
       </div>
-      <div class="mt-10 flex items-center justify-center">
-        <button class="pill px-5 py-2.5">Load 22 more</button>
+      <div class="mt-10 flex flex-col items-center gap-2">
+        <div class="text-sm text-[color:var(--color-fg-muted)]">That's everything we've published so far.</div>
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">More essays land every other Friday — <a href="/feed.xml" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">subscribe via RSS</a></div>
       </div>
     </div>
   </section>
@@ -114,6 +118,25 @@ const latest = [
       </div>
     </div>
   </section>
+
+  <script>
+    const grid = document.getElementById('insights-grid');
+    const featured = document.querySelector<HTMLAnchorElement>('a[data-type][href="/community/insights/yuma-walk-through"]');
+    const cards = grid ? Array.from(grid.querySelectorAll<HTMLAnchorElement>('a[data-type]')) : [];
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-type]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filterType || 'all';
+        document.querySelectorAll('[data-filter-type]').forEach((b) => b.classList.toggle('active', b === btn));
+        for (const c of cards) {
+          c.style.display = f === 'all' || c.dataset.type === f ? '' : 'none';
+        }
+        if (featured) {
+          featured.style.display = f === 'all' || featured.dataset.type === f ? '' : 'none';
+        }
+      });
+    });
+  </script>
 </BaseLayout>
 
 <style>

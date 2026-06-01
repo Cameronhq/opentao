@@ -1,8 +1,13 @@
 name = "opentao"
+main = "src/worker.ts"
 compatibility_date = "2025-01-01"
 
-# Cloudflare unified Workers + Pages — static deploy goes through the
-# Workers-with-Assets pattern. dist/ is uploaded and served from edge.
+# Cloudflare Workers-with-Assets — src/worker.ts handles /api/* (taostats
+# proxy) and falls through to the ASSETS binding for everything else.
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "404-page"
+
+# Secrets (set via `wrangler secret put`, not in this file):
+#   TAOSTATS_KEY — required for /api/subnet/[netuid]. Get one at https://taostats.io/pro.

@@ -3,23 +3,21 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import SubNav from '../../../components/SubNav.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { playbooks, type Playbook } from '../../../data/playbooks';
+import { getRichPlaybook, type RichPlaybook } from '../../../data/playbook-rich';
 
 export async function getStaticPaths() {
   return playbooks.map((p) => ({ params: { slug: p.slug }, props: { playbook: p } }));
 }
 
-interface Props {
-  playbook: Playbook;
-}
+interface Props { playbook: Playbook }
 const { playbook } = Astro.props;
+const rich: RichPlaybook | undefined = getRichPlaybook(playbook.slug);
 
 const subnav = [
   { href: '/mine/general-setup', label: 'General setup' },
   { href: '/mine/playbooks', label: 'Subnet playbooks' },
   { href: '/mine/resources', label: 'Resources' },
 ];
-
-const isVerified = playbook.status === 'verified';
 
 // Related playbooks: same category, exclude self, take 3
 const related = playbooks
@@ -33,6 +31,7 @@ const related = playbooks
 >
   <SubNav items={subnav} active="/mine/playbooks" rightMeta={`SN${playbook.netuid} · ${playbook.name}`} />
 
+  {/* ── Header ──────────────────────────────────────────── */}
   <section class="border-b hairline">
     <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
       <Breadcrumb crumbs={[
@@ -42,18 +41,22 @@ const related = playbooks
         { label: `${playbook.netuid} · ${playbook.name}` },
       ]} />
 
-      <div class="flex items-end justify-between gap-8 flex-wrap mb-10">
+      <div class="flex items-end justify-between gap-8 flex-wrap mb-8">
         <div>
           <div class="flex items-center gap-3 mb-4 flex-wrap">
             <span class={`cat cat-${playbook.category}`}>{playbook.categoryLabel}</span>
-            <span class={`text-xs font-mono pb-${playbook.status}`}>{playbook.statusText}</span>
+            {rich ? (
+              <span class="text-xs font-mono pb-verified">✓ verified {rich.verifiedAt} by {rich.verifiedBy}</span>
+            ) : (
+              <span class={`text-xs font-mono pb-${playbook.status}`}>{playbook.statusText}</span>
+            )}
           </div>
           <div class="flex items-baseline gap-5 mb-3">
             <span class="font-mono text-[color:var(--color-fg-dim)] text-sm">netuid</span>
             <span class="font-mono text-[64px] leading-none font-semibold tracking-tight">{playbook.netuid}</span>
           </div>
           <h1 class="font-serif text-[44px] font-medium leading-tight tracking-[-0.015em]">{playbook.name}</h1>
-          <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{playbook.blurb}</p>
+          <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{rich?.blurb ?? playbook.blurb}</p>
         </div>
 
         <div class="flex flex-col items-end gap-2">
@@ -61,73 +64,320 @@ const related = playbooks
             View subnet page
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
-          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">emission · {playbook.emission}</span>
+          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">emission · <span data-live="emission" data-fallback={rich?.emission ?? playbook.emission}>{rich?.emission ?? playbook.emission}</span></span>
         </div>
       </div>
+
+      {rich && (
+        <>
+          {/* ── Decision header / live signal grid ─────────── */}
+          <div class="signal-grid" data-netuid={playbook.netuid}>
+            <div class="signal">
+              <div class="label">Burn-cost now</div>
+              <div class="value" data-live="burn-cost" data-fallback={rich.burnCostFallback}>{rich.burnCostFallback}</div>
+              <div class="sub">to register a UID</div>
+            </div>
+            <div class="signal">
+              <div class="label">Hardware</div>
+              <div class="value-sm">{rich.hardware.find((n) => n.gpu)?.gpu?.split('·')[0]?.trim() ?? rich.hardware[0]?.role ?? '—'}</div>
+              <div class="sub">{rich.hardware.length > 1 ? `${rich.hardware.length} node types` : rich.hardware[0] ? `${rich.hardware[0].ramGb} GB RAM` : 'no spec'}</div>
+            </div>
+            <div class="signal">
+              <div class="label">Avg / UID / day</div>
+              <div class="value">{rich.profitability.estimatedDailyEmissionPerUid.toFixed(2)} τ</div>
+              <div class="sub">across all active miners</div>
+            </div>
+            <div class="signal">
+              <div class="label">Active miners</div>
+              <div class="value" data-live="miners" data-fallback={String(rich.minerCountFallback)}>{rich.minerCountFallback || '—'}</div>
+              <div class="sub">vs 256 slot cap</div>
+            </div>
+            <div class="signal">
+              <div class="label">Last verified</div>
+              <div class="value-sm">{rich.verifiedAt}</div>
+              <div class="sub">by {rich.verifiedBy}</div>
+            </div>
+            <div class="signal signal-cta">
+              <button class="agent-copy-btn" id="agent-copy" type="button">
+                📋 Copy as agent prompt
+              </button>
+              <div class="sub">Paste into Claude / GPT to delegate setup</div>
+            </div>
+          </div>
+
+          {/* ── Profitability calculator ──────────────────── */}
+          <details class="calc-wrap mt-6">
+            <summary class="calc-summary">
+              <span>💰 Profitability calculator</span>
+              <span class="calc-hint">click to expand · uses your hardware + live TAO price</span>
+            </summary>
+            <div class="calc-body">
+              <div class="calc-grid">
+                <label class="calc-field">
+                  <span>{rich.rentalOk ? 'GPU rental ($/hr)' : 'Server cost ($/hr)'}</span>
+                  <input type="number" id="calc-gpu-cost" step="0.01" value={rich.rentalOk ? (rich.rentalUsdPerHr?.runpod ?? 1.89) : 2.50} />
+                </label>
+                <label class="calc-field">
+                  <span>Daily emission earned (τ)</span>
+                  <input type="number" id="calc-tao-earned" step="0.01" value={rich.profitability.estimatedDailyEmissionPerUid} />
+                </label>
+                <label class="calc-field">
+                  <span>TAO price (USD)</span>
+                  <input type="number" id="calc-tao-price" step="0.01" value={rich.profitability.tokenPriceUsdFallback} data-live="tao-price-input" />
+                </label>
+                <label class="calc-field">
+                  <span>Burn-cost paid (τ, one-time)</span>
+                  <input type="number" id="calc-burn-cost" step="0.01" value={parseFloat(rich.burnCostFallback) || 0.4} data-live="burn-cost-input" />
+                </label>
+              </div>
+              <div class="calc-result" id="calc-result">
+                <div class="calc-row"><span>Daily revenue</span><span class="calc-val" data-out="rev-day">—</span></div>
+                <div class="calc-row"><span>Daily cost (rental)</span><span class="calc-val" data-out="cost-day">—</span></div>
+                <div class="calc-row calc-row-net"><span>Daily net</span><span class="calc-val" data-out="net-day">—</span></div>
+                <div class="calc-row"><span>Days to recoup burn-cost</span><span class="calc-val" data-out="payback">—</span></div>
+                <div class="calc-row calc-row-net"><span>30-day projected net</span><span class="calc-val" data-out="net-30d">—</span></div>
+              </div>
+              <p class="calc-disclaimer">
+                Rough estimate. Emission per UID is heavy-tailed — top miners earn 5–10× median. Recompute with your actual numbers after a week of mining.
+                {rich.profitability.capexNote && <><br/><strong>Capex:</strong> {rich.profitability.capexNote}</>}
+                {rich.profitability.notes      && <><br/>{rich.profitability.notes}</>}
+              </p>
+            </div>
+          </details>
+        </>
+      )}
     </div>
   </section>
 
+  {/* ── Body — for rich playbooks, full content; for stubs, the contribution CTA ── */}
   <section class="border-b hairline">
     <div class="max-w-[1400px] mx-auto px-6 py-16 grid lg:grid-cols-[1fr_320px] gap-12">
+
       <div class="prose">
-        {!isVerified ? (
-          <div class="stub-banner">
-            <div class="label">Playbook missing</div>
-            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
-              We don't have a verified playbook for SN{playbook.netuid} {playbook.name} yet. If you've mined this subnet for &gt;7 days,
-              you're qualified to write the first one. <a class="inline" href="#" style="color: #b8470b">Start a draft on GitHub →</a>
-            </p>
-          </div>
+        {!rich ? (
+          /* ── Stub fallback ─────────────────────────────── */
+          <>
+            <div class={`stub-banner ${playbook.status === 'verified' ? 'verified' : ''}`}>
+              <div class="label">{playbook.status === 'verified' ? "Editor's note" : 'Playbook missing'}</div>
+              <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
+                {playbook.status === 'verified'
+                  ? 'A lightweight playbook is below. The full template (hardware, scoring rules, monitoring, debug guide) is being filled in — see the SN64 Chutes playbook for what every page becomes.'
+                  : `We don't have a verified playbook for SN${playbook.netuid} ${playbook.name} yet. If you've mined this subnet for >7 days, you're qualified to write the first one.`}
+                {' '}<a class="inline" href="https://github.com/opentao-ai/opentao/blob/main/src/data/playbook-rich.ts" target="_blank" rel="noopener" style="color: #b8470b">Start a draft on GitHub →</a>
+              </p>
+            </div>
+
+            <h2 id="prereqs">Prerequisites</h2>
+            <p>Before this playbook:</p>
+            <ul>
+              <li>Complete <a class="inline" href="/mine/general-setup">General setup</a> — wallet, btcli, registration mechanics.</li>
+              <li>Have ~0.5 τ buffer above the current burn-cost for SN{playbook.netuid}.</li>
+            </ul>
+
+            <h2 id="quickstart">Generic miner-launch shape</h2>
+            <pre class="terminal"><span class="prompt">$</span> btcli subnet burn-cost --netuid {playbook.netuid}
+<span class="prompt">$</span> btcli subnet register   --netuid {playbook.netuid} --wallet.name $WALLET --wallet.hotkey $HOTKEY
+<span class="prompt">$</span> git clone &lt;subnet-repo&gt; &amp;&amp; cd &lt;subnet-repo&gt;
+<span class="prompt">$</span> pip install -r requirements.txt
+<span class="prompt">$</span> python neurons/miner.py --netuid {playbook.netuid} --wallet.name $WALLET --wallet.hotkey $HOTKEY</pre>
+            <p class="text-sm text-[color:var(--color-fg-muted)]">The actual repo URL, hardware spec, and subnet-specific flags are part of the full playbook (not yet written).</p>
+
+            <h2 id="reference">Reference playbook</h2>
+            <p>For a fully written, end-to-end playbook with hardware spec, scoring rules, monitoring, and a profitability calculator, see <a class="inline" href="/mine/playbooks/64-chutes" style="color: #b8470b">SN64 Chutes</a>. Every playbook will reach that depth.</p>
+          </>
         ) : (
-          <div class="stub-banner verified">
-            <div class="label">Editor's note</div>
-            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
-              This playbook is being expanded. Operational basics are covered below — full step-by-step (install, validator config, monitoring, troubleshooting) is being added.
-            </p>
-          </div>
+          /* ── Rich playbook body ────────────────────────── */
+          <>
+            <h2 id="what-miners-do">What miners do</h2>
+            <p class="lead">{rich.blurb}</p>
+            <p>{rich.whatMinersDo}</p>
+
+            <h2 id="prereqs">Prerequisites</h2>
+            <ul>
+              <li>Complete <a class="inline" href="/mine/general-setup">General setup</a> — wallet, btcli, registration mechanics.</li>
+              <li>Have ~0.5 τ above the current burn-cost buffer in your coldkey.</li>
+              <li>Read the <a class="inline" href={`/beginner/subnets/${rich.slug}`}>subnet page</a> for context on what the network rewards.</li>
+            </ul>
+
+            <h2 id="hardware">Hardware</h2>
+            {rich.hardware.map((node) => (
+              <div class="node-card">
+                <div class="node-head">
+                  <span class="node-role">{node.role}</span>
+                  {node.count && <span class="node-count">{node.count}</span>}
+                </div>
+                <table class="spec-table">
+                  <tbody>
+                    {node.gpu     && <tr><td>GPU</td><td>{node.gpu}</td></tr>}
+                    {node.vramGb  && <tr><td>VRAM</td><td>{node.vramGb} GB</td></tr>}
+                    <tr><td>CPU</td><td>{node.cpuCores} cores</td></tr>
+                    <tr><td>RAM</td><td>{node.ramGb} GB</td></tr>
+                    <tr><td>Disk</td><td>{node.diskGb} GB</td></tr>
+                    {node.bandwidth && <tr><td>Network</td><td>{node.bandwidth}</td></tr>}
+                  </tbody>
+                </table>
+                {node.notes && <p class="text-sm text-[color:var(--color-fg-muted)] node-note">{node.notes}</p>}
+              </div>
+            ))}
+            {rich.hardwareNote && <p class="text-sm text-[color:var(--color-fg-muted)] mt-3">{rich.hardwareNote}</p>}
+
+            {rich.rentalOk ? (
+              <div class="rental-row">
+                <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">Approx rental cost ($/hr)</span>
+                {rich.rentalUsdPerHr?.lambda    && <span class="rental-val">Lambda <strong>${rich.rentalUsdPerHr.lambda.toFixed(2)}</strong></span>}
+                {rich.rentalUsdPerHr?.runpod    && <span class="rental-val">RunPod <strong>${rich.rentalUsdPerHr.runpod.toFixed(2)}</strong></span>}
+                {rich.rentalUsdPerHr?.coreweave && <span class="rental-val">CoreWeave <strong>${rich.rentalUsdPerHr.coreweave.toFixed(2)}</strong></span>}
+              </div>
+            ) : (
+              <div class="rental-warn">
+                <div class="warn-label">⚠ Rented GPUs NOT allowed</div>
+                <p class="text-sm text-[color:var(--color-fg-muted)] m-0">{rich.rentalNote}</p>
+              </div>
+            )}
+
+            <h2 id="repo">Repository</h2>
+            <div class="repo-card">
+              <div class="repo-row"><span class="k">Repo</span><a class="inline" href={rich.repo.url} target="_blank" rel="noopener">{rich.repo.url} ↗</a></div>
+              <div class="repo-row"><span class="k">Branch</span><code>{rich.repo.branch}</code></div>
+              {rich.repo.verifiedCommit && (
+                <div class="repo-row"><span class="k">Verified commit</span><code>{rich.repo.verifiedCommit.slice(0, 12)}</code></div>
+              )}
+              {rich.repo.extraRepos && rich.repo.extraRepos.map((r) => (
+                <div class="repo-row"><span class="k">{r.name}</span><a class="inline" href={r.url} target="_blank" rel="noopener">{r.url} ↗</a> <span class="text-xs text-[color:var(--color-fg-dim)] ml-2">· {r.purpose}</span></div>
+              ))}
+            </div>
+
+            <h2 id="install">Install</h2>
+            <p class="text-sm text-[color:var(--color-fg-muted)]">{rich.setupOverview}</p>
+            <ol class="step-list">
+              {rich.install.map((s, i) => (
+                <li class="step-item">
+                  <span class="step-num">{String(i + 1).padStart(2, '0')}</span>
+                  <div class="step-body">
+                    <div class="step-text">{s.step}</div>
+                    {s.cmd && <pre class="terminal"><span class="prompt">$</span> {s.cmd}</pre>}
+                    {s.note && <p class="step-note">{s.note}</p>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <h2 id="run">Run</h2>
+            <ol class="step-list">
+              {rich.runSteps.map((s, i) => (
+                <li class="step-item">
+                  <span class="step-num">{String(i + 1).padStart(2, '0')}</span>
+                  <div class="step-body">
+                    <div class="step-text">{s.step}</div>
+                    {s.cmd && <pre class="terminal"><span class="prompt">$</span> {s.cmd}</pre>}
+                    {s.note && <p class="step-note">{s.note}</p>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div class="env-grid">
+              <div class="env-label">Env vars</div>
+              {rich.envVars.map((e) => (
+                <div class={`env-row ${e.required ? 'required' : 'optional'}`}>
+                  <code>{e.name}</code>
+                  <span class="env-desc">{e.description}</span>
+                  <span class="env-req">{e.required ? 'required' : 'optional'}</span>
+                </div>
+              ))}
+            </div>
+
+            <h2 id="scoring">Validator scoring</h2>
+            <p>{rich.scoring.summary}</p>
+            <div class="callout-card">
+              <div class="callout-row"><span class="k">Rule</span><span>{rich.scoring.rule}</span></div>
+              {rich.scoring.sourcePath && (
+                <div class="callout-row"><span class="k">Source</span><a class="inline" href={`${rich.repo.url}/blob/${rich.repo.branch}/${rich.scoring.sourcePath.split(':')[0]}`} target="_blank" rel="noopener"><code>{rich.scoring.sourcePath}</code> ↗</a></div>
+              )}
+              <div class="callout-row danger"><span class="k">Don't</span><span>{rich.scoring.cheatPath}</span></div>
+            </div>
+
+            <h2 id="milestones">First-week milestones</h2>
+            <div class="timeline">
+              {rich.milestones.map((m) => (
+                <div class="milestone">
+                  <div class="ms-day">{m.day}</div>
+                  <div>
+                    <div class="ms-target">{m.target}</div>
+                    <div class="ms-note">{m.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <h2 id="monitoring">Monitoring</h2>
+            <table class="spec-table">
+              <thead><tr><th>Metric</th><th>Threshold</th><th>Where to check</th></tr></thead>
+              <tbody>
+                {rich.monitoring.map((m) => (
+                  <tr><td>{m.metric}</td><td><code>{m.threshold}</code></td><td class="text-[color:var(--color-fg-muted)]">{m.where}</td></tr>
+                ))}
+              </tbody>
+            </table>
+
+            <h2 id="known-issues">Common failures</h2>
+            <div class="issue-list">
+              {rich.knownIssues.map((iss, i) => (
+                <details class="issue" open={i === 0}>
+                  <summary><span class="issue-num">{String(i + 1).padStart(2, '0')}</span> {iss.symptom}</summary>
+                  <div class="issue-body">
+                    <div class="issue-row"><span class="k">Cause</span><span>{iss.cause}</span></div>
+                    <div class="issue-row"><span class="k">Fix</span><span>{iss.fix}</span></div>
+                  </div>
+                </details>
+              ))}
+            </div>
+
+            {rich.notes && rich.notes.length > 0 && (
+              <>
+                <h2 id="operator-notes">Operator notes</h2>
+                <ul>
+                  {rich.notes.map((n) => <li>{n}</li>)}
+                </ul>
+              </>
+            )}
+          </>
         )}
-
-        <h2 id="prereqs">Prerequisites</h2>
-        <p>Before opening this playbook:</p>
-        <ul>
-          <li>Run through <a class="inline" href="/mine/general-setup" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;">General setup</a> — wallet, coldkey/hotkey, btcli, Bittensor SDK.</li>
-          <li>Have funds for registration burn (currently ~0.4 τ for most subnets; see chain).</li>
-          <li>Decide hardware: rented (Lambda / Runpod / Coreweave) or owned.</li>
-        </ul>
-
-        <h2 id="what-it-does">What this subnet does</h2>
-        <p class="lead">{playbook.blurb}</p>
-        <p>Read the <a class="inline" href={`/beginner/subnets/${playbook.slug}`} style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;">subnet page</a> for the validator scoring logic and what the miner is actually expected to produce.</p>
-
-        <h2 id="quickstart">Quick start</h2>
-        <pre class="terminal"><span class="prompt">$</span> btcli wallet new_coldkey --wallet.name miner
-<span class="prompt">$</span> btcli wallet new_hotkey  --wallet.name miner --wallet.hotkey default
-<span class="prompt">$</span> btcli subnet register    --netuid {playbook.netuid} --wallet.name miner
-<span class="muted">  → registration cost displayed before confirm</span>
-<span class="prompt">$</span> git clone https://github.com/&lt;subnet-org&gt;/&lt;subnet-repo&gt; &amp;&amp; cd &lt;subnet-repo&gt;
-<span class="prompt">$</span> python neurons/miner.py --netuid {playbook.netuid} --wallet.name miner --wallet.hotkey default</pre>
-        <p class="text-sm text-[color:var(--color-fg-muted)]">Above is the generic miner-launch shape. The actual subnet repo URL, runtime flags, and any required env vars are part of the full playbook (being added).</p>
-
-        <h2 id="reference">Reference playbook</h2>
-        <p>For a fully written, end-to-end playbook with verifier setup, monitoring dashboard, and known-issue troubleshooting, see <a class="inline" href="/mine/playbooks/42-cortex" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;">SN42 Cortex playbook</a>. Every playbook will reach that depth.</p>
       </div>
 
+      {/* ── Sidebar ─────────────────────────────────────── */}
       <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
         <div>
           <div class="section-label mb-3">At a glance</div>
           <div class="card rounded-md p-5 space-y-3 text-sm">
             <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">netuid</span><span class="text-[color:var(--color-fg)] font-mono">{playbook.netuid}</span></div>
             <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Category</span><span class="text-[color:var(--color-fg)]">{playbook.categoryLabel}</span></div>
-            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Emission</span><span class="text-[color:var(--color-fg)] font-mono">{playbook.emission}</span></div>
-            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Status</span><span class={`pb-${playbook.status}`}>{playbook.status}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Emission</span><span class="text-[color:var(--color-fg)] font-mono" data-live="emission-aside" data-fallback={rich?.emission ?? playbook.emission}>{rich?.emission ?? playbook.emission}</span></div>
+            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Status</span><span class={`pb-${rich ? 'verified' : playbook.status}`}>{rich ? 'verified' : playbook.status}</span></div>
+            {rich && (
+              <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Verified</span><span class="text-[color:var(--color-fg)] font-mono text-xs">{rich.verifiedAt}</span></div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div class="section-label mb-3">For AI agents</div>
+          <div class="card rounded-md p-4 text-xs space-y-2">
+            <a href={`/mine/playbooks/${playbook.slug}.json`} class="agent-link"><code>{playbook.slug}.json</code> <span class="text-[color:var(--color-fg-dim)]">— structured spec</span></a>
+            <a href={`/mine/playbooks/${playbook.slug}.md`} class="agent-link"><code>{playbook.slug}.md</code> <span class="text-[color:var(--color-fg-dim)]">— raw markdown</span></a>
+            {rich && (
+              <button class="agent-link w-full text-left" id="agent-copy-aside" type="button">
+                <span>📋 Copy as agent prompt</span>
+              </button>
+            )}
           </div>
         </div>
 
         <div>
           <div class="section-label mb-3">Help complete this</div>
           <div class="card rounded-md p-4 text-sm text-[color:var(--color-fg-muted)]">
-            If you've successfully mined SN{playbook.netuid}, share your install steps. We attribute every playbook to its first verified author.
-            <a href="#" class="block mt-3 text-[color:var(--color-accent)]">Submit playbook on GitHub →</a>
+            Mined SN{playbook.netuid}? Share your install steps and tuning notes.
+            <a href="https://github.com/opentao-ai/opentao/blob/main/src/data/playbook-rich.ts" target="_blank" rel="noopener" class="block mt-3 text-[color:var(--color-accent)]">Submit playbook on GitHub →</a>
           </div>
         </div>
       </aside>
@@ -159,46 +409,265 @@ const related = playbooks
     <div class="max-w-[1400px] mx-auto px-6 py-10">
       <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
         <div class="flex items-center gap-5">
-          <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
-          <a href="#" class="hover:text-[color:var(--color-fg)]">Submit yours</a>
+          <a href={`https://github.com/opentao-ai/opentao/blob/main/src/data/playbooks/${playbook.slug}.ts`} target="_blank" rel="noopener" class="hover:text-[color:var(--color-fg)]">Edit on GitHub ↗</a>
+          <span>·</span>
+          <a href={`/mine/playbooks/${playbook.slug}.json`} class="hover:text-[color:var(--color-fg)]">JSON</a>
+          <a href={`/mine/playbooks/${playbook.slug}.md`} class="hover:text-[color:var(--color-fg)]">Markdown</a>
         </div>
-        <span>{isVerified ? 'Stub · expanding into full guide' : 'Stub · awaiting first verified author'}</span>
+        <span>{rich ? `Verified ${rich.verifiedAt} · live data via taostats` : 'Stub · awaiting first verified author'}</span>
       </div>
       <div class="mt-6 text-center"><a href="/mine/playbooks" class="text-sm hover:text-[color:var(--color-accent)] text-[color:var(--color-fg-muted)]">← All 128 playbooks</a></div>
     </div>
   </section>
+
+  {rich && (
+    <script define:vars={{ netuid: playbook.netuid, slug: playbook.slug, fallbackPrice: rich.profitability.tokenPriceUsdFallback, primaryRunCmd: rich.runSteps[0]?.cmd || '(see install steps)' }}>
+      // ── Live data refresh via /api/subnet/[netuid] (Worker proxy → taostats)
+      async function refreshLive() {
+        try {
+          const r = await fetch(`/api/subnet/${netuid}`, { headers: { accept: 'application/json' } });
+          if (!r.ok) return;
+          const data = await r.json();
+          const setText = (k, v) => document.querySelectorAll(`[data-live="${k}"]`).forEach((el) => { el.textContent = v; });
+          const setVal  = (k, v) => document.querySelectorAll(`[data-live="${k}"]`).forEach((el) => { if (el instanceof HTMLInputElement) el.value = String(v); });
+
+          if (data.burn_cost_tao != null) {
+            setText('burn-cost', `${data.burn_cost_tao.toFixed(3)} τ`);
+            setVal('burn-cost-input', data.burn_cost_tao.toFixed(3));
+          }
+          if (data.miner_count != null) setText('miners', String(data.miner_count));
+          if (data.price_usd != null) {
+            setVal('tao-price-input', data.price_usd.toFixed(2));
+          }
+          recalc();
+        } catch (err) {
+          console.warn('[playbook] live data unavailable, using fallback:', err);
+        }
+      }
+      refreshLive();
+
+      // ── Profitability calculator ──────────────────────
+      function readNum(id) {
+        const el = document.getElementById(id);
+        return parseFloat((el && el.value) || '0');
+      }
+      function recalc() {
+        const gpu  = readNum('calc-gpu-cost');
+        const tao  = readNum('calc-tao-earned');
+        const px   = readNum('calc-tao-price');
+        const burn = readNum('calc-burn-cost');
+
+        const revDay  = tao * px;
+        const costDay = gpu * 24;
+        const netDay  = revDay - costDay;
+        const payback = netDay > 0 ? (burn * px) / netDay : Infinity;
+        const net30   = netDay * 30 - burn * px;
+
+        const fmt = (n) => isFinite(n) ? `$${n.toFixed(2)}` : '—';
+        const fmtDays = (n) => isFinite(n) ? `${n.toFixed(1)} d` : 'never (loss)';
+
+        const set = (k, v) => { const el = document.querySelector(`[data-out="${k}"]`); if (el) el.textContent = v; };
+        set('rev-day',  fmt(revDay));
+        set('cost-day', fmt(costDay));
+        set('net-day',  fmt(netDay));
+        set('payback',  fmtDays(payback));
+        set('net-30d',  fmt(net30));
+      }
+
+      ['calc-gpu-cost', 'calc-tao-earned', 'calc-tao-price', 'calc-burn-cost'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('input', recalc);
+      });
+      recalc();
+
+      // ── Copy as agent prompt ──────────────────────────
+      const SITE = window.location.origin;
+      const promptText = `You are an experienced Bittensor miner. Set up a mining node for subnet ${netuid} on a fresh Linux box.
+
+Full structured playbook: ${SITE}/mine/playbooks/${slug}.json
+Raw markdown: ${SITE}/mine/playbooks/${slug}.md
+
+First run-step command (full install/run flow is in the JSON above):
+${primaryRunCmd}
+
+Before running:
+1. Fetch the JSON above and verify the repo URL, branch, and verified commit SHA.
+2. Confirm hardware matches the spec — abort if VRAM/RAM is short.
+3. Run through opentao.ai/mine/general-setup to ensure btcli, wallet, and burn-cost registration are done.
+4. Install repo deps per the install[] array.
+5. Set required env vars.
+6. Start the miner. Monitor incentive over the first 24 hours.
+7. If incentive stays at 0, walk the known_issues[] list.
+
+Report back after 24h with: assigned UID, current incentive, p95 latency, and any errors.`;
+
+      async function copyPrompt(btn) {
+        try {
+          await navigator.clipboard.writeText(promptText);
+          const orig = btn.textContent;
+          btn.textContent = '✓ Copied — paste into your agent';
+          setTimeout(() => { btn.textContent = orig; }, 1800);
+        } catch { btn.textContent = 'copy failed'; }
+      }
+      document.getElementById('agent-copy')?.addEventListener('click', (e) => copyPrompt(e.currentTarget));
+      document.getElementById('agent-copy-aside')?.addEventListener('click', (e) => copyPrompt(e.currentTarget));
+    </script>
+  )}
 </BaseLayout>
 
 <style>
   .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
-  .cat-llm     { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
-  .cat-vision  { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
-  .cat-audio   { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
-  .cat-robotics{ color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
-  .cat-data    { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
-  .cat-reason  { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
-  .cat-storage { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
-  .cat-compute { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
+  .cat-llm      { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision   { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio    { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics { color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data     { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason   { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-storage  { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+  .cat-compute  { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
 
   .pb-verified { color: #15803d; }
   .pb-stale    { color: #b8470b; }
   .pb-missing  { color: #b91c1c; opacity: 0.85; }
 
+  /* Signal grid — decision header */
+  .signal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0;
+    border: 1px solid rgba(15,15,18,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fafaf9;
+  }
+  .signal { padding: 16px 20px; border-right: 1px solid rgba(15,15,18,0.06); border-bottom: 1px solid rgba(15,15,18,0.06); }
+  .signal .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 6px; }
+  .signal .value { font-family: var(--font-mono); font-size: 22px; font-weight: 600; color: #0c0c10; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .signal .value-sm { font-size: 14px; font-weight: 500; color: #0c0c10; }
+  .signal .sub { font-family: var(--font-mono); font-size: 10px; color: #767680; margin-top: 4px; }
+  .signal-cta { background: rgba(184,71,11,0.04); display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+  .agent-copy-btn { background: #0c0c10; color: #ffffff; padding: 8px 14px; font-size: 12px; font-weight: 500; border-radius: 5px; cursor: pointer; border: 0; }
+  .agent-copy-btn:hover { background: #b8470b; }
+
+  /* Calculator */
+  .calc-wrap { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 8px; }
+  .calc-summary { cursor: pointer; padding: 14px 20px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+  .calc-summary::-webkit-details-marker { display: none; }
+  .calc-summary::after { content: '▾'; font-family: var(--font-mono); color: #b8b8be; }
+  .calc-wrap[open] .calc-summary::after { content: '▴'; }
+  .calc-hint { font-family: var(--font-mono); font-size: 11px; color: #767680; font-weight: 400; }
+  .calc-body { padding: 0 20px 18px; border-top: 1px solid rgba(15,15,18,0.06); }
+  .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; padding: 18px 0; }
+  .calc-field { display: flex; flex-direction: column; gap: 4px; }
+  .calc-field span { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #767680; }
+  .calc-field input { padding: 8px 10px; border: 1px solid rgba(15,15,18,0.1); border-radius: 5px; font-family: var(--font-mono); font-size: 14px; color: #0c0c10; background: #fafaf9; outline: none; }
+  .calc-field input:focus { border-color: #b8470b; background: #ffffff; }
+  .calc-result { background: #faf8f4; border: 1px solid rgba(15,15,18,0.06); border-radius: 6px; padding: 14px 18px; margin-top: 6px; }
+  .calc-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; font-size: 13px; }
+  .calc-row .calc-val { font-family: var(--font-mono); color: #0c0c10; font-variant-numeric: tabular-nums; }
+  .calc-row-net { border-top: 1px dashed rgba(15,15,18,0.12); padding-top: 8px; margin-top: 4px; font-weight: 500; }
+  .calc-row-net .calc-val { color: #b8470b; }
+  .calc-disclaimer { font-family: var(--font-mono); font-size: 11px; color: #767680; margin-top: 10px; line-height: 1.6; }
+
+  /* Prose */
   .prose { max-width: 720px; }
   .prose p { color: #1c1c22; line-height: 1.75; margin: 18px 0; font-size: 17px; }
   .prose p.lead { font-size: 19px; color: #0c0c10; }
   .prose h2 { font-family: var(--font-serif); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin: 48px 0 12px; color: #0c0c10; }
   .prose ul { padding-left: 1.2rem; margin: 14px 0; }
   .prose li { margin: 8px 0; line-height: 1.7; }
+  .prose a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .prose a.inline:hover { text-decoration-color: #b8470b; }
+  .prose code { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); border-radius: 3px; padding: 1px 6px; font-family: var(--font-mono); font-size: 14px; }
 
+  /* Spec table */
+  .spec-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+  .spec-table td, .spec-table th { padding: 10px 14px; border-bottom: 1px solid rgba(15,15,18,0.06); text-align: left; vertical-align: top; }
+  .spec-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #767680; font-weight: 400; }
+  .spec-table td:first-child { font-family: var(--font-mono); font-size: 12px; color: #767680; width: 30%; }
+
+  /* Rental cost row */
+  .rental-row { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding: 10px 0; border-top: 1px dashed rgba(15,15,18,0.1); border-bottom: 1px dashed rgba(15,15,18,0.1); margin: 18px 0; }
+  .rental-val { font-size: 13px; color: #4a4a52; }
+  .rental-val strong { color: #0c0c10; margin-left: 4px; }
+
+  /* Rental NOT allowed warning */
+  .rental-warn { background: rgba(185,28,28,0.06); border: 1px solid rgba(185,28,28,0.25); border-left: 3px solid #b91c1c; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 18px 0; }
+  .rental-warn .warn-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #b91c1c; margin-bottom: 6px; font-weight: 500; }
+
+  /* Per-node hardware card */
+  .node-card { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; padding: 14px 18px; margin: 14px 0; }
+  .node-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid rgba(15,15,18,0.06); margin-bottom: 4px; }
+  .node-role { font-weight: 500; color: #0c0c10; font-size: 14px; }
+  .node-count { font-family: var(--font-mono); font-size: 11px; color: #767680; }
+  .node-note { margin-top: 6px !important; }
+
+  /* Step list (install / run) */
+  .step-list { list-style: none; padding-left: 0; margin: 20px 0; }
+  .step-item { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(15,15,18,0.06); }
+  .step-item:first-child { border-top: 0; }
+  .step-item .step-num { font-family: var(--font-mono); font-size: 11px; color: #b8470b; letter-spacing: 0.05em; padding-top: 4px; }
+  .step-item .step-body { min-width: 0; }
+  .step-item .step-text { font-weight: 500; color: #0c0c10; font-size: 15px; line-height: 1.5; }
+  .step-item .step-note { font-size: 13px; color: #4a4a52; margin: 6px 0 0; line-height: 1.55; }
+  .step-item .terminal { margin: 8px 0 0; }
+
+  /* Repo card */
+  .repo-card { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; padding: 14px 18px; margin: 18px 0; }
+  .repo-row { display: flex; gap: 14px; padding: 4px 0; font-size: 14px; align-items: baseline; }
+  .repo-row .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #767680; width: 100px; flex-shrink: 0; }
+
+  /* Env grid */
+  .env-grid { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; padding: 12px 18px; margin: 18px 0; }
+  .env-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 8px; }
+  .env-row { display: grid; grid-template-columns: 200px 1fr 80px; gap: 14px; padding: 6px 0; border-top: 1px solid rgba(15,15,18,0.05); font-size: 13px; align-items: baseline; }
+  .env-row:first-of-type { border-top: 0; }
+  .env-row .env-desc { color: #4a4a52; }
+  .env-row .env-req { font-family: var(--font-mono); font-size: 10px; text-align: right; }
+  .env-row.required .env-req { color: #b8470b; }
+  .env-row.optional .env-req { color: #767680; }
+
+  /* Callout card */
+  .callout-card { background: #faf8f4; border: 1px solid rgba(15,15,18,0.08); border-left: 3px solid #b8470b; border-radius: 0 6px 6px 0; padding: 16px 20px; margin: 18px 0; }
+  .callout-row { display: flex; gap: 14px; padding: 6px 0; font-size: 14px; line-height: 1.6; align-items: baseline; }
+  .callout-row .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #767680; width: 60px; flex-shrink: 0; padding-top: 2px; }
+  .callout-row.danger .k { color: #b91c1c; }
+  .callout-row.danger span:last-child { color: #1c1c22; }
+
+  /* Timeline */
+  .timeline { margin: 22px 0; }
+  .milestone { display: grid; grid-template-columns: 110px 1fr; gap: 18px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); }
+  .milestone:first-child { border-top: 0; }
+  .ms-day { font-family: var(--font-mono); font-size: 12px; color: #b8470b; letter-spacing: 0.05em; }
+  .ms-target { font-weight: 500; color: #0c0c10; font-size: 15px; }
+  .ms-note { font-size: 13px; color: #4a4a52; margin-top: 3px; line-height: 1.5; }
+
+  /* Known issues — accordion */
+  .issue-list { display: flex; flex-direction: column; gap: 6px; margin: 18px 0; }
+  .issue { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; }
+  .issue summary { padding: 12px 18px; cursor: pointer; font-weight: 500; font-size: 15px; display: flex; gap: 12px; align-items: baseline; list-style: none; }
+  .issue summary::-webkit-details-marker { display: none; }
+  .issue summary::after { content: '+'; margin-left: auto; font-family: var(--font-mono); color: #b8b8be; }
+  .issue[open] summary::after { content: '−'; }
+  .issue .issue-num { font-family: var(--font-mono); font-size: 11px; color: #b8b8be; letter-spacing: 0.05em; }
+  .issue-body { padding: 0 18px 14px; border-top: 1px solid rgba(15,15,18,0.06); }
+  .issue-row { display: flex; gap: 12px; padding: 8px 0; font-size: 14px; line-height: 1.6; align-items: baseline; }
+  .issue-row .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #767680; width: 50px; flex-shrink: 0; padding-top: 3px; }
+
+  /* Agent links */
+  .agent-link { display: block; padding: 6px 8px; border-radius: 4px; color: #4a4a52; transition: background .12s; text-align: left; width: 100%; }
+  .agent-link:hover { background: rgba(184,71,11,0.06); color: #0c0c10; }
+  .agent-link code { font-size: 11px; color: #b8470b; }
+
+  /* Terminal (reused from old template) */
+  .terminal { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; padding: 16px 18px; border-radius: 6px; overflow-x: auto; margin: 20px 0; }
+  .terminal .prompt { color: #b8470b; }
+  .terminal .muted { color: #767680; }
+
+  /* Stub banner */
   .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 28px 0; }
   .stub-banner.verified { background: linear-gradient(180deg, rgba(21,128,61,0.05), rgba(21,128,61,0)); border-left-color: #15803d; }
   .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
   .stub-banner.verified .label { color: #15803d; }
-
-  .terminal { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; padding: 16px 18px; border-radius: 6px; overflow-x: auto; white-space: pre; margin: 20px 0; }
-  .terminal .prompt { color: #b8470b; }
-  .terminal .muted { color: #767680; }
 
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 </style>

@@ -154,8 +154,11 @@ img.logo {
 
 /* Top-nav dropdown */
 .nav-dropdown { position: relative; }
-.nav-dropdown summary {
-  list-style: none;
+.nav-dropdown .nav-trigger {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font: inherit;
   cursor: pointer;
   padding: 7px 12px;
   border-radius: 6px;
@@ -164,8 +167,7 @@ img.logo {
   gap: 6px;
   color: #4a4a52;
 }
-.nav-dropdown summary::-webkit-details-marker { display: none; }
-.nav-dropdown summary::after {
+.nav-dropdown .nav-trigger::after {
   content: '';
   display: inline-block;
   width: 6px;
@@ -178,9 +180,16 @@ img.logo {
   opacity: 0.5;
   transition: transform 0.15s;
 }
-.nav-dropdown summary:hover { color: #0c0c10; background: rgba(15, 15, 18, 0.04); }
-.nav-dropdown[open] summary { color: #0c0c10; background: rgba(15, 15, 18, 0.06); }
-.nav-dropdown[open] summary::after { transform: rotate(225deg); margin-bottom: -1px; }
+.nav-dropdown .nav-trigger:hover { color: #0c0c10; background: rgba(15, 15, 18, 0.04); }
+.nav-dropdown .nav-trigger:focus { outline: none; }
+.nav-dropdown:hover .nav-trigger {
+  color: #0c0c10;
+  background: rgba(15, 15, 18, 0.06);
+}
+.nav-dropdown:hover .nav-trigger::after {
+  transform: rotate(225deg);
+  margin-bottom: -1px;
+}
 .nav-dropdown .dropdown-menu {
   position: absolute;
   top: 100%; left: 50%;
@@ -193,6 +202,26 @@ img.logo {
   min-width: 280px;
   padding: 6px;
   z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease, visibility 0s linear 0.12s;
+}
+.nav-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.12s ease, visibility 0s linear 0s;
+}
+/* Invisible bridge so the cursor can travel from trigger to menu
+   through the 6px margin gap without the :hover state breaking. */
+.nav-dropdown .dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
 }
 .nav-dropdown .dropdown-item {
   display: flex;
@@ -210,4 +239,66 @@ img.logo {
   font-family: var(--font-mono);
   font-size: 10px;
   color: #767680;
+}
+
+/* Search modal — empty-state quick links and suggestion pills */
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 15, 18, 0.08);
+  border-radius: 6px;
+  background: #fafaf9;
+  transition: all 0.12s;
+}
+.quick-link:hover {
+  border-color: rgba(184, 71, 11, 0.35);
+  background: #ffffff;
+}
+.quick-link .ql-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.quick-link .ql-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0c0c10;
+}
+.quick-link .ql-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #767680;
+  margin-top: 1px;
+}
+.suggest-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 15, 18, 0.1);
+  background: transparent;
+  color: #4a4a52;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.suggest-pill:hover {
+  border-color: rgba(184, 71, 11, 0.35);
+  color: #b8470b;
+  background: rgba(184, 71, 11, 0.05);
+}
+
+/* Generic "Coming soon" badge — used on placeholder controls */
+.coming-soon {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(15, 15, 18, 0.05);
+  color: #767680;
+  border: 1px solid rgba(15, 15, 18, 0.1);
 }

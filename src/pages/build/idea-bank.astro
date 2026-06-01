@@ -19,13 +19,13 @@ const domainCounts = [
 ];
 
 const filters = [
-  { label: 'All · 12', active: true },
-  { label: 'Education · 2', active: false },
-  { label: 'Finance · 3', active: false },
-  { label: 'Robotics · 2', active: false },
-  { label: 'Data · 2', active: false },
-  { label: 'Code · 1', active: false },
-  { label: 'Health · 2', active: false },
+  { label: 'All · 12',      domain: 'all',       active: true },
+  { label: 'Education · 2', domain: 'EDUCATION', active: false },
+  { label: 'Finance · 3',   domain: 'FINANCE',   active: false },
+  { label: 'Robotics · 2',  domain: 'ROBOTICS',  active: false },
+  { label: 'Data · 2',      domain: 'DATA',      active: false },
+  { label: 'Code · 1',      domain: 'CODE',      active: false },
+  { label: 'Health · 2',    domain: 'HEALTH',    active: false },
 ];
 
 const domainStyles: Record<string, string> = {
@@ -257,9 +257,9 @@ const failures = [
 ];
 
 const refSubnets = [
-  { netuid: '64', name: 'Chutes', body: 'Inference market with hard determinism on output bytes. Clean L3/L4.' },
-  { netuid: '5', name: 'OpenKaito', body: 'Search ranking judged against rotating private gold set. Strong L3.' },
-  { netuid: '120', name: 'Affine', body: 'Reasoning traces, verifier-graded. Compute fully utilized at scale.' },
+  { slug: '64-chutes',   netuid: '64',  name: 'Chutes',   body: 'Inference market with hard determinism on output bytes. Clean L3/L4.' },
+  { slug: '22-desearch', netuid: '22',  name: 'Desearch', body: 'Search ranking judged against rotating private gold set. Strong L3.' },
+  { slug: '120-affine',  netuid: '120', name: 'Affine',   body: 'Reasoning traces, verifier-graded. Compute fully utilized at scale.' },
 ];
 
 const onePager = [
@@ -338,22 +338,21 @@ const computeRowsB = [
       <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
         <div class="flex flex-wrap gap-2">
           {filters.map((f) => (
-            <button class={`filter-btn ${f.active ? 'active' : ''}`}>{f.label}</button>
+            <button class={`filter-btn ${f.active ? 'active' : ''}`} data-filter-domain={f.domain}>{f.label}</button>
           ))}
         </div>
         <div class="flex items-center gap-3 text-xs font-mono text-[color:var(--color-fg-dim)]">
           <span>sort</span>
-          <select class="bg-transparent border hairline rounded px-2 py-1 text-[color:var(--color-fg)]">
-            <option>buyer-readiness</option>
-            <option>compute intensity</option>
-            <option>recently added</option>
+          <select id="idea-sort" class="bg-transparent border hairline rounded px-2 py-1 text-[color:var(--color-fg)]">
+            <option value="heat">buyer-readiness</option>
+            <option value="recent">recently added</option>
           </select>
         </div>
       </div>
 
-      <div class="grid lg:grid-cols-2 gap-4">
-        {ideas.map((idea) => (
-          <article class="card rounded-md p-7">
+      <div class="grid lg:grid-cols-2 gap-4" id="idea-grid">
+        {ideas.map((idea, i) => (
+          <article class="card rounded-md p-7" data-domain={idea.domain} data-heat={idea.heat} data-order={i}>
             <div class="flex items-baseline justify-between mb-3">
               <span class="domain-tag" style={domainStyles[idea.domain]}>{idea.domain}</span>
               <span class="heat text-[color:var(--color-fg-dim)]">buyer ready <span class="heat-bar"><span style={`width: ${idea.heat}%`}></span></span></span>
@@ -530,7 +529,7 @@ const computeRowsB = [
 
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
           {refSubnets.map((s) => (
-            <a href="/beginner/subnets" class="card rounded-md p-5 block">
+            <a href={`/beginner/subnets/${s.slug}`} class="card rounded-md p-5 block">
               <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">netuid {s.netuid} · live</div>
               <h4 class="font-semibold mb-1">{s.name}</h4>
               <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{s.body}</p>
@@ -563,6 +562,37 @@ const computeRowsB = [
 
     </div>
   </section>
+
+  <script>
+    const grid = document.getElementById('idea-grid');
+    const cards = grid ? Array.from(grid.querySelectorAll<HTMLElement>('article[data-domain]')) : [];
+
+    let domain = 'all';
+
+    function render() {
+      if (!grid) return;
+      const sortSel = document.getElementById('idea-sort') as HTMLSelectElement | null;
+      const mode = sortSel?.value || 'heat';
+      const sorted = [...cards].sort((a, b) => {
+        if (mode === 'heat') return Number(b.dataset.heat) - Number(a.dataset.heat);
+        return Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      for (const c of sorted) grid.appendChild(c);
+      for (const c of cards) {
+        const match = domain === 'all' || c.dataset.domain === domain;
+        c.style.display = match ? '' : 'none';
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-domain]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        domain = btn.dataset.filterDomain || 'all';
+        document.querySelectorAll('[data-filter-domain]').forEach((b) => b.classList.toggle('active', b === btn));
+        render();
+      });
+    });
+    document.getElementById('idea-sort')?.addEventListener('change', render);
+  </script>
 </BaseLayout>
 
 <style>

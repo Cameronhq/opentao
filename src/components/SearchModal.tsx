@@ -110,7 +110,7 @@ export default function SearchModal() {
       </button>
 
       <div
-        class="fixed inset-0 z-[200] flex items-start justify-center pt-[10vh] px-4 bg-black/40 backdrop-blur-sm"
+        class="fixed inset-0 z-[200] flex items-start justify-center pt-[10vh] px-4 bg-black/55 backdrop-blur"
         onClick={() => setOpen(false)}
       >
         <div
@@ -135,8 +135,26 @@ export default function SearchModal() {
 
           <div class="max-h-[60vh] overflow-y-auto">
             {!query && (
-              <div class="px-5 py-10 text-center text-sm text-[color:var(--color-fg-dim)]">
-                Type to search across all 73 pages. Powered by Pagefind.
+              <div class="px-5 py-6">
+                <div class="text-[10px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-3">Jump to</div>
+                <div class="grid grid-cols-2 gap-2 mb-6">
+                  <a href="/beginner/wiki"     class="quick-link" onClick={() => setOpen(false)}><span class="ql-icon">📚</span><span><div class="ql-title">Wiki</div><div class="ql-sub">25+ concepts</div></span></a>
+                  <a href="/beginner/subnets"  class="quick-link" onClick={() => setOpen(false)}><span class="ql-icon">🗂️</span><span><div class="ql-title">Subnet directory</div><div class="ql-sub">128 subnets</div></span></a>
+                  <a href="/mine/general-setup" class="quick-link" onClick={() => setOpen(false)}><span class="ql-icon">⛏️</span><span><div class="ql-title">Start mining</div><div class="ql-sub">8-step setup</div></span></a>
+                  <a href="/build/idea-bank"   class="quick-link" onClick={() => setOpen(false)}><span class="ql-icon">💡</span><span><div class="ql-title">Idea bank</div><div class="ql-sub">12 subnet ideas</div></span></a>
+                  <a href="/community/events"  class="quick-link" onClick={() => setOpen(false)}><span class="ql-icon">📅</span><span><div class="ql-title">Events</div><div class="ql-sub">12 upcoming</div></span></a>
+                  <a href="/community/insights" class="quick-link" onClick={() => setOpen(false)}><span class="ql-icon">📝</span><span><div class="ql-title">Insights</div><div class="ql-sub">long reads</div></span></a>
+                </div>
+                <div class="text-[10px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-3">Try searching</div>
+                <div class="flex flex-wrap gap-1.5">
+                  {['Yuma consensus', 'miner', 'validator', 'dTAO', 'cortex', 'subnet 42', 'register'].map((t) => (
+                    <button
+                      key={t}
+                      class="suggest-pill"
+                      onClick={() => { setQuery(t); inputRef.current?.focus(); }}
+                    >{t}</button>
+                  ))}
+                </div>
               </div>
             )}
             {query && loading && (

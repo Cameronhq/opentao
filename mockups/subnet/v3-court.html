@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subnet mockup · V3 court — Zeus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --fg: #0c0c10; --fg-muted: #4a4a52; --fg-dim: #767680;
+      --accent: #b8470b; --green: #15803d; --blue: #1c6ea4;
+      --paper: #ffffff; --surface: #fafaf9;
+      --border: rgba(15,15,18,0.08); --border-strong: rgba(15,15,18,0.18);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --font-serif: 'Fraunces', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); color: var(--fg); background: var(--paper); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 56px 32px; }
+    .pill { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+    .pill.variant { background: rgba(184,71,11,0.06); color: var(--accent); border-color: rgba(184,71,11,0.3); }
+    .section-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-dim); }
+
+    /* hero (reused) */
+    .hero { padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .hero-meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .hero-meta .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; color: var(--green); background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); }
+    .hero-meta .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--green); box-shadow: 0 0 8px rgba(22,163,74,0.45); display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .hero-meta .light { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+    .hero-id { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+    .hero-id .lbl { font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim); }
+    .hero-id .num { font-family: var(--font-mono); font-size: 56px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg); line-height: 1; }
+    .hero h1 { font-family: var(--font-serif); font-weight: 500; font-size: 44px; letter-spacing: -0.015em; line-height: 1.1; margin: 6px 0 18px; }
+    .hero .pitch { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: var(--fg); max-width: 760px; margin: 0; }
+    .hero .pitch strong { font-style: normal; font-weight: 500; color: var(--accent); }
+    .hero .pitch-sub { font-size: 14px; color: var(--fg-muted); max-width: 720px; margin-top: 8px; }
+
+    /* court layout */
+    .court-section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    .court-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .court-head h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.01em; margin: 0; }
+    .court-head .meta { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; }
+
+    .court {
+      display: grid;
+      grid-template-columns: 1fr 240px 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .court > div { padding: 24px; }
+    .side { background: var(--paper); position: relative; }
+    .side.miner { border-right: 1px dashed var(--border); }
+    .side.validator { border-left: 1px dashed var(--border); }
+
+    .side .role-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .side .role-tag {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 3px; color: var(--paper);
+    }
+    .side.miner .role-tag { background: var(--accent); }
+    .side.validator .role-tag { background: var(--blue); }
+    .side .role-count { font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+
+    .side h3 {
+      font-family: var(--font-serif); font-weight: 500; font-size: 24px; letter-spacing: -0.01em;
+      margin: 0 0 16px; line-height: 1.2;
+    }
+    .side .summary { font-size: 14px; color: var(--fg-muted); margin: 0 0 18px; line-height: 1.6; }
+
+    .field-list { display: flex; flex-direction: column; gap: 10px; }
+    .field {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 14px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      align-items: baseline;
+    }
+    .field:first-child { border-top: 0; padding-top: 0; }
+    .field .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--fg-dim); padding-top: 2px; }
+    .field .v { color: var(--fg); line-height: 1.55; }
+    .field .v code { font-family: var(--font-mono); font-size: 12px; background: var(--surface); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+
+    /* middle column — the ball / interaction */
+    .ball-col {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      padding: 28px 14px !important;
+      position: relative;
+    }
+    .ball-col::before, .ball-col::after {
+      /* horizontal dashed connector across the gap */
+      content: ''; position: absolute; top: 50%; height: 1px;
+      background: repeating-linear-gradient(90deg, rgba(184,71,11,0.4) 0 4px, transparent 4px 8px);
+    }
+    .ball-col::before { left: -1px; right: 50%; }
+    .ball-col::after { left: 50%; right: -1px; }
+
+    .interaction {
+      display: flex; flex-direction: column; gap: 14px;
+      padding: 0;
+    }
+    .interaction .arrow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--fg-dim);
+    }
+    .interaction .arrow .label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--fg-muted);
+      letter-spacing: 0;
+      text-align: center;
+      padding: 6px 8px;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .interaction .arrow .label strong { font-weight: 500; color: var(--accent); display: block; font-size: 12px; margin-bottom: 2px; }
+    .interaction .arrow .pointer {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .interaction .arrow.left .pointer.right { color: rgba(184,71,11,0.18); }
+    .interaction .arrow.right .pointer.left { color: rgba(184,71,11,0.18); }
+
+    .verifier-card {
+      background: rgba(184,71,11,0.05);
+      border: 1px solid rgba(184,71,11,0.22);
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--fg-muted);
+      line-height: 1.55;
+    }
+    .verifier-card .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+    .verifier-card code { font-family: var(--font-mono); font-size: 11px; color: var(--fg); }
+
+    /* settlement strip */
+    .settlement {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 24px;
+      background: rgba(21,128,61,0.04);
+      border: 1px solid rgba(21,128,61,0.22);
+      border-radius: 8px;
+    }
+    .settlement .col { font-size: 13px; color: var(--fg-muted); line-height: 1.55; }
+    .settlement .col .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); margin-bottom: 4px; }
+    .settlement .col strong { color: var(--fg); font-weight: 500; }
+    .settlement .yuma {
+      font-family: var(--font-serif); font-style: italic; font-size: 18px; color: var(--green);
+      padding: 4px 14px; border: 1px solid rgba(21,128,61,0.3); border-radius: 999px; background: var(--paper);
+      white-space: nowrap;
+    }
+
+    /* timing strip */
+    .timing { margin-top: 22px; display: flex; gap: 18px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); }
+    .timing .ti { display: flex; align-items: center; gap: 6px; }
+    .timing .ti .d { width: 6px; height: 6px; border-radius: 999px; }
+    .timing .ti .d.m { background: var(--accent); }
+    .timing .ti .d.v { background: var(--blue); }
+    .timing .ti .d.c { background: var(--green); }
+
+    .footer { padding: 28px 0; border-top: 1px solid var(--border); margin-top: 24px; }
+    .footer-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;">
+      <span class="section-label">SUBNET PAGE MOCKUP</span>
+      <span class="pill variant">V3 · COURT</span>
+    </div>
+
+    <header class="hero">
+      <div class="hero-meta">
+        <span class="cat">Data · Prediction</span>
+        <span class="light"><span class="dot"></span>active · 25 miners · 11 validators</span>
+        <span class="light">· operator <span style="color:var(--fg)">Orpheus AI</span></span>
+      </div>
+      <div class="hero-id"><span class="lbl">netuid</span><span class="num">18</span></div>
+      <h1>Zeus</h1>
+      <p class="pitch">
+        Zeus is a subnet that <strong>forecasts the weather</strong> — miners run global atmospheric models, validators score their predictions against ground-truth ERA5 reanalysis, and the customer outside the network is the energy-trading desk.
+      </p>
+      <p class="pitch-sub">
+        Read once and you know what's being made (a global forecast), how it's judged (anomaly-correlation-coefficient against the held-out ground truth), and who's paying for it in the real world.
+      </p>
+    </header>
+
+    <section class="court-section">
+      <div class="court-head">
+        <h2>The two sides of every subnet</h2>
+        <span class="meta">universal template · works for any subnet</span>
+      </div>
+
+      <div class="court">
+        <!-- ─── Left side: Miner ─────────────────── -->
+        <div class="side miner">
+          <div class="role-head">
+            <span class="role-tag">Miner</span>
+            <span class="role-count">25 active · UID 0–127</span>
+          </div>
+          <h3>Produces work the network cares about.</h3>
+          <p class="summary">Each miner runs a global atmospheric forecast model and returns gridded predictions every tempo.</p>
+          <div class="field-list">
+            <div class="field"><span class="k">does</span><span class="v">Forecasts temperature, wind, geopotential, and humidity at +6h, +24h, +72h, +120h horizons.</span></div>
+            <div class="field"><span class="k">input</span><span class="v"><code>ERA5 init</code> · withheld atmospheric state, ~4 MB tensor.</span></div>
+            <div class="field"><span class="k">output</span><span class="v"><code>gridded fields</code> · 4 horizons × 4 variables × global grid.</span></div>
+            <div class="field"><span class="k">hardware</span><span class="v">1×H100 80GB (recommended) · 1×A100 minimum.</span></div>
+            <div class="field"><span class="k">paid for</span><span class="v">High ACC vs the held-out truth. Top decile earns 5–10× median.</span></div>
+          </div>
+        </div>
+
+        <!-- ─── Middle: Interaction primitives ─────── -->
+        <div class="ball-col">
+          <div class="interaction">
+            <div class="arrow left">
+              <span></span>
+              <div class="label"><strong>← challenge</strong>broadcast initial state</div>
+              <span></span>
+            </div>
+            <div class="arrow right">
+              <span></span>
+              <div class="label"><strong>response →</strong>gridded prediction</div>
+              <span></span>
+            </div>
+            <div class="arrow left">
+              <span></span>
+              <div class="label"><strong>← weight</strong>per-miner score</div>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="verifier-card">
+            <div class="lbl">Verifier</div>
+            <code>ACC</code> vs <code>ERA5</code> truth window. Weighted sum across variables and horizons.
+          </div>
+        </div>
+
+        <!-- ─── Right side: Validator ─────────────── -->
+        <div class="side validator">
+          <div class="role-head">
+            <span class="role-tag">Validator</span>
+            <span class="role-count">11 active · top-N stake</span>
+          </div>
+          <h3>Grades the work against ground truth.</h3>
+          <p class="summary">Each validator pulls the held-out ERA5 window, runs ACC against every miner, and submits a weight vector.</p>
+          <div class="field-list">
+            <div class="field"><span class="k">does</span><span class="v">Picks the challenge slice, scores each miner with anomaly-correlation-coefficient, submits weights to chain.</span></div>
+            <div class="field"><span class="k">input</span><span class="v"><code>miner responses</code> · all 25 returns + held-out ERA5 truth.</span></div>
+            <div class="field"><span class="k">output</span><span class="v"><code>weight vector</code> · one score per UID, signed and posted on-chain.</span></div>
+            <div class="field"><span class="k">requires</span><span class="v">Top-N stake position + ERA5 mirror + reference validator code.</span></div>
+            <div class="field"><span class="k">paid for</span><span class="v">Submitting weights that agree with the consensus median across other validators.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settlement strip — where it all gets paid out -->
+      <div class="settlement">
+        <div class="col">
+          <div class="lbl">Inputs</div>
+          11 validators each post a weight vector. <strong>One vector per validator</strong>, stake-weighted.
+        </div>
+        <div class="yuma">Yuma consensus</div>
+        <div class="col">
+          <div class="lbl">Output</div>
+          <strong>Emission per UID</strong>. Top miners earn most. Validators earn from consensus alignment.
+        </div>
+      </div>
+
+      <div class="timing">
+        <div class="ti"><span class="d v"></span>validator challenge · t=0</div>
+        <div class="ti"><span class="d m"></span>miner response · t≈2 min</div>
+        <div class="ti"><span class="d v"></span>validator scoring · t≈3 min</div>
+        <div class="ti"><span class="d c"></span>chain settlement · t=72 min</div>
+        <div class="ti">≈ 20 cycles per day</div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-meta">
+        <span>Mockup v3 — court. The two-sides + interaction primitive template generalizes to any subnet: swap the verifier, the input/output schemas, the hardware.</span>
+        <span>Zeus · SN18 · @zeussubnet</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -71,29 +71,38 @@ const pctMissing = 100 - pctVerified - pctStale;
     <div class="max-w-[1400px] mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
       <div class="flex items-center gap-2 px-3 py-2 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] w-full sm:w-64">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" placeholder="Search playbooks…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+        <input id="playbook-search" type="text" placeholder="Search playbooks…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
       </div>
       <div class="flex items-center gap-2 overflow-x-auto">
-        <button class="pill active">All categories</button>
-        <button class="pill">LLM</button>
-        <button class="pill">Vision</button>
-        <button class="pill">Robotics</button>
-        <button class="pill">Data</button>
+        <button class="pill active" data-filter-cat="all">All categories</button>
+        <button class="pill" data-filter-cat="llm">LLM</button>
+        <button class="pill" data-filter-cat="vision">Vision</button>
+        <button class="pill" data-filter-cat="audio">Audio</button>
+        <button class="pill" data-filter-cat="robotics">Robotics</button>
+        <button class="pill" data-filter-cat="data">Data</button>
+        <button class="pill" data-filter-cat="reason">Reasoning</button>
+        <button class="pill" data-filter-cat="compute">Compute</button>
+        <button class="pill" data-filter-cat="storage">Storage</button>
       </div>
-      <div class="flex items-center gap-2 ml-auto">
-        <button class="pill flex items-center gap-1.5">By hardware ▾</button>
-        <button class="pill flex items-center gap-1.5">By status ▾</button>
-        <button class="pill flex items-center gap-1.5">Sort: emission ↓</button>
+      <div class="flex items-center gap-2 ml-auto overflow-x-auto">
+        <button class="pill active" data-filter-status="all">All status</button>
+        <button class="pill" data-filter-status="verified">Verified</button>
+        <button class="pill" data-filter-status="stale">Stale</button>
+        <button class="pill" data-filter-status="missing">Missing</button>
+        <span class="pill" style="cursor: default; opacity: 0.55;">Sort · emission ↓</span>
       </div>
     </div>
   </section>
 
   <section class="border-b hairline">
     <div class="max-w-[1400px] mx-auto px-6 py-10">
-      <div class="section-label mb-4">Pick by what's plugged in</div>
+      <div class="section-label mb-4 flex items-center gap-3">
+        <span>Pick by what's plugged in</span>
+        <span class="coming-soon">filter · coming soon</span>
+      </div>
       <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
         {hardwareTiers.map((t) => (
-          <a href="#" class="card rounded-md p-5">
+          <div class="card rounded-md p-5">
             <div class="flex items-center gap-1 mb-3">
               {[1, 2, 3, 4].map((i) => (
                 <span class={`hw-icon ${i <= t.dots ? 'on' : ''}`}></span>
@@ -101,7 +110,7 @@ const pctMissing = 100 - pctVerified - pctStale;
             </div>
             <h3 class="font-medium mb-1">{t.name}</h3>
             <div class="text-xs text-[color:var(--color-fg-dim)] font-mono">{t.meta}</div>
-          </a>
+          </div>
         ))}
       </div>
     </div>
@@ -111,9 +120,16 @@ const pctMissing = 100 - pctVerified - pctStale;
     <div class="max-w-[1400px] mx-auto px-6 py-10">
       <div class="section-label mb-5">Playbooks · sorted by emission</div>
 
-      <div class="grid lg:grid-cols-2 gap-3">
+      <div class="grid lg:grid-cols-2 gap-3" id="playbook-grid">
         {playbooks.map((p) => (
-          <a href={p.href} class={`pcard card rounded-md p-6 block`} style={p.dashed ? 'border-style: dashed;' : ''}>
+          <a
+            href={p.href}
+            class={`pcard card rounded-md p-6 block`}
+            style={p.dashed ? 'border-style: dashed;' : ''}
+            data-cat={p.category}
+            data-status={p.status}
+            data-search={`${p.name} ${p.netuid} ${p.categoryLabel} ${p.blurb}`.toLowerCase()}
+          >
             <div class="flex items-baseline justify-between mb-4">
               <div class="flex items-baseline gap-3">
                 <span class={`netuid text-2xl font-semibold ${p.faded ? 'text-[color:var(--color-fg-muted)]' : 'text-[color:var(--color-fg)]'}`}>{p.netuid}</span>
@@ -142,11 +158,57 @@ const pctMissing = 100 - pctVerified - pctStale;
         ))}
       </div>
 
-      <div class="mt-8 text-center text-xs font-mono text-[color:var(--color-fg-dim)]">
-        Showing all {stats.total} subnets · sorted verified → missing
+      <div class="mt-8 text-center text-xs font-mono text-[color:var(--color-fg-dim)]" id="playbook-count">
+        Showing <span class="text-[color:var(--color-fg)]" data-visible>{stats.total}</span> of {stats.total} subnets · sorted verified → missing
       </div>
     </div>
   </section>
+
+  <script>
+    let cat = 'all';
+    let status = 'all';
+    let query = '';
+
+    const cards = Array.from(document.querySelectorAll<HTMLAnchorElement>('#playbook-grid > a.pcard'));
+    const visible = document.querySelector<HTMLSpanElement>('#playbook-count [data-visible]');
+
+    function apply() {
+      let shown = 0;
+      for (const c of cards) {
+        const matchCat = cat === 'all' || c.dataset.cat === cat;
+        const matchStatus = status === 'all' || c.dataset.status === status;
+        const matchSearch = !query || (c.dataset.search || '').includes(query);
+        const show = matchCat && matchStatus && matchSearch;
+        c.style.display = show ? '' : 'none';
+        if (show) shown++;
+      }
+      if (visible) visible.textContent = String(shown);
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-cat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        cat = btn.dataset.filterCat || 'all';
+        document.querySelectorAll('[data-filter-cat]').forEach((b) => b.classList.toggle('active', b === btn));
+        apply();
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-status]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        status = btn.dataset.filterStatus || 'all';
+        document.querySelectorAll('[data-filter-status]').forEach((b) => b.classList.toggle('active', b === btn));
+        apply();
+      });
+    });
+
+    const search = document.getElementById('playbook-search') as HTMLInputElement | null;
+    if (search) {
+      search.addEventListener('input', () => {
+        query = search.value.trim().toLowerCase();
+        apply();
+      });
+    }
+  </script>
 </BaseLayout>
 
 <style>

@@ -9,12 +9,24 @@ const subnav = [
   { href: '/community/insights', label: 'Insights' },
 ];
 
-const upcoming = [
-  { href: '/community/events/2026-sn3-fireside-ke-ng', month: 'Jun', day: '12', tags: [{ label: 'Online · AMA', cls: 'tag tag-online' }], title: '"What we learned running SN3 for a year" — fireside with @ke.ng', meta: 'Discord stage · 09:00 PST · 60 min', when: 'in 16 days' },
-  { href: '/community/events/2026-sf-build-first-subnet', month: 'Jun', day: '15', tags: [{ label: 'Workshop', cls: 'tag' }, { label: 'In-person', cls: 'tag' }], title: 'San Francisco — "Build your first subnet in 4 hours"', meta: '📍 Mission · 10:00 PST · hosted by SF Chapter', when: 'in 19 days' },
-  { href: '/community/events/2026-hackathon-mid-checkpoint', month: 'Jun', day: '22', tags: [{ label: 'Hackathon · kick-off', cls: 'tag tag-hackathon' }], title: 'Mid-checkpoint demos · Season 01 hackathon', meta: 'Hybrid · 6 cities · 18:00 local · open to spectators', when: 'in 26 days' },
-  { href: '/community/events/2026-berlin-garden-edition', month: 'Jun', day: '28', tags: [{ label: 'Meetup', cls: 'tag' }, { label: 'In-person', cls: 'tag' }], title: 'Berlin — Bittensor Garden Edition', meta: '📍 Kreuzberg · 17:00 CEST · BBQ + brief talks', when: 'in 32 days' },
-  { href: '/community/events/2026-validator-night-bonding', month: 'Jul', day: '06', tags: [{ label: 'Online · Workshop', cls: 'tag tag-online' }], title: 'Validator night — bonding & trust calibration', meta: 'Discord stage · 18:00 UTC · 90 min · for experienced validators', when: 'in 40 days' },
+interface UpcomingItem {
+  href: string;
+  month: string;
+  day: string;
+  tags: { label: string; cls: string }[];
+  title: string;
+  meta: string;
+  when: string;
+  category: string; // 'Meetup' | 'AMA' | 'Workshop' | 'Hackathon' | 'Demo day'
+  mode: string;     // 'In-person' | 'Online' | 'Hybrid'
+}
+
+const upcoming: UpcomingItem[] = [
+  { href: '/community/events/2026-sn3-fireside-ke-ng', month: 'Jun', day: '12', tags: [{ label: 'Online · AMA', cls: 'tag tag-online' }], title: '"What we learned running SN3 for a year" — fireside with @ke.ng', meta: 'Discord stage · 09:00 PST · 60 min', when: 'in 16 days', category: 'AMA', mode: 'Online' },
+  { href: '/community/events/2026-sf-build-first-subnet', month: 'Jun', day: '15', tags: [{ label: 'Workshop', cls: 'tag' }, { label: 'In-person', cls: 'tag' }], title: 'San Francisco — "Build your first subnet in 4 hours"', meta: '📍 Mission · 10:00 PST · hosted by SF Chapter', when: 'in 19 days', category: 'Workshop', mode: 'In-person' },
+  { href: '/community/events/2026-hackathon-mid-checkpoint', month: 'Jun', day: '22', tags: [{ label: 'Hackathon · kick-off', cls: 'tag tag-hackathon' }], title: 'Mid-checkpoint demos · Season 01 hackathon', meta: 'Hybrid · 6 cities · 18:00 local · open to spectators', when: 'in 26 days', category: 'Hackathon', mode: 'Hybrid' },
+  { href: '/community/events/2026-berlin-garden-edition', month: 'Jun', day: '28', tags: [{ label: 'Meetup', cls: 'tag' }, { label: 'In-person', cls: 'tag' }], title: 'Berlin — Bittensor Garden Edition', meta: '📍 Kreuzberg · 17:00 CEST · BBQ + brief talks', when: 'in 32 days', category: 'Meetup', mode: 'In-person' },
+  { href: '/community/events/2026-validator-night-bonding', month: 'Jul', day: '06', tags: [{ label: 'Online · Workshop', cls: 'tag tag-online' }], title: 'Validator night — bonding & trust calibration', meta: 'Discord stage · 18:00 UTC · 90 min · for experienced validators', when: 'in 40 days', category: 'Workshop', mode: 'Online' },
 ];
 ---
 <BaseLayout
@@ -47,9 +59,9 @@ const upcoming = [
       <div class="flex flex-col">
         <div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] uppercase tracking-wider mb-1">Subscribe</div>
         <div class="flex gap-1.5 mt-1 flex-wrap">
-          <a href="#" class="pill text-xs">📅 iCal</a>
-          <a href="#" class="pill text-xs">RSS</a>
-          <a href="#" class="pill text-xs">✉ Email</a>
+          <a href="/events.ics" class="pill text-xs">📅 iCal</a>
+          <a href="/events.xml" class="pill text-xs">RSS</a>
+          <span class="pill text-xs" style="cursor: default; opacity: 0.6;">✉ Email <span class="ml-1 coming-soon" style="font-size: 8px; padding: 1px 5px;">soon</span></span>
         </div>
       </div>
     </div>
@@ -59,18 +71,18 @@ const upcoming = [
     <div class="max-w-[1200px] mx-auto px-6 py-5">
       <div class="flex items-center gap-6 flex-wrap">
         <div class="flex border hairline rounded-md overflow-hidden text-sm">
-          <button class="px-4 py-2 bg-[color:var(--color-paper)] border-r hairline text-[color:var(--color-fg)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>List</button>
-          <button class="px-4 py-2 text-[color:var(--color-fg-muted)] border-r hairline hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-paper)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</button>
-          <button class="px-4 py-2 text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] hover:bg-[color:var(--color-paper)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map</button>
+          <button class="px-4 py-2 bg-[color:var(--color-paper)] border-r hairline text-[color:var(--color-fg)] flex items-center gap-1.5" disabled style="cursor: default;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>List</button>
+          <button class="px-4 py-2 text-[color:var(--color-fg-dim)] border-r hairline flex items-center gap-1.5" disabled title="Coming soon" style="cursor: not-allowed; opacity: 0.55;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</button>
+          <button class="px-4 py-2 text-[color:var(--color-fg-dim)] flex items-center gap-1.5" disabled title="Coming soon" style="cursor: not-allowed; opacity: 0.55;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Map</button>
         </div>
         <div class="flex flex-wrap items-center gap-2 ml-auto">
-          <button class="pill active">All</button>
-          <button class="pill">In-person</button>
-          <button class="pill">Online</button>
-          <button class="pill">Hackathon</button>
-          <button class="pill">Workshop</button>
-          <button class="pill">AMA</button>
-          <button class="pill">📍 All cities ▾</button>
+          <button class="pill active" data-filter-evt="all">All</button>
+          <button class="pill" data-filter-evt="In-person">In-person</button>
+          <button class="pill" data-filter-evt="Online">Online</button>
+          <button class="pill" data-filter-evt="Hackathon">Hackathon</button>
+          <button class="pill" data-filter-evt="Workshop">Workshop</button>
+          <button class="pill" data-filter-evt="AMA">AMA</button>
+          <span class="pill" style="cursor: default; opacity: 0.6;">📍 All cities <span class="coming-soon" style="font-size: 8px; padding: 1px 5px; margin-left: 4px;">soon</span></span>
         </div>
       </div>
     </div>
@@ -79,7 +91,7 @@ const upcoming = [
   <section class="border-b hairline">
     <div class="max-w-[1200px] mx-auto px-6 py-14">
       <div class="section-label mb-5">Up next</div>
-      <a href="/community/events/2026-tokyo-meetup-03" class="card rounded-md p-8 grid lg:grid-cols-[auto_1fr_auto] gap-8 items-center">
+      <a href="/community/events/2026-tokyo-meetup-03" class="card rounded-md p-8 grid lg:grid-cols-[auto_1fr_auto] gap-8 items-center" data-evt-category="Meetup" data-evt-mode="In-person">
         <div class="date-block"><div class="month">Jun</div><div class="day">08</div></div>
         <div>
           <div class="flex items-center gap-2 mb-3"><span class="tag">Meetup</span><span class="tag">In-person</span><span class="text-xs text-[color:var(--color-fg-dim)] font-mono">· hosted by <span class="text-[color:var(--color-fg)]">Tokyo Chapter</span></span></div>
@@ -101,9 +113,9 @@ const upcoming = [
   <section class="border-b hairline">
     <div class="max-w-[1200px] mx-auto px-6 py-14">
       <div class="section-label mb-6">All upcoming</div>
-      <div class="space-y-3">
+      <div class="space-y-3" id="events-list">
         {upcoming.map((e) => (
-          <a href={e.href} class="card rounded-md p-5 flex items-center gap-6 block">
+          <a href={e.href} class="card rounded-md p-5 flex items-center gap-6 block" data-evt-category={e.category} data-evt-mode={e.mode}>
             <div class="date-block"><div class="month">{e.month}</div><div class="day">{e.day}</div></div>
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-1.5">{e.tags.map((t) => <span class={t.cls}>{t.label}</span>)}</div>
@@ -113,7 +125,7 @@ const upcoming = [
             <div class="text-sm text-[color:var(--color-fg-muted)] font-mono whitespace-nowrap">{e.when}</div>
           </a>
         ))}
-        <a href="/community/events/2026-sf-demo-day-season-01" class="card rounded-md p-5 flex items-center gap-6 block" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.03);">
+        <a href="/community/events/2026-sf-demo-day-season-01" class="card rounded-md p-5 flex items-center gap-6 block" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.03);" data-evt-category="Demo day" data-evt-mode="In-person">
           <div class="date-block" style="background: rgba(184,71,11,0.06); border-color: rgba(184,71,11,0.2);"><div class="month" style="color: #b8470b;">Jul</div><div class="day" style="color: #b8470b;">22</div></div>
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-1.5"><span class="tag tag-hackathon">Demo day</span><span class="tag">In-person + livestream</span></div>
@@ -142,6 +154,25 @@ const upcoming = [
       </div>
     </div>
   </section>
+
+  <script>
+    const featured = document.querySelector<HTMLAnchorElement>('a[data-evt-category][href="/community/events/2026-tokyo-meetup-03"]');
+    const listed = Array.from(document.querySelectorAll<HTMLAnchorElement>('#events-list > a[data-evt-category]'));
+    const all = featured ? [featured, ...listed] : listed;
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-evt]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filterEvt || 'all';
+        document.querySelectorAll('[data-filter-evt]').forEach((b) => b.classList.toggle('active', b === btn));
+        for (const c of all) {
+          if (f === 'all') { c.style.display = ''; continue; }
+          const matchMode = c.dataset.evtMode === f;
+          const matchCat = c.dataset.evtCategory === f;
+          c.style.display = matchMode || matchCat ? '' : 'none';
+        }
+      });
+    });
+  </script>
 </BaseLayout>
 
 <style>

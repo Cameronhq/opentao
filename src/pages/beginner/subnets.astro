@@ -13,40 +13,35 @@ interface Row {
   emission: string;
   mcap: string;
   price: string;
-  delta: string;
-  deltaSign: 'pos' | 'neg';
-  spark: string; // polyline points
-  sparkColor: string;
-  miners: string;
+  delta7d: string;
+  delta7dSign: 'pos' | 'neg';
+  miners: string;        // registered miner slots filled
+  minerSlots: string;    // total slots
+  minersEarning: string; // miners earning rewards
   validators: string;
   pb: string;
   pbClass: 'pb-yes' | 'pb-no' | 'pb-stale';
   dot: 'dot-active' | 'dot-new' | 'dot-stale';
-  featured?: boolean;
-  refBadge?: boolean;
   newTag?: boolean;
 }
 
-// 11 curated rich rows kept first with their sparkline + playbook status — these are the
-// hand-tuned hero entries. Everything else is synthesized from src/data/subnets.ts below.
-const richRows: Row[] = [
-  { netuid: 42, slug: '42-cortex', name: 'Cortex', owner: '@cortex-team', cat: 'reason', catLabel: 'Reasoning', emission: '412.18', mcap: '$83.4M', price: '0.0721', delta: '+4.18%', deltaSign: 'pos', spark: '0,14 8,12 16,13 24,9 32,8 40,6 48,7 60,4', sparkColor: '#16a34a', miners: '1,184', validators: '64', pb: '✓ 2d', pbClass: 'pb-yes', dot: 'dot-active', featured: true, refBadge: true },
-  { netuid: 1, slug: '1-apex', name: 'Apex', owner: '@apex-labs', cat: 'llm', catLabel: 'LLM', emission: '388.04', mcap: '$71.9M', price: '0.0640', delta: '+1.92%', deltaSign: 'pos', spark: '0,10 8,11 16,9 24,8 32,10 40,8 48,7 60,6', sparkColor: '#16a34a', miners: '2,408', validators: '61', pb: '✓ 5d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 3, slug: '3-templar', name: 'Templar', owner: '@templar.io', cat: 'llm', catLabel: 'LLM', emission: '336.42', mcap: '$58.2M', price: '0.0524', delta: '+7.81%', deltaSign: 'pos', spark: '0,16 8,15 16,12 24,11 32,9 40,8 48,5 60,3', sparkColor: '#16a34a', miners: '3,108', validators: '58', pb: '✓ 1d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 17, slug: '17-spectra', name: 'Spectra', owner: '@spectra-vision', cat: 'vision', catLabel: 'Vision', emission: '298.55', mcap: '$48.1M', price: '0.0481', delta: '−1.21%', deltaSign: 'neg', spark: '0,6 8,8 16,7 24,9 32,8 40,10 48,11 60,12', sparkColor: '#b91c1c', miners: '1,892', validators: '52', pb: '✓ 12d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 5, slug: '5-lumen', name: 'Lumen', owner: '@lumen-research', cat: 'vision', catLabel: 'Vision', emission: '271.09', mcap: '$42.7M', price: '0.0418', delta: '+0.84%', deltaSign: 'pos', spark: '0,11 8,12 16,10 24,11 32,9 40,10 48,8 60,9', sparkColor: '#16a34a', miners: '1,484', validators: '49', pb: '✓ 3d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 36, slug: '36-glyph', name: 'Glyph', owner: '@glyph-code', cat: 'llm', catLabel: 'LLM', emission: '241.66', mcap: '$38.0M', price: '0.0386', delta: '+3.04%', deltaSign: 'pos', spark: '0,12 8,10 16,11 24,9 32,8 40,7 48,8 60,5', sparkColor: '#16a34a', miners: '1,728', validators: '50', pb: '✓ 6d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 12, slug: '12-echelon', name: 'Echelon', owner: '@echelon-team', cat: 'audio', catLabel: 'Audio', emission: '215.82', mcap: '$31.4M', price: '0.0322', delta: '+1.16%', deltaSign: 'pos', spark: '0,10 8,11 16,9 24,10 32,8 40,9 48,8 60,7', sparkColor: '#16a34a', miners: '912', validators: '44', pb: '✓ 8d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 27, slug: '27-atlas', name: 'Atlas', owner: '@atlas-robotics', cat: 'robotics', catLabel: 'Robotics', emission: '172.41', mcap: '$22.9M', price: '0.0254', delta: '+5.62%', deltaSign: 'pos', spark: '0,14 8,12 16,11 24,10 32,9 40,7 48,6 60,4', sparkColor: '#16a34a', miners: '448', validators: '36', pb: '✓ 4d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 31, slug: '31-orion', name: 'Orion', owner: '@orion-storage', cat: 'storage', catLabel: 'Storage', emission: '142.51', mcap: '$16.0M', price: '0.0182', delta: '+0.92%', deltaSign: 'pos', spark: '0,10 8,9 16,10 24,8 32,9 40,8 48,9 60,7', sparkColor: '#16a34a', miners: '1,386', validators: '38', pb: '✓ 9d', pbClass: 'pb-yes', dot: 'dot-active' },
-  { netuid: 8, slug: '8-proteus', name: 'Proteus', owner: '@proteus-ai', cat: 'data', catLabel: 'Data', emission: '62.18', mcap: '$5.4M', price: '0.0066', delta: '−3.41%', deltaSign: 'neg', spark: '0,5 8,7 16,8 24,9 32,11 40,12 48,13 60,14', sparkColor: '#b91c1c', miners: '402', validators: '20', pb: '⚠ 73d', pbClass: 'pb-stale', dot: 'dot-stale' },
-  { netuid: 57, slug: '57-helix', name: 'Helix', owner: '@helix-ai', cat: 'data', catLabel: 'Data', emission: '48.04', mcap: '$3.9M', price: '0.0048', delta: '+12.18%', deltaSign: 'pos', spark: '0,17 8,15 16,12 24,10 32,8 40,6 48,4 60,2', sparkColor: '#b8470b', miners: '184', validators: '16', pb: '— missing', pbClass: 'pb-no', dot: 'dot-new', newTag: true },
-];
+// Parsers for sort-key data attributes
+const parseSI = (raw: string | undefined): number => {
+  const m = (raw || '').match(/([\d.]+)\s*([KMB]?)/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const u = m[2].toUpperCase();
+  return n * (u === 'B' ? 1e9 : u === 'M' ? 1e6 : u === 'K' ? 1e3 : 1);
+};
+const parseDelta = (raw: string | undefined, sign: 'pos' | 'neg'): number => {
+  const n = parseFloat((raw || '').replace(/[^0-9.]/g, '') || '0');
+  return sign === 'neg' ? -n : n;
+};
 
-// Synthesize stub rows for the remaining 117 subnets from data/subnets.ts
-const richNetuids = new Set(richRows.map((r) => r.netuid));
-const stubRows: Row[] = allSubnets
-  .filter((s) => !richNetuids.has(s.netuid))
+// Pull all 128 subnets from the live taostats-backed data file. Refresh via:
+//   bun run scripts/refresh-subnets.ts > src/data/subnets.ts
+const rows: Row[] = [...allSubnets]
+  .sort((a, b) => parseSI(b.emission) - parseSI(a.emission))
   .map((s) => ({
     netuid: s.netuid,
     slug: s.slug,
@@ -57,19 +52,16 @@ const stubRows: Row[] = allSubnets
     emission: s.emission,
     mcap: s.mcap,
     price: s.price,
-    delta: s.delta,
-    deltaSign: s.deltaSign,
-    // Generic flat sparkline for stub rows — no real time series yet
-    spark: '0,10 10,10 20,10 30,10 40,10 50,10 60,10',
-    sparkColor: '#767680',
+    delta7d: s.delta7d,
+    delta7dSign: s.delta7dSign,
     miners: s.miners,
+    minerSlots: s.minerSlots,
+    minersEarning: s.minersEarning,
     validators: s.validators,
     pb: '— missing',
     pbClass: 'pb-no' as const,
     dot: 'dot-active' as const,
   }));
-
-const rows: Row[] = [...richRows, ...stubRows];
 ---
 <BaseLayout
   title="Subnet Directory — OpenTAO"
@@ -105,49 +97,19 @@ const rows: Row[] = [...richRows, ...stubRows];
     <div class="max-w-[1500px] mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
       <div class="flex items-center gap-2 px-3 py-2 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] w-full sm:w-64">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" placeholder="Search by name, netuid, owner…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+        <input id="subnet-search" type="text" placeholder="Search by name, netuid, owner…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
       </div>
       <div class="flex items-center gap-2 overflow-x-auto">
-        <button class="pill active">All</button>
-        <button class="pill">LLM</button>
-        <button class="pill">Vision</button>
-        <button class="pill">Audio</button>
-        <button class="pill">Robotics</button>
-        <button class="pill">Data</button>
-        <button class="pill">Reasoning</button>
-        <button class="pill">Compute</button>
-        <button class="pill">Storage</button>
+        <button class="pill active" data-filter-cat="all">All</button>
+        <button class="pill" data-filter-cat="llm">LLM</button>
+        <button class="pill" data-filter-cat="vision">Vision</button>
+        <button class="pill" data-filter-cat="audio">Audio</button>
+        <button class="pill" data-filter-cat="robotics">Robotics</button>
+        <button class="pill" data-filter-cat="data">Data</button>
+        <button class="pill" data-filter-cat="reason">Reasoning</button>
+        <button class="pill" data-filter-cat="compute">Compute</button>
+        <button class="pill" data-filter-cat="storage">Storage</button>
       </div>
-      <div class="flex items-center gap-2 ml-auto">
-        <button class="pill flex items-center gap-1.5"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Active only</button>
-        <button class="pill flex items-center gap-1.5"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M5 11l7-7 7 7"/></svg>Has playbook</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="border-b hairline">
-    <div class="max-w-[1500px] mx-auto px-6 pt-6 pb-2">
-      <div class="section-label mb-3">Featured · reference page</div>
-      <a href="/beginner/subnets/42-cortex" class="featured-callout">
-        <div class="flex items-center gap-6 flex-wrap">
-          <div class="flex items-baseline gap-3 shrink-0">
-            <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">netuid</span>
-            <span class="font-mono text-[40px] leading-none font-semibold tracking-tight" style="color: #b8470b">42</span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-3 mb-1 flex-wrap">
-              <h3 class="text-xl font-serif font-medium">Cortex</h3>
-              <span class="cat cat-reason">Reasoning</span>
-              <span class="ref-badge">★ full page</span>
-              <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">— the only completed subnet template</span>
-            </div>
-            <p class="text-sm text-[color:var(--color-fg-muted)]">Open-ended reasoning traces graded by an ensemble of verifier models. Has the full validator/miner network graph, Twitter feed, leaderboards, and all content sections.</p>
-          </div>
-          <div class="text-sm text-[color:var(--color-fg)] flex items-center gap-2 shrink-0">
-            Open page <span class="arrow">→</span>
-          </div>
-        </div>
-      </a>
     </div>
   </section>
 
@@ -157,43 +119,52 @@ const rows: Row[] = [...richRows, ...stubRows];
         <table class="subnet-table tabular">
           <thead>
             <tr>
-              <th class="left">#<span class="sort">↕</span></th>
-              <th class="left">Subnet</th>
-              <th class="left">Category</th>
-              <th class="sorted">Emission · 24h <span class="sort">↓</span></th>
-              <th>Market cap <span class="sort">↕</span></th>
-              <th>Price (τ) <span class="sort">↕</span></th>
-              <th>24h <span class="sort">↕</span></th>
-              <th>7d trend</th>
-              <th>Miners <span class="sort">↕</span></th>
-              <th>Validators <span class="sort">↕</span></th>
-              <th>Playbook</th>
+              <th class="left sortable" data-sort="netuid"      data-sort-default="asc"><span class="lbl">#</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="netuid"      data-sort-default="asc"><span class="lbl">Subnet</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="cat"         data-sort-default="asc"><span class="lbl">Category</span><span class="sort">↕</span></th>
+              <th class="sortable sorted" data-sort="emission"  data-sort-default="desc" data-sort-active="desc"><span class="lbl">Emission · 24h</span><span class="sort">↓</span></th>
+              <th class="sortable" data-sort="mcap"             data-sort-default="desc"><span class="lbl">Market cap</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="price"            data-sort-default="desc"><span class="lbl">Price (τ)</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="delta7d"          data-sort-default="desc"><span class="lbl">7d</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="miners"           data-sort-default="desc"><span class="lbl">Miners</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="validators"       data-sort-default="desc"><span class="lbl">Validators</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="playbook"         data-sort-default="desc"><span class="lbl">Playbook</span><span class="sort">↕</span></th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr class={r.featured ? 'featured' : ''} data-href={`/beginner/subnets/${r.slug}`}>
+              <tr
+                data-href={`/beginner/subnets/${r.slug}`}
+                data-cat={r.cat}
+                data-playbook={r.pbClass === 'pb-yes' ? '1' : '0'}
+                data-netuid={String(r.netuid).padStart(4, '0')}
+                data-emission-n={String(parseSI(r.emission))}
+                data-mcap-n={String(parseSI(r.mcap))}
+                data-price-n={String(parseFloat(r.price) || 0)}
+                data-delta7d-n={String(parseDelta(r.delta7d, r.delta7dSign))}
+                data-miners-n={String(parseSI(r.miners))}
+                data-validators-n={String(parseSI(r.validators))}
+                data-name={r.name.toLowerCase()}
+                data-search={`${r.name} ${r.owner} ${r.netuid} ${r.catLabel}`.toLowerCase()}
+              >
                 <td class="left"><span class="netuid">{r.netuid}</span></td>
                 <td class="left">
                   <div class="name">
-                    {r.name}
-                    {r.refBadge && <span class="ref-badge">★ full page</span>}
+                    {/^[\d⚒]+$/.test(r.name) ? <span class="text-[color:var(--color-fg-dim)] italic">(unnamed)</span> : r.name}
                     {r.newTag && <span class="text-[9px] text-[color:var(--color-accent)] font-mono ml-1">NEW</span>}
                   </div>
-                  <div class="owner">{r.owner}</div>
                 </td>
                 <td class="left"><span class={`cat cat-${r.cat}`}>{r.catLabel}</span></td>
                 <td><span class="text-[color:var(--color-fg)]">{r.emission}</span> <span class="text-[color:var(--color-fg-dim)] text-xs">τ</span></td>
                 <td>{r.mcap}</td>
                 <td>{r.price}</td>
-                <td class={r.deltaSign}>{r.delta}</td>
+                <td class={r.delta7dSign}>{r.delta7d}</td>
                 <td>
-                  <svg class="spark" width="60" height="20" viewBox="0 0 60 20">
-                    <polyline fill="none" stroke={r.sparkColor} stroke-width="1.4" points={r.spark} />
-                  </svg>
+                  <span class="text-[color:var(--color-fg)]">{r.miners}</span>
+                  <span class="text-[color:var(--color-fg-dim)] text-xs"> / {r.minerSlots}</span>
+                  <span class="text-[color:var(--color-fg-dim)] text-xs"> · {r.minersEarning} earning</span>
                 </td>
-                <td>{r.miners}</td>
                 <td>{r.validators}</td>
                 <td><span class={r.pbClass}>{r.pb}</span></td>
                 <td><span class={r.dot}></span></td>
@@ -204,14 +175,15 @@ const rows: Row[] = [...richRows, ...stubRows];
       </div>
 
       <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t hairline pt-5">
-        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]" data-showing>Showing <span class="text-[color:var(--color-fg)]">1–{rows.length}</span> of <span class="text-[color:var(--color-fg)]">{rows.length}</span> subnets</div>
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]" id="subnet-count">Showing <span class="text-[color:var(--color-fg)]" data-visible>{rows.length}</span> of <span class="text-[color:var(--color-fg)]">{rows.length}</span> subnets</div>
 
-        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]"><a href="#" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">CSV ↓</a> · <a href="#" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">methodology</a></div>
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]"><a href="/subnets.csv" download class="hover:text-[color:var(--color-fg)] underline underline-offset-2">CSV ↓</a> · <a href="/beginner/concepts/yuma-consensus" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">methodology</a></div>
       </div>
     </div>
   </section>
 
   <script>
+    // Row click → open detail
     document.querySelectorAll<HTMLTableRowElement>('tr[data-href]').forEach((tr) => {
       tr.style.cursor = 'pointer';
       tr.addEventListener('click', () => {
@@ -219,6 +191,99 @@ const rows: Row[] = [...richRows, ...stubRows];
         if (href) window.location.href = href;
       });
     });
+
+    // Filter + sort state
+    let cat = 'all';
+    let query = '';
+    let sortKey: string = 'emission';
+    let sortDir: 'asc' | 'desc' = 'desc';
+
+    const tbody = document.querySelector<HTMLTableSectionElement>('.subnet-table tbody');
+    const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('tbody tr[data-href]'));
+    const visibleCount = document.querySelector<HTMLSpanElement>('[data-visible]');
+    const headers = Array.from(document.querySelectorAll<HTMLTableCellElement>('th.sortable'));
+
+    // Map sort key → row data attribute + comparison kind
+    const COMPARE: Record<string, { attr: string; kind: 'number' | 'string' }> = {
+      netuid:     { attr: 'netuid',      kind: 'string' },  // zero-padded so string compare = numeric order
+      name:       { attr: 'name',        kind: 'string' },
+      cat:        { attr: 'cat',         kind: 'string' },
+      emission:   { attr: 'emissionN',   kind: 'number' },
+      mcap:       { attr: 'mcapN',       kind: 'number' },
+      price:      { attr: 'priceN',      kind: 'number' },
+      delta7d:    { attr: 'delta7dN',    kind: 'number' },
+      miners:     { attr: 'minersN',     kind: 'number' },
+      validators: { attr: 'validatorsN', kind: 'number' },
+      playbook:   { attr: 'playbook',    kind: 'number' },  // 1 / 0
+    };
+
+    function apply() {
+      // Filter
+      let shown = 0;
+      const visible: HTMLTableRowElement[] = [];
+      for (const r of rows) {
+        const rCat = r.dataset.cat || '';
+        const rSearch = r.dataset.search || '';
+        const matchCat = cat === 'all' || rCat === cat;
+        const matchSearch = !query || rSearch.includes(query);
+        const show = matchCat && matchSearch;
+        r.style.display = show ? '' : 'none';
+        if (show) { shown++; visible.push(r); }
+      }
+      // Sort visible rows
+      const spec = COMPARE[sortKey] || COMPARE.emission;
+      const flip = sortDir === 'asc' ? 1 : -1;
+      const sorted = [...visible].sort((a, b) => {
+        const av = a.dataset[spec.attr] || '';
+        const bv = b.dataset[spec.attr] || '';
+        if (spec.kind === 'number') return (Number(av) - Number(bv)) * flip;
+        return av.localeCompare(bv) * flip;
+      });
+      if (tbody) for (const r of sorted) tbody.appendChild(r);
+      if (visibleCount) visibleCount.textContent = String(shown);
+
+      // Update header visuals: arrow + active class
+      for (const th of headers) {
+        const key = th.dataset.sort;
+        const isActive = key === sortKey;
+        th.classList.toggle('sorted', isActive);
+        const arrow = th.querySelector<HTMLSpanElement>('.sort');
+        if (arrow) arrow.textContent = isActive ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-cat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        cat = btn.dataset.filterCat || 'all';
+        document.querySelectorAll('[data-filter-cat]').forEach((b) => b.classList.toggle('active', b === btn));
+        apply();
+      });
+    });
+
+    const search = document.getElementById('subnet-search') as HTMLInputElement | null;
+    if (search) {
+      search.addEventListener('input', () => {
+        query = search.value.trim().toLowerCase();
+        apply();
+      });
+    }
+
+    // Click-to-sort: clicking a sortable header sets it as the sort key. Clicking
+    // the same header again flips direction. Default direction comes from
+    // data-sort-default (asc for text columns, desc for numeric).
+    for (const th of headers) {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (!key) return;
+        if (sortKey === key) {
+          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortKey = key;
+          sortDir = (th.dataset.sortDefault as 'asc' | 'desc') || 'desc';
+        }
+        apply();
+      });
+    }
   </script>
 </BaseLayout>
 
@@ -232,9 +297,12 @@ const rows: Row[] = [...richRows, ...stubRows];
   .pill.active { color: #b8470b; border-color: rgba(184,71,11,0.4); background: rgba(184,71,11,0.06); }
 
   table.subnet-table { width: 100%; border-collapse: collapse; }
-  .subnet-table thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #767680; font-weight: 400; padding: 14px 12px; text-align: right; border-bottom: 1px solid rgba(15,15,18,0.12); white-space: nowrap; background: #ffffff; }
+  .subnet-table thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #767680; font-weight: 400; padding: 14px 12px; text-align: right; border-bottom: 1px solid rgba(15,15,18,0.12); white-space: nowrap; background: #ffffff; user-select: none; }
   .subnet-table thead th.left { text-align: left; }
-  .subnet-table thead th .sort { opacity: 0.4; margin-left: 4px; }
+  .subnet-table thead th.sortable { cursor: pointer; transition: color .12s; }
+  .subnet-table thead th.sortable:hover { color: #0c0c10; }
+  .subnet-table thead th.sortable:hover .sort { opacity: 0.85; }
+  .subnet-table thead th .sort { opacity: 0.35; margin-left: 4px; transition: opacity .12s, color .12s; }
   .subnet-table thead th.sorted .sort { opacity: 1; color: #b8470b; }
   .subnet-table thead th.sorted { color: #0c0c10; }
   .subnet-table tbody td { padding: 14px 12px; border-bottom: 1px solid rgba(15,15,18,0.05); font-size: 13px; text-align: right; vertical-align: middle; }
@@ -242,16 +310,6 @@ const rows: Row[] = [...richRows, ...stubRows];
   .subnet-table tbody tr { transition: background .12s; }
   .subnet-table tbody tr:hover { background: #fafaf9; }
   .subnet-table tbody tr:hover .netuid { color: #b8470b; }
-  .subnet-table tbody tr.featured td { background: rgba(184,71,11,0.05); }
-  .subnet-table tbody tr.featured:hover td { background: rgba(184,71,11,0.09); }
-  .subnet-table tbody tr.featured td:first-child { border-left: 3px solid #b8470b; }
-  .subnet-table tbody tr.featured .netuid { color: #b8470b; font-weight: 600; }
-
-  .featured-callout { background: linear-gradient(90deg, rgba(184,71,11,0.06), rgba(184,71,11,0.02), rgba(184,71,11,0)); border: 1px solid rgba(184,71,11,0.25); border-radius: 10px; padding: 22px 26px; transition: all .15s; display: block; }
-  .featured-callout:hover { border-color: rgba(184,71,11,0.5); transform: translateY(-1px); }
-  .featured-callout .arrow { transition: transform .15s; }
-  .featured-callout:hover .arrow { transform: translateX(4px); }
-
   .netuid { font-family: var(--font-mono); font-weight: 500; transition: color .15s; color: #0c0c10; }
   .name { font-weight: 500; color: #0c0c10; }
   .owner { font-family: var(--font-mono); font-size: 11px; color: #767680; }
@@ -272,12 +330,10 @@ const rows: Row[] = [...richRows, ...stubRows];
 
   .pos { color: #15803d; }
   .neg { color: #b91c1c; }
-  .spark { display: inline-block; vertical-align: middle; }
   .pb-yes { color: #15803d; font-family: var(--font-mono); font-size: 10px; }
   .pb-no  { color: #767680; font-family: var(--font-mono); font-size: 10px; }
   .pb-stale  { color: #b8470b; font-family: var(--font-mono); font-size: 10px; }
 
-  .ref-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; background: rgba(184,71,11,0.1); color: #b8470b; border: 1px solid rgba(184,71,11,0.3); margin-left: 6px; vertical-align: middle; }
 
   .tabular { font-variant-numeric: tabular-nums; }
 </style>

@@ -27,22 +27,22 @@ const { next } = getAdjacent(slug);
       </p>
       <div class="mt-10 flex items-center justify-between flex-wrap gap-4">
         <div class="flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)]">
-          <span><span class="text-[color:var(--color-fg)]">25</span> min read</span>
+          <span><span class="text-[color:var(--color-fg)]" id="depth-read-time">25</span> min read</span>
           <span class="opacity-30">·</span>
           <span>last verified 2026·05·27 by @editorial</span>
           <span class="opacity-30">·</span>
           <span>3 contributors</span>
         </div>
-        <div class="depth-toggle">
-          <button>5 min</button>
-          <button class="active">25 min</button>
+        <div class="depth-toggle" id="depth-toggle">
+          <button data-depth="short">5 min</button>
+          <button data-depth="long" class="active">25 min</button>
         </div>
       </div>
     </div>
   </header>
 
   <main class="border-b hairline">
-    <article class="article px-6 py-16">
+    <article class="article px-6 py-16" data-depth="long" id="depth-article">
       <p class="lead">
         Most networks reward one kind of work. Bitcoin rewards hashing; Filecoin rewards storage. Bittensor is built for many kinds of work at once — and the kinds aren't fixed in advance. Anyone with an idea about what "useful intelligence" could mean is welcome to launch a market for it.
       </p>
@@ -51,11 +51,14 @@ const { next } = getAdjacent(slug);
       </p>
 
       <h2 id="why-it-matters"><span class="index">I.</span>Why it matters</h2>
-      <p>
+      <p class="long-only">
         Most AI today is concentrated in a handful of companies. Their models are reachable only through APIs, their training data is private, and the value flows to whoever owns the platform.
       </p>
-      <p>
+      <p class="long-only">
         Bittensor inverts this. Anyone can join a subnet as a <a class="inline" href="/beginner/concepts/miner">miner</a> and contribute work; anyone can join as a <a class="inline" href="/beginner/concepts/validator">validator</a> and grade that work; anyone can launch a new subnet for a new kind of intelligence. <span class="term" title="The native token of Bittensor">TAO</span> flows to whoever produces value — not to whoever owns the platform.
+      </p>
+      <p class="short-only">
+        Most AI today concentrates in a few companies — closed models, private data, value flows to whoever owns the platform. Bittensor inverts this: anyone can mine, anyone can validate, anyone can launch a new market. <span class="term" title="The native token of Bittensor">TAO</span> follows the work.
       </p>
       <p class="pullquote">
         Whether this is actually a better system depends on the math of the incentives. But the shape, at least, is what makes Bittensor interesting.
@@ -64,22 +67,28 @@ const { next } = getAdjacent(slug);
       <h2 id="how-it-works"><span class="index">II.</span>How it works</h2>
       <p>Three pieces, in order.</p>
 
-      <h3><span class="step-num">i.</span>Subtensor, the chain</h3>
-      <p>
-        Underneath everything is <code>subtensor</code>, a Substrate-based blockchain. It keeps the books: who has TAO, who's registered to what, what validators are saying about which miners. Every <code>block</code> (~12 seconds) and every <code>tempo</code> (~360 blocks ≈ 72 minutes), it settles accounts and pays out emissions.
+      <p class="short-only">
+        <strong>Subtensor</strong> is a Substrate blockchain that keeps the books and pays emissions every ~72 minutes. <strong>Subnets</strong> are the markets that run on top — each one defines what miners submit and how validators score it. <strong>Yuma consensus</strong> takes every validator's weights, multiplies by stake, and produces the final reward distribution. About twenty cycles a day.
       </p>
 
-      <h3><span class="step-num">ii.</span>Subnets, the marketplaces</h3>
-      <p>
-        On top of the chain run subnets. Each one is, in effect, a market for one kind of intelligence: text generation, image generation, reasoning traces, motor control for a robot arm. Each has its own rules about what miners submit and how validators score it. From the chain's point of view, all subnets look the same — they just produce a vector of weights at every tempo.
-      </p>
+      <div class="long-only">
+        <h3><span class="step-num">i.</span>Subtensor, the chain</h3>
+        <p>
+          Underneath everything is <code>subtensor</code>, a Substrate-based blockchain. It keeps the books: who has TAO, who's registered to what, what validators are saying about which miners. Every <code>block</code> (~12 seconds) and every <code>tempo</code> (~360 blocks ≈ 72 minutes), it settles accounts and pays out emissions.
+        </p>
 
-      <h3><span class="step-num">iii.</span>Yuma consensus, the settlement</h3>
-      <p>
-        At each tempo, every validator submits weights for every miner. <a class="inline" href="/beginner/concepts/yuma-consensus">Yuma</a> aggregates these weights, weighted by each validator's stake, into a final reward distribution. Miners get paid; validators get paid; subnet owners take a fee. The cycle repeats — about twenty times a day, every day.
-      </p>
+        <h3><span class="step-num">ii.</span>Subnets, the marketplaces</h3>
+        <p>
+          On top of the chain run subnets. Each one is, in effect, a market for one kind of intelligence: text generation, image generation, reasoning traces, motor control for a robot arm. Each has its own rules about what miners submit and how validators score it. From the chain's point of view, all subnets look the same — they just produce a vector of weights at every tempo.
+        </p>
 
-      <div class="figure">[figure] Chain → 128 subnets → per-tempo weights → Yuma aggregation → emission</div>
+        <h3><span class="step-num">iii.</span>Yuma consensus, the settlement</h3>
+        <p>
+          At each tempo, every validator submits weights for every miner. <a class="inline" href="/beginner/concepts/yuma-consensus">Yuma</a> aggregates these weights, weighted by each validator's stake, into a final reward distribution. Miners get paid; validators get paid; subnet owners take a fee. The cycle repeats — about twenty times a day, every day.
+        </p>
+
+        <div class="figure">[figure] Chain → 128 subnets → per-tempo weights → Yuma aggregation → emission</div>
+      </div>
 
       <h2 id="in-practice"><span class="index">III.</span>In practice</h2>
       <p>If you want to participate, you'll pick one of three roles:</p>
@@ -88,12 +97,12 @@ const { next } = getAdjacent(slug);
         <li><strong>Validator</strong> — you have (or can attract) enough TAO stake and you want to grade. Validators take more work to set up but earn from delegations.</li>
         <li><strong>Subnet owner</strong> — you have a new kind of intelligence you want to incentivize. See <a class="inline" href="/build/hackathon">Build a subnet</a>.</li>
       </ul>
-      <p>
+      <p class="long-only">
         Most newcomers don't decide which role they want until they've read about all three. That's fine — read on, then come back to this page once you know.
       </p>
 
-      <h2 id="going-deeper"><span class="index">IV.</span>Going deeper</h2>
-      <div class="going-deeper-list mt-4">
+      <h2 id="going-deeper" class="long-only"><span class="index">IV.</span>Going deeper</h2>
+      <div class="going-deeper-list mt-4 long-only">
         <a href="#"><div><div class="text-[color:var(--color-fg)] font-medium">The Bittensor whitepaper</div><div class="meta">PDF · 2021 · math-heavy but short</div></div><span class="arrow">↗</span></a>
         <a href="/community/insights"><div><div class="text-[color:var(--color-fg)] font-medium">Yuma Consensus, slowly</div><div class="meta">Insight · 22 min · hand-traced walk through one block</div></div><span class="arrow">→</span></a>
         <a href="/community/insights"><div><div class="text-[color:var(--color-fg)] font-medium">Why dTAO changed everything</div><div class="meta">Insight · 14 min · the 2024 economic upgrade in retrospect</div></div><span class="arrow">→</span></a>
@@ -152,6 +161,20 @@ const { next } = getAdjacent(slug);
       </div>
     </div>
   </section>
+
+  <script>
+    const article = document.getElementById('depth-article');
+    const readTime = document.getElementById('depth-read-time');
+    document.querySelectorAll<HTMLButtonElement>('#depth-toggle button[data-depth]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const depth = btn.dataset.depth || 'long';
+        if (article) article.dataset.depth = depth;
+        if (readTime) readTime.textContent = depth === 'short' ? '5' : '25';
+        document.querySelectorAll('#depth-toggle button[data-depth]').forEach((b) => b.classList.toggle('active', b === btn));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
 </BaseLayout>
 
 <style>
@@ -174,8 +197,12 @@ const { next } = getAdjacent(slug);
   .figure { background: #faf8f4; border: 1px dashed rgba(15,15,18,0.18); padding: 32px; text-align: center; font-family: var(--font-mono); font-size: 13px; color: #767680; border-radius: 6px; margin: 30px 0; }
 
   .depth-toggle { display: inline-flex; border: 1px solid rgba(15,15,18,0.14); border-radius: 6px; padding: 2px; }
-  .depth-toggle button { padding: 4px 12px; font-size: 12px; color: #4a4a52; border-radius: 4px; font-family: var(--font-mono); }
+  .depth-toggle button { padding: 4px 12px; font-size: 12px; color: #4a4a52; border-radius: 4px; font-family: var(--font-mono); cursor: pointer; background: transparent; border: 0; }
   .depth-toggle button.active { background: rgba(184,71,11,0.1); color: #b8470b; }
+
+  /* Depth-mode visibility — long shows everything, short hides .long-only and reveals .short-only */
+  .article[data-depth="long"] .short-only { display: none; }
+  .article[data-depth="short"] .long-only { display: none; }
 
   .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); padding: 18px 20px; border-radius: 6px; transition: all .15s; display: block; }
   .related-card:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; }

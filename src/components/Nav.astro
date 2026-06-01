@@ -59,13 +59,21 @@ const sections = [
 
     <div class="hidden md:flex items-center gap-1 text-sm text-[color:var(--color-fg-muted)]">
       {sections.map((s) => (
-        <details class="nav-dropdown">
-          <summary class={section === s.key ? 'active' : ''}>{s.label}</summary>
-          <nav class="dropdown-menu">
+        <div class="nav-dropdown">
+          <button
+            type="button"
+            class={`nav-trigger ${section === s.key ? 'active' : ''}`}
+            aria-haspopup="true"
+            aria-expanded="false"
+            tabindex="-1"
+            onmousedown="event.preventDefault()"
+          >{s.label}</button>
+          <nav class="dropdown-menu" role="menu">
             {s.items.map((it) => (
               <a
                 href={it.href}
                 class="dropdown-item"
+                role="menuitem"
                 target={it.external ? '_blank' : undefined}
                 rel={it.external ? 'noopener' : undefined}
               >
@@ -73,7 +81,7 @@ const sections = [
               </a>
             ))}
           </nav>
-        </details>
+        </div>
       ))}
     </div>
 
@@ -85,3 +93,21 @@ const sections = [
     </div>
   </div>
 </nav>
+
+<script>
+  // Belt-and-braces: pure CSS :hover already drives the dropdowns. This script
+  // adds a tiny safety net — if a dropdown ever gets "stuck" open (e.g. due to
+  // a focused descendant retaining state), hovering any sibling forces all
+  // others to release any inline open-state attribute.
+  const dropdowns = document.querySelectorAll<HTMLElement>('.nav-dropdown');
+  dropdowns.forEach((dd) => {
+    dd.addEventListener('mouseenter', () => {
+      dropdowns.forEach((other) => {
+        if (other === dd) return;
+        // Force-blur any focused descendant in sibling dropdowns
+        const focused = other.querySelector(':focus') as HTMLElement | null;
+        if (focused) focused.blur();
+      });
+    });
+  });
+</script>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subnet page mockups — pick one</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --fg: #0c0c10; --fg-muted: #4a4a52; --fg-dim: #767680;
+      --accent: #b8470b; --paper: #fff; --surface: #fafaf9;
+      --border: rgba(15,15,18,0.08);
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; color: var(--fg); background: var(--paper); margin: 0; padding: 0; line-height: 1.55; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 64px 32px; }
+    h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 44px; letter-spacing: -0.015em; margin: 0 0 8px; }
+    .lead { font-size: 17px; color: var(--fg-muted); max-width: 720px; margin: 0 0 36px; }
+    .lead strong { color: var(--accent); font-weight: 500; }
+    .grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr 1fr; }
+    .card {
+      background: var(--paper); border: 1px solid var(--border); border-radius: 14px;
+      padding: 24px; text-decoration: none; color: inherit; transition: all 0.15s; display: block;
+    }
+    .card:hover { border-color: rgba(184,71,11,0.35); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(15,15,18,0.06); }
+    .card .pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; background: rgba(184,71,11,0.06); color: var(--accent); border: 1px solid rgba(184,71,11,0.3); display: inline-block; margin-bottom: 16px; }
+    .card h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin: 0 0 8px; }
+    .card p { font-size: 14px; color: var(--fg-muted); margin: 0 0 16px; line-height: 1.6; }
+    .card .pros { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--fg-dim); margin-bottom: 4px; }
+    .card .pros .ok { color: #15803d; margin-right: 6px; }
+    .card .arrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); margin-top: 18px; display: inline-block; }
+    .note {
+      margin-top: 48px; padding: 24px; background: var(--surface); border: 1px dashed var(--border); border-radius: 10px;
+      font-size: 14px; color: var(--fg-muted); line-height: 1.7; max-width: 840px;
+    }
+    .note strong { color: var(--fg); font-weight: 500; }
+    .note code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--paper); border: 1px solid var(--border); padding: 1px 6px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Subnet page — three directions</h1>
+    <p class="lead">
+      Three different ways to visualize <strong>what miners and validators do</strong> on a subnet. All three use SN18 Zeus (weather forecasting) as the example. All three include the same one-line pitch at the top.
+    </p>
+
+    <div class="grid">
+      <a class="card" href="./v1-cycle.html">
+        <div class="pill">V1 · Cycle</div>
+        <h2>Tempo cycle</h2>
+        <p>A 4-step horizontal pipeline: validator challenges → miner computes → validator scores → chain settles. Reads as a flow diagram.</p>
+        <div class="pros"><span class="ok">✓</span>Most "technical doc" feel</div>
+        <div class="pros"><span class="ok">✓</span>Clear ordering</div>
+        <div class="pros"><span class="ok">✓</span>Easy to generalize across subnets</div>
+        <span class="arrow">Open V1 →</span>
+      </a>
+
+      <a class="card" href="./v2-orbit.html">
+        <div class="pill">V2 · Orbit</div>
+        <h2>Bipartite star</h2>
+        <p>Validators clustered at center, miners orbiting on a ring. Edges between them animate to show scoring. Topology-first.</p>
+        <div class="pros"><span class="ok">✓</span>Most visually striking</div>
+        <div class="pros"><span class="ok">✓</span>Scales with miner count</div>
+        <div class="pros"><span class="ok">✓</span>Good for "this is a network" intuition</div>
+        <span class="arrow">Open V2 →</span>
+      </a>
+
+      <a class="card" href="./v3-court.html">
+        <div class="pill">V3 · Court</div>
+        <h2>Two-sides court</h2>
+        <p>Miner on the left, validator on the right, interaction primitives in the middle, Yuma settlement strip at the bottom. Side-by-side compare.</p>
+        <div class="pros"><span class="ok">✓</span>Most "what does each role do?" focused</div>
+        <div class="pros"><span class="ok">✓</span>Universal template — same shape for every subnet</div>
+        <div class="pros"><span class="ok">✓</span>Reads top-to-bottom AND left-to-right</div>
+        <span class="arrow">Open V3 →</span>
+      </a>
+    </div>
+
+    <div class="note">
+      <strong>What's the same across all three:</strong> one-sentence pitch at top, then the miner ↔ validator diagram, then a short role table. Differences are entirely in the diagram metaphor.<br/><br/>
+      <strong>How to read:</strong> open all three side-by-side in different tabs and compare. The one that makes you say "yes I'd send this to someone who has 30 seconds" is the winner. Tell me which (or call out the parts you like from each).<br/><br/>
+      <strong>Generalization plan:</strong> whichever wins becomes the template at <code>src/pages/beginner/subnets/[slug].astro</code>. The template reads the same data shape (input, output, verifier, hardware) for every subnet — so it works for Chutes, Masa, Templar, Affine, etc. without per-subnet hand-crafting.
+    </div>
+  </div>
+</body>
+</html>

@@ -10,6 +10,7 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "preview:full": "bun run build && astro preview",
+    "deploy": "bun run build && bun x wrangler deploy",
     "astro": "astro"
   },
   "dependencies": {

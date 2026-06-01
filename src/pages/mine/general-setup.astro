@@ -9,101 +9,206 @@ const subnav = [
   { href: '/mine/resources', label: 'Resources' },
 ];
 
+type CodeLine = { kind: 'comment' | 'prompt' | 'ok' | 'spacer'; text?: string };
+interface CodeBlock { lines: CodeLine[]; }
+
 interface Step {
+  id: string;                                            // anchor id (step-01 .. step-08)
   n: string;
   title: string;
   time: string;
   body: string;
-  status?: 'done' | 'current';
   bullets?: string[];
-  code?: { lines: { kind: 'comment' | 'prompt' | 'ok' | 'spacer'; text?: string }[] };
+  code?: CodeBlock;                                      // OS-agnostic code
+  codeByOs?: { macos: CodeBlock; linux: CodeBlock; wsl: CodeBlock };  // OS-specific variants
   callout?: { tip: string; html: string };
-  faded?: boolean;
+  seeAlso?: { label: string; href: string; meta?: string }[];  // links into /mine/resources
 }
 
 const steps: Step[] = [
   {
-    n: '01 / 08 ✓',
-    status: 'done',
+    id: 'step-01',
+    n: '01 / 08',
     title: 'System requirements',
     time: '~2 min',
     body: "Confirm your machine has what's needed. Most modern laptops do; servers usually need a Python upgrade.",
     bullets: [
-      'Python ≥ 3.10 · disk ≥ 50GB · RAM ≥ 16GB',
-      'macOS 12+ / Ubuntu 20.04+ / Windows 11 with WSL2',
-      'Stable broadband (chain communication during registration)',
+      'Python 3.10–3.12 · disk ≥ 50GB · RAM ≥ 16GB',
+      'macOS 12+ / Ubuntu 22.04+ / Windows 11 with WSL2 (Ubuntu inside)',
+      'Subnet miners are NOT supported on native Windows. Use WSL2 for tooling, but run actual mining workloads on Linux.',
+      'Stable broadband — chain comms during registration; long-lived TCP for miner ↔ validator.',
     ],
   },
   {
-    n: '02 / 08 ✓',
-    status: 'done',
+    id: 'step-02',
+    n: '02 / 08',
     title: 'Install dependencies',
     time: '~4 min',
-    body: "Python, git, build essentials. If you're on macOS, Homebrew is the easiest path.",
-    code: {
-      lines: [
-        { kind: 'comment', text: '# macOS' },
-        { kind: 'prompt', text: 'brew install python@3.12 git' },
-        { kind: 'prompt', text: 'python3 --version' },
-        { kind: 'ok', text: 'Python 3.12.4' },
-      ],
+    body: 'Python ≥ 3.10, git, and build essentials. Pick your OS above — the rest of the page is identical regardless.',
+    codeByOs: {
+      macos: {
+        lines: [
+          { kind: 'comment', text: '# macOS — via Homebrew' },
+          { kind: 'prompt', text: 'brew install python@3.12 git' },
+          { kind: 'prompt', text: 'python3 --version' },
+          { kind: 'ok', text: 'Python 3.12.7' },
+          { kind: 'spacer' },
+          { kind: 'comment', text: '# Alternative: install btcli directly (skip step 3)' },
+          { kind: 'prompt', text: 'brew install btcli' },
+        ],
+      },
+      linux: {
+        lines: [
+          { kind: 'comment', text: '# Ubuntu 22.04+ / Debian 12+' },
+          { kind: 'prompt', text: 'sudo apt update' },
+          { kind: 'prompt', text: 'sudo apt install -y python3.12 python3.12-venv python3-pip git build-essential' },
+          { kind: 'prompt', text: 'python3 --version' },
+          { kind: 'ok', text: 'Python 3.12.3' },
+        ],
+      },
+      wsl: {
+        lines: [
+          { kind: 'comment', text: '# Inside WSL2 — Ubuntu 22.04+' },
+          { kind: 'prompt', text: 'sudo apt update' },
+          { kind: 'prompt', text: 'sudo apt install -y python3.12 python3.12-venv python3-pip git build-essential' },
+          { kind: 'spacer' },
+          { kind: 'comment', text: '# Run actual miner inside WSL — not Windows PowerShell.' },
+        ],
+      },
     },
   },
   {
-    n: '03 / 08 ←',
-    status: 'current',
+    id: 'step-03',
+    n: '03 / 08',
     title: 'Install bittensor CLI',
     time: '~3 min',
-    body: 'Install the official btcli into a Python virtual environment. Keeps your global Python clean.',
+    body: 'Install the official btcli into a Python virtual environment. Keeps your system Python clean and avoids dep conflicts with old `bittensor` SDK installs.',
+    seeAlso: [
+      { label: 'btcli reference + alt wallets',  href: '/mine/resources#wallets', meta: 'Wallets · 3 entries' },
+    ],
     code: {
       lines: [
         { kind: 'prompt', text: 'python3 -m venv ~/.venv-bittensor' },
         { kind: 'prompt', text: 'source ~/.venv-bittensor/bin/activate' },
+        { kind: 'prompt', text: 'pip install --upgrade pip' },
         { kind: 'prompt', text: 'pip install bittensor-cli' },
         { kind: 'spacer' },
         { kind: 'prompt', text: 'btcli --version' },
-        { kind: 'ok', text: 'bittensor-cli 8.4.2' },
+        { kind: 'ok', text: 'BTCLI version: 9.22.0' },
       ],
     },
     callout: {
       tip: '⚠ tip',
-      html: '— Add <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">source ~/.venv-bittensor/bin/activate</code> to your <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">~/.zshrc</code> so the venv loads in new terminals.',
+      html: '— Add <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">source ~/.venv-bittensor/bin/activate</code> to your <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">~/.zshrc</code> or <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">~/.bashrc</code> so the venv auto-loads in new terminals. If you used <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">brew install btcli</code> in Step 2, skip the pip install.',
     },
   },
   {
+    id: 'step-04',
     n: '04 / 08',
-    faded: true,
     title: 'Create wallet',
     time: '~5 min',
-    body: 'Generate a coldkey + hotkey. Coldkey holds your TAO; hotkey is the identity you stake from.',
+    body: "Generate a coldkey + hotkey. Coldkey holds your TAO and signs balance moves; hotkey is the identity you mine/validate from. Write down the 12-word mnemonic — there's no recovery without it.",
+    code: {
+      lines: [
+        { kind: 'comment', text: '# Create both coldkey and hotkey in one prompt-driven flow' },
+        { kind: 'prompt', text: 'btcli wallet create --wallet.name my-coldkey --wallet.hotkey my-hot1' },
+        { kind: 'spacer' },
+        { kind: 'comment', text: '# Or create them separately:' },
+        { kind: 'prompt', text: 'btcli wallet new-coldkey --wallet.name my-coldkey' },
+        { kind: 'prompt', text: 'btcli wallet new-hotkey  --wallet.name my-coldkey --wallet.hotkey my-hot1' },
+        { kind: 'spacer' },
+        { kind: 'prompt', text: 'btcli wallet list' },
+      ],
+    },
+    callout: {
+      tip: '🔐 security',
+      html: '— The coldkey mnemonic is the only way back if you lose the keystore. Write it on paper, store it offline. Never paste it into a chat, screenshot it, or commit it to git. If you can, run a separate cold/offline machine for the coldkey and copy only the hotkey to the mining box.',
+    },
+    seeAlso: [
+      { label: 'Wallet options (CLI · browser · Ledger)', href: '/mine/resources#wallets', meta: 'Wallets · 3 entries' },
+    ],
   },
   {
+    id: 'step-05',
     n: '05 / 08',
-    faded: true,
     title: 'Get TAO',
     time: '~8 min',
-    body: 'Mainnet: buy on a CEX and withdraw to your coldkey. Testnet: use the faucet.',
+    body: 'Mainnet (finney): buy on a CEX and withdraw to your coldkey ss58 address. Testnet: request testnet TAO from the official Discord — the on-chain PoW faucet was disabled on mainnet/finney, it now works only on local chains.',
+    bullets: [
+      'CEX listings (2026): Binance, Kraken, KuCoin, MEXC, Bybit, Gate.io, regional Coinbase. Binance has the deepest book.',
+      'Withdraw to the coldkey ss58 address shown in `btcli wallet list` — NOT to a hotkey.',
+      'Testnet faucet: Bittensor Discord, #testnet-faucet channel. Read the channel rules first.',
+      'Have a small buffer beyond the burn-cost — registration prices spike unpredictably.',
+    ],
+    seeAlso: [
+      { label: 'CEX comparison + KYC notes', href: '/mine/resources#exchanges', meta: 'Exchanges · 3 entries' },
+    ],
   },
   {
+    id: 'step-06',
     n: '06 / 08',
-    faded: true,
     title: 'Register on a subnet',
     time: '~5 min',
-    body: 'Claim a UID slot in the subnet you want to mine. Cost floats — watch the meter.',
+    body: 'Registration is burn-based: you pay a recycled TAO fee for a UID slot. The fee doubles after each successful registration on that subnet and decays smoothly per block. Always re-check the burn-cost immediately before you register.',
+    code: {
+      lines: [
+        { kind: 'comment', text: '# Replace 64 with your target subnet' },
+        { kind: 'prompt', text: 'btcli subnet burn-cost --netuid 64' },
+        { kind: 'ok', text: 'Current burn-cost: 0.421 τ' },
+        { kind: 'spacer' },
+        { kind: 'prompt', text: 'btcli subnet register --netuid 64 \\' },
+        { kind: 'prompt', text: '  --wallet.name my-coldkey --wallet.hotkey my-hot1' },
+        { kind: 'spacer' },
+        { kind: 'comment', text: '# Testnet — append the network flag' },
+        { kind: 'prompt', text: 'btcli subnet register --netuid 64 \\' },
+        { kind: 'prompt', text: '  --wallet.name my-coldkey --wallet.hotkey my-hot1 \\' },
+        { kind: 'prompt', text: '  --subtensor.network test' },
+      ],
+    },
+    callout: {
+      tip: '⚠ immunity period',
+      html: "— A freshly registered hotkey is protected from pruning for ~4,096 blocks (~13.7h). If your incentive doesn't climb above the lowest non-immune miner before immunity expires, you get deregistered and the burn-cost is gone. Plan to be earning real incentive within that window.",
+    },
+    seeAlso: [
+      { label: 'Live burn-cost & subnet stats', href: '/mine/resources#tools', meta: 'Tools · Taostats' },
+      { label: 'GPU rental (Lambda · RunPod · Vast)', href: '/mine/resources#compute', meta: 'Compute · 3 entries' },
+    ],
   },
   {
+    id: 'step-07',
     n: '07 / 08',
-    faded: true,
     title: 'Verify your setup',
     time: '~2 min',
-    body: 'Confirm your hotkey shows up in the metagraph and you can query stake.',
+    body: "Confirm the registration landed: your hotkey should appear at a UID on the subnet's metagraph, and your coldkey should show the burn-cost deducted.",
+    code: {
+      lines: [
+        { kind: 'prompt', text: 'btcli wallet overview --wallet.name my-coldkey' },
+        { kind: 'comment', text: '# Shows balance, all hotkeys, and which UIDs they hold across subnets.' },
+        { kind: 'spacer' },
+        { kind: 'prompt', text: 'btcli subnet metagraph --netuid 64' },
+        { kind: 'comment', text: '# Find your hotkey in the table to confirm UID assignment.' },
+        { kind: 'spacer' },
+        { kind: 'prompt', text: 'btcli subnet list' },
+        { kind: 'comment', text: '# Snapshot of all subnets, current burn-costs, validator counts.' },
+      ],
+    },
+    seeAlso: [
+      { label: 'Taostats explorer · btcli-tui · Grafana exporter', href: '/mine/resources#tools', meta: 'Tools · 3 entries' },
+    ],
   },
   {
+    id: 'step-08',
     n: '08 / 08',
-    faded: true,
-    title: 'Common errors',
+    title: 'Common errors (reference)',
     time: 'reference',
-    body: 'Five things that usually go wrong, and the one-line fixes.',
+    body: 'The five real-world failures that swallow most new miners. Bookmark this section.',
+    bullets: [
+      'Deregistered before earning: your incentive didn\'t cross the prune threshold inside the 4,096-block immunity window. Solution: profile the lowest non-immune incentive on the subnet before you register, and have the miner config tuned ahead of time.',
+      'Burn-cost spike: cost doubled between your `burn-cost` query and the `register` call. Re-query within a few seconds of registering, and keep extra TAO buffer.',
+      'Network flag mismatch: miner code talking to `finney` while wallet was registered on `test`. Pass `--subtensor.network` consistently across registration and miner invocation.',
+      'Dep conflicts: old `bittensor` SDK installed alongside `bittensor-cli` causing version mismatch. Solution: pin to the venv, `pip uninstall bittensor bittensor-cli bittensor-wallet` then re-install only `bittensor-cli`.',
+      'Coldkey/hotkey confusion: TAO sent to a hotkey ss58 (lost), or attempting to register a hotkey already on the subnet (each hotkey can hold only one UID per subnet). Always copy the address from `btcli wallet list`.',
+    ],
   },
 ];
 ---
@@ -127,7 +232,11 @@ const steps: Step[] = [
           <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[600px]">Every subnet playbook assumes you've done these eight things. Run them once, save the wallet, and skip straight to whichever subnet you want to mine.</p>
         </div>
         <div class="flex items-center gap-3">
-          <div class="os-tabs"><button class="active">macOS</button><button>Linux</button><button>WSL</button></div>
+          <div class="os-tabs" id="os-tabs">
+            <button class="active" data-os="macos">macOS</button>
+            <button data-os="linux">Linux</button>
+            <button data-os="wsl">WSL</button>
+          </div>
           <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">est. 30 min · fresh install</span>
         </div>
       </div>
@@ -135,17 +244,17 @@ const steps: Step[] = [
   </section>
 
   <section class="border-b hairline">
-    <div class="max-w-[900px] mx-auto px-6 py-16 space-y-6">
+    <div class="max-w-[900px] mx-auto px-6 py-16 space-y-6" id="setup-steps" data-os="macos">
       {steps.map((s) => (
-        <div class={`step ${s.faded ? 'opacity-70' : ''}`}>
-          <div class={`flex items-center justify-between ${s.bullets || s.code || s.callout ? 'mb-5' : 'mb-1'}`}>
+        <div class="step" id={s.id}>
+          <div class={`flex items-center justify-between ${s.bullets || s.code || s.codeByOs || s.callout ? 'mb-5' : 'mb-1'}`}>
             <div class="flex items-baseline gap-3">
-              <span class={`step-num ${s.status ?? ''}`}>{s.n}</span>
+              <span class="step-num">{s.n}</span>
               <h3 class="text-xl font-semibold">{s.title}</h3>
             </div>
             <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">{s.time}</span>
           </div>
-          <p class={`text-[color:var(--color-fg-muted)] text-sm ${s.bullets || s.code ? 'mb-5' : 'mt-3'}`}>{s.body}</p>
+          <p class={`text-[color:var(--color-fg-muted)] text-sm ${s.bullets || s.code || s.codeByOs ? 'mb-5' : 'mt-3'}`}>{s.body}</p>
           {s.bullets && (
             <ul class="text-sm text-[color:var(--color-fg-muted)] space-y-1.5 ml-4 list-disc marker:text-[color:var(--color-fg-dim)]">
               {s.bullets.map((b) => <li>{b}</li>)}
@@ -162,10 +271,35 @@ const steps: Step[] = [
               })}
             </div>
           )}
+          {s.codeByOs && (Object.entries(s.codeByOs) as [keyof typeof s.codeByOs, CodeBlock][]).map(([os, block]) => (
+            <div class="code-block p-4 mb-3 relative" data-os-variant={os}>
+              <div class="absolute top-3 right-3 copy-btn">copy</div>
+              {block.lines.map((l) => {
+                if (l.kind === 'spacer') return <div class="mt-2"></div>;
+                if (l.kind === 'comment') return <div><span class="comment">{l.text}</span></div>;
+                if (l.kind === 'ok') return <div><span class="ok">{l.text}</span></div>;
+                return <div><span class="prompt">$</span> {l.text}</div>;
+              })}
+            </div>
+          ))}
           {s.callout && (
             <div class="callout text-sm text-[color:var(--color-fg-muted)]">
               <span class="font-mono text-xs uppercase tracking-wider" style="color: #b8470b;">{s.callout.tip}</span>
               <span set:html={s.callout.html}></span>
+            </div>
+          )}
+          {s.seeAlso && s.seeAlso.length > 0 && (
+            <div class="see-also">
+              <div class="see-also-label">See also · in Resources</div>
+              <div class="see-also-grid">
+                {s.seeAlso.map((r) => (
+                  <a href={r.href} class="see-also-card">
+                    <span class="sa-label">{r.label}</span>
+                    {r.meta && <span class="sa-meta">{r.meta}</span>}
+                    <span class="sa-arrow">→</span>
+                  </a>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -174,11 +308,47 @@ const steps: Step[] = [
 
     <div class="max-w-[900px] mx-auto px-6 pb-16">
       <div class="flex items-center justify-between border-t hairline pt-6 text-xs font-mono text-[color:var(--color-fg-dim)]">
-        <span>Last verified 2026·05·26 against btcli 8.4.x</span>
+        <span>Last verified 2026·05·30 against btcli 9.22.x</span>
         <a href="/mine/playbooks" class="hover:text-[color:var(--color-accent)] text-sm">After setup → pick a subnet to mine →</a>
       </div>
     </div>
   </section>
+
+  <script>
+    const stepsEl = document.getElementById('setup-steps');
+    const tabsEl = document.getElementById('os-tabs');
+    if (stepsEl && tabsEl) {
+      tabsEl.querySelectorAll<HTMLButtonElement>('button[data-os]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const os = btn.dataset.os || 'macos';
+          stepsEl.dataset.os = os;
+          tabsEl.querySelectorAll('button[data-os]').forEach((b) => b.classList.toggle('active', b === btn));
+        });
+      });
+    }
+
+    // Copy-to-clipboard for prompt lines
+    document.querySelectorAll<HTMLDivElement>('.code-block .copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const block = btn.parentElement;
+        if (!block) return;
+        const text = Array.from(block.querySelectorAll<HTMLDivElement>(':scope > div'))
+          .filter((d) => !d.classList.contains('copy-btn'))
+          .map((d) => {
+            const prompt = d.querySelector('.prompt');
+            return prompt ? d.textContent?.replace(/^\$\s*/, '').trim() : '';
+          })
+          .filter(Boolean)
+          .join('\n');
+        try {
+          await navigator.clipboard.writeText(text);
+          const orig = btn.textContent;
+          btn.textContent = 'copied ✓';
+          setTimeout(() => { btn.textContent = orig; }, 1200);
+        } catch { btn.textContent = 'failed'; }
+      });
+    });
+  </script>
 </BaseLayout>
 
 <style>
@@ -209,6 +379,11 @@ const steps: Step[] = [
   .code-block .prompt { color: #b8470b; }
   .code-block .comment { color: #767680; }
   .code-block .ok { color: #15803d; }
+
+  /* OS-variant code blocks — show only the one matching #setup-steps[data-os] */
+  #setup-steps[data-os="macos"] .code-block[data-os-variant]:not([data-os-variant="macos"]) { display: none; }
+  #setup-steps[data-os="linux"] .code-block[data-os-variant]:not([data-os-variant="linux"]) { display: none; }
+  #setup-steps[data-os="wsl"]   .code-block[data-os-variant]:not([data-os-variant="wsl"])   { display: none; }
   .os-tabs {
     display: inline-flex;
     border: 1px solid rgba(15, 15, 18, 0.14);
@@ -221,6 +396,10 @@ const steps: Step[] = [
     padding: 4px 10px;
     border-radius: 3px;
     color: #4a4a52;
+    background: transparent;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
   }
   .os-tabs button.active {
     background: rgba(184, 71, 11, 0.1);
@@ -232,6 +411,42 @@ const steps: Step[] = [
     padding: 14px 18px;
     border-radius: 4px;
   }
+  .see-also {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(15, 15, 18, 0.1);
+  }
+  .see-also-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #767680;
+    margin-bottom: 8px;
+  }
+  .see-also-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 8px;
+  }
+  .see-also-card {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid rgba(15, 15, 18, 0.08);
+    border-radius: 5px;
+    background: #fafaf9;
+    transition: all 0.12s;
+  }
+  .see-also-card:hover {
+    border-color: rgba(184, 71, 11, 0.35);
+    background: #ffffff;
+  }
+  .see-also-card .sa-label { font-size: 13px; color: #0c0c10; }
+  .see-also-card .sa-meta { font-family: var(--font-mono); font-size: 10px; color: #767680; }
+  .see-also-card .sa-arrow { color: #b8470b; font-family: var(--font-mono); }
   .copy-btn {
     color: #767680;
     font-family: var(--font-mono);

@@ -1,167 +1,573 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { subnets, getSubnet, type Subnet } from '../../../data/subnets';
+import { getRichSubnet, type RichSubnet } from '../../../data/subnet-rich';
 
 export async function getStaticPaths() {
-  return subnets
-    .filter((s) => !s.rich)
-    .map((s) => ({ params: { slug: s.slug }, props: { subnet: s } }));
+  return subnets.map((s) => ({ params: { slug: s.slug }, props: { subnet: s } }));
 }
 
 interface Props { subnet: Subnet }
 const { subnet } = Astro.props;
+const rich: RichSubnet | undefined = getRichSubnet(subnet.slug);
 
-// related: same category, exclude self
-const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.slug).slice(0, 3);
+const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.slug).slice(0, 4);
 ---
 <BaseLayout
-  title={`Subnet ${subnet.netuid} · ${subnet.name} — OpenTAO`}
-  description={subnet.description}
+  title={rich ? `Subnet ${subnet.netuid} · ${subnet.name} — OpenTAO` : `Subnet ${subnet.netuid} · ${subnet.name} — OpenTAO`}
+  description={rich?.shortPitch ?? subnet.description}
   section="beginner"
 >
-  <section class="border-b hairline">
-    <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
-      <div class="flex items-center gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-6 flex-wrap">
-        <a href="/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
-        <a href="/beginner/subnets" class="hover:text-[color:var(--color-fg)]">Subnets</a><span>/</span>
-        <span class="text-[color:var(--color-fg)]">{subnet.netuid} · {subnet.name}</span>
-      </div>
-
-      <div class="flex items-end justify-between gap-8 flex-wrap mb-10">
-        <div>
-          <div class="flex items-center gap-3 mb-4 flex-wrap">
+  {rich ? (
+    <>
+      <!-- ════════════════════════════════════════════════════════ HERO -->
+      <header class="hero-full">
+        <div class="max-w-[1400px] mx-auto px-6 pt-12">
+          <div class="hero-bcrumb">
+            <a href="/">OpenTAO</a><span class="sep">/</span>
+            <a href="/beginner/subnets">Subnets</a><span class="sep">/</span>
+            <span class="curr">{subnet.netuid} · {subnet.name}</span>
+          </div>
+          <div class="hero-meta">
             <span class={`cat cat-${subnet.cat}`}>{subnet.catLabel}</span>
-            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]"><span class="dot-active mr-1"></span>active</span>
-            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">· owner: {subnet.owner}</span>
+            <span class="light"><span class="dot"></span>active · <span data-live="miners" data-fallback={subnet.miners}>{subnet.miners}</span> miners · <span data-live="validators" data-fallback={subnet.validators}>{subnet.validators}</span> validators</span>
           </div>
-          <div class="flex items-baseline gap-5 mb-3">
-            <span class="font-mono text-[color:var(--color-fg-dim)] text-sm">netuid</span>
-            <span class="font-mono text-[64px] leading-none font-semibold tracking-tight">{subnet.netuid}</span>
+          <div class="hero-id"><span class="lbl">netuid</span><span class="num">{subnet.netuid}</span></div>
+          <h1>{subnet.name}</h1>
+          <p class="pitch" set:html={rich.shortPitch}></p>
+
+          <div class="stats-row">
+            <div class="stat-cell"><div class="k">Emission · 24h</div><div class="v"><span data-live="emission" data-fallback={subnet.emission}>{subnet.emission}</span></div></div>
+            <div class="stat-cell"><div class="k">Burn-cost</div><div class="v"><span data-live="burn-cost">—</span></div></div>
+            <div class="stat-cell"><div class="k">α-price</div><div class="v">{subnet.price} τ</div><div class="sub">mcap {subnet.mcap}</div></div>
+            <div class="stat-cell"><div class="k">Active miners</div><div class="v"><span data-live="miners" data-fallback={subnet.miners}>{subnet.miners}</span></div></div>
+            <div class="stat-cell"><div class="k">Registered</div><div class="v stat-v-small">{subnet.registered}</div></div>
           </div>
-          <h1 class="font-serif text-[44px] font-medium leading-tight tracking-[-0.015em]">{subnet.name}</h1>
-          <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{subnet.description}</p>
+          <span class="live-badge"><span class="pulse"></span>Live · via taostats · refreshed daily</span>
         </div>
+      </header>
 
-        <div class="flex flex-col items-end gap-2">
-          <a href="/mine/playbooks" class="inline-flex items-center gap-2 text-sm font-semibold px-5 py-3 rounded-md" style="background: #0c0c10; color: #ffffff;">
-            Open mining playbook
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </a>
-          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">{subnet.verifiedNote}</span>
+      <!-- ════════════════════════════════════════════════════════ BODY: 2-col main + sticky sidebar -->
+      <div class="max-w-[1400px] mx-auto px-6 py-12">
+        <div class="body-grid">
+          <div class="body-main">
+
+            <section id="overview">
+              <h2 class="section-h">Overview</h2>
+              <div class="prose">
+                {rich.overview.map((p, i) => (
+                  <p class={i === 0 ? 'lead' : ''} set:html={p}></p>
+                ))}
+              </div>
+            </section>
+
+            <section id="cycle">
+              <div class="cycle-head">
+                <h2 class="section-h-inline">One tempo · miner ↔ validator</h2>
+                <span class="tempo">1 tempo ≈ 72 min · ~20×/day</span>
+              </div>
+              <div class="stage-row">
+                {(['challenge', 'compute', 'score', 'settle'] as const).map((key) => {
+                  const stage = rich.cycle[key];
+                  const sideClass = stage.actor === 'Miner' ? 'miner' : stage.actor === 'Validator' ? 'validator' : 'chain';
+                  const stepLabels = { challenge: '01 · Challenge', compute: '02 · Compute', score: '03 · Score', settle: '04 · Settle' } as const;
+                  return (
+                    <div class="stage" data-side={sideClass}>
+                      <div class="step">{stepLabels[key]}</div>
+                      <div class="actor">{stage.actor}</div>
+                      <h3>{stage.title}</h3>
+                      <p>{stage.body}</p>
+                      <div class="data"><span class="k">{stage.dataK} </span><span class="v">{stage.dataV}</span></div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section id="roles">
+              <h2 class="section-h">Who does what</h2>
+              <div class="roles-grid">
+                <div class="role-card" data-role="miner">
+                  <div class="role-head"><span class="role-dot"></span><span class="role-name">MINER</span></div>
+                  <h3>Produces the work.</h3>
+                  <div class="field"><span class="k">does</span><span class="v">{rich.miner.does}</span></div>
+                  <div class="field"><span class="k">input</span><span class="v">{rich.miner.input}</span></div>
+                  <div class="field"><span class="k">output</span><span class="v">{rich.miner.output}</span></div>
+                  <div class="field"><span class="k">hardware</span><span class="v">{rich.miner.hardware}</span></div>
+                  <div class="field"><span class="k">paid for</span><span class="v">{rich.miner.paidFor}</span></div>
+                  <div class="field"><span class="k">paid via</span><span class="v">{rich.miner.paidVia}</span></div>
+                </div>
+                <div class="role-card" data-role="validator">
+                  <div class="role-head"><span class="role-dot"></span><span class="role-name">VALIDATOR</span></div>
+                  <h3>Grades against truth.</h3>
+                  <div class="field"><span class="k">does</span><span class="v">{rich.validator.does}</span></div>
+                  <div class="field"><span class="k">requires</span><span class="v">{rich.validator.requires}</span></div>
+                  <div class="field"><span class="k">output</span><span class="v">{rich.validator.output}</span></div>
+                  <div class="field"><span class="k">paid for</span><span class="v">{rich.validator.paidFor}</span></div>
+                  <div class="field"><span class="k">paid via</span><span class="v">{rich.validator.paidVia}</span></div>
+                </div>
+              </div>
+            </section>
+
+            <section id="scoring">
+              <h2 class="section-h">How scoring works</h2>
+              <div class="prose">
+                <p class="lead">{rich.scoring.leadOneLine}</p>
+                {rich.scoring.explanation.map((p) => <p>{p}</p>)}
+              </div>
+              <div class="callout-red">
+                <div class="lbl">⚠ What doesn't work</div>
+                <p>{rich.scoring.cheatPath}</p>
+              </div>
+            </section>
+
+            <section id="customer">
+              <h2 class="section-h">Who pays — and what they're paying for</h2>
+              <div class="prose">
+                <p class="lead">{rich.customer.leadOneLine}</p>
+                {rich.customer.explanation.map((p) => <p>{p}</p>)}
+              </div>
+
+              <div class="compete-head">
+                <h3>Competitive landscape</h3>
+                <span class="scope">{rich.competitive.scope}</span>
+              </div>
+              <table class="compete-table">
+                <thead><tr><th>Forecaster</th><th>Approach</th><th>Access</th><th>Differentiator</th></tr></thead>
+                <tbody>
+                  {rich.competitive.rows.map((row) => (
+                    <tr class={row.isSelf ? 'self' : ''}>
+                      <td>{row.name}{row.subtitle && <span class="badge decn">{row.subtitle}</span>}</td>
+                      <td>{row.approach}</td>
+                      <td><span class={`badge ${row.accessTone}`}>{row.access}</span></td>
+                      <td>{row.differentiator}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p class="compete-note">{rich.competitive.note}</p>
+            </section>
+
+            <section id="team">
+              <h2 class="section-h">Team &amp; founders {rich.team.placeholder && <span class="ph-badge">⚠ placeholder data</span>}</h2>
+              <div class="team-intro">
+                {rich.team.intro.map((p) => <p>{p}</p>)}
+              </div>
+              <div class="founders-grid">
+                {rich.team.founders.map((f) => (
+                  <div class="founder" data-c={f.gradient}>
+                    <div class="top">
+                      <div class="avatar">{f.initials}</div>
+                      <div><div class="name">{f.name}</div><div class="role">{f.role}</div></div>
+                    </div>
+                    <p class="bio">{f.bio}</p>
+                    {(f.twitter || f.github) && (
+                      <div class="socials">
+                        {f.twitter && <a href={f.twitter} target="_blank" rel="noopener">𝕏</a>}
+                        {f.github  && <a href={f.github}  target="_blank" rel="noopener">github</a>}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div class="team-meta">
+                <div class="cell"><div class="k">Team size</div><div class="v">{rich.team.size}</div></div>
+                <div class="cell"><div class="k">Founded</div><div class="v">{rich.team.founded}</div></div>
+                <div class="cell"><div class="k">Based</div><div class="v">{rich.team.based}</div></div>
+              </div>
+              <div class="backers-row">
+                <span class="lbl">Backers / funding</span>
+                <span class="v"><em>{rich.team.backers}</em></span>
+              </div>
+              {rich.team.placeholder && (
+                <div class="ph-banner">⚠ Some founder data above is placeholder. When the operator claims this page (or a contributor verifies via PR), real values replace these.</div>
+              )}
+            </section>
+
+            <section id="history">
+              <h2 class="section-h">Project history</h2>
+              <div class="timeline">
+                {rich.milestones.map((m) => (
+                  <div class="milestone"><span class="mdate">{m.date}</span><span class="mtext">{m.text}</span></div>
+                ))}
+              </div>
+            </section>
+
+            <section id="join">
+              <h2 class="section-h">Joining</h2>
+              <div class="join-card">
+                <div>
+                  <div class="lbl">→ become a miner</div>
+                  <h3>{rich.join.title}</h3>
+                  <p>{rich.join.body}</p>
+                  <div class="aside-note">{rich.join.asideNote}</div>
+                </div>
+                <a class="cta" href={`/mine/playbooks/${subnet.slug}`}>
+                  Open mining playbook
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+            </section>
+          </div>
+
+          <aside class="body-side">
+            <div class="side-card">
+              <div class="lbl">Quick facts</div>
+              <div class="row"><span class="k">netuid</span><span class="v">{subnet.netuid}</span></div>
+              <div class="row"><span class="k">operator</span><span class="v">{rich.team.founders[0]?.name.includes('[') ? subnet.owner.slice(0, 18) : rich.team.intro[0].split(' ').slice(0, 2).join(' ')}</span></div>
+              <div class="row"><span class="k">registered</span><span class="v">{subnet.registered}</span></div>
+            </div>
+
+            <div class="side-card">
+              <div class="lbl">Tags</div>
+              <div class="tag-list">
+                {rich.tags.map((t) => <span class="tag">{t}</span>)}
+              </div>
+            </div>
+
+            <div class="side-card">
+              <div class="lbl">External</div>
+              <div class="ext-list">
+                {rich.external.github  && <a href={rich.external.github}  target="_blank" rel="noopener"><span>GitHub</span><span class="arrow">↗</span></a>}
+                {rich.external.website && <a href={rich.external.website} target="_blank" rel="noopener"><span>Website</span><span class="arrow">↗</span></a>}
+                {rich.external.twitter && <a href={rich.external.twitter} target="_blank" rel="noopener"><span>Twitter</span><span class="arrow">↗</span></a>}
+                <a href={rich.external.taostats} target="_blank" rel="noopener"><span>taostats</span><span class="arrow">↗</span></a>
+              </div>
+            </div>
+
+            {rich.tweets && rich.tweets.length > 0 && (
+              <div class="side-card">
+                <div class="lbl">Operator feed</div>
+                <div class="tw-mini">
+                  {rich.tweets.slice(0, 3).map((t) => (
+                    <div class="item">
+                      <div class="when">{t.when}</div>
+                      {t.body}
+                    </div>
+                  ))}
+                </div>
+                {rich.external.twitter && <div class="more"><a href={rich.external.twitter} target="_blank" rel="noopener">view full feed ↗</a></div>}
+              </div>
+            )}
+          </aside>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-6 border hairline rounded-md overflow-hidden bg-[color:var(--color-surface)]">
-        <div class="stat-cell"><div class="section-label">Emission · 24h</div><div class="stat-num mt-1 tabular">{subnet.emission} <span class="text-[color:var(--color-fg-muted)] text-sm">τ</span></div></div>
-        <div class="stat-cell"><div class="section-label">Market cap</div><div class="stat-num mt-1 tabular">{subnet.mcap}</div></div>
-        <div class="stat-cell"><div class="section-label">Price (τ)</div><div class="stat-num mt-1 tabular">{subnet.price} <span class={`${subnet.deltaSign} text-xs font-mono`}>{subnet.delta}</span></div></div>
-        <div class="stat-cell"><div class="section-label">Miners</div><div class="stat-num mt-1 tabular">{subnet.miners}</div></div>
-        <div class="stat-cell"><div class="section-label">Validators</div><div class="stat-num mt-1 tabular">{subnet.validators}</div></div>
-        <div class="stat-cell"><div class="section-label">Registered</div><div class="stat-num mt-1 tabular text-lg">{subnet.registered}</div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="border-b hairline">
-    <div class="max-w-[1400px] mx-auto px-6 py-16 grid lg:grid-cols-[1fr_320px] gap-12">
-      <div class="prose">
-        <div class="stub-banner">
-          <div class="label">Editor's note</div>
-          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">This subnet page is still being written. The chain stats above are live; the rest is being filled in by the editorial team or by {subnet.owner} when they claim the page. <a class="inline" href="#" style="color: #b8470b">Help write this page →</a></p>
-        </div>
-
-        <h2 id="what">What it does</h2>
-        <p class="lead">{subnet.description}</p>
-        <p>Full subnet page with how-it-works, scoring details, validator/miner graphic, and team Twitter feed is being assembled. In the meantime, the <a class="inline" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;" href="/mine/playbooks">mining playbook</a> has the operational details miners need.</p>
-
-        <h2 id="reference">Reference page</h2>
-        <p>For a fully-built subnet page with validator/miner graph, team feed, and full content sections, see <a class="inline" style="color: #b8470b; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.4); text-underline-offset: 3px;" href="/beginner/subnets/42-cortex">SN42 Cortex</a>. Every subnet page will eventually have this depth.</p>
-      </div>
-
-      <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
-        <div>
-          <div class="section-label mb-3">Quick facts</div>
-          <div class="card rounded-md p-5 space-y-3 text-sm">
-            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Hardware</span><span class="text-[color:var(--color-fg)]">{subnet.hardware}</span></div>
-            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Category</span><span class="text-[color:var(--color-fg)]">{subnet.catLabel}</span></div>
-            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Owner</span><span class="text-[color:var(--color-fg)] font-mono">{subnet.owner}</span></div>
-            <div class="flex justify-between"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">Registered</span><span class="text-[color:var(--color-fg)] font-mono">{subnet.registered}</span></div>
+      <!-- ════════════════════════════════════════════════════════ RELATED -->
+      <section class="related">
+        <div class="max-w-[1400px] mx-auto px-6">
+          <h2 class="section-h">Related subnets · same category</h2>
+          <div class="related-grid">
+            {related.map((r) => (
+              <a href={`/beginner/subnets/${r.slug}`} class="related-card">
+                <div class="top"><span class="net">{r.netuid}</span><span class={`cat-tag cat-${r.cat}`}>{r.catLabel}</span></div>
+                <div class="name">{r.name}</div>
+                <div class="desc">{r.description}</div>
+              </a>
+            ))}
           </div>
         </div>
+      </section>
 
-        <div>
-          <div class="section-label mb-3">Links</div>
-          <div class="card rounded-md p-4 text-sm text-[color:var(--color-fg-muted)]">
-            External links (GitHub, Discord, X, website) are added when the subnet owner claims this page. <a href="#" class="text-[color:var(--color-accent)]">Claim this subnet →</a>
+      <footer class="pg-footer">
+        <div class="max-w-[1400px] mx-auto px-6">
+          <div class="row">
+            <div style="display: flex; gap: 22px;">
+              <a href={`https://github.com/opentao-ai/opentao/blob/main/src/data/subnets/${subnet.slug}.ts`} target="_blank" rel="noopener">Edit on GitHub ↗</a>
+              <a href="#">Claim this subnet</a>
+            </div>
+            <span>Live data refreshes daily via taostats</span>
           </div>
         </div>
-      </aside>
-    </div>
-  </section>
+      </footer>
 
-  <section class="border-b hairline">
-    <div class="max-w-[1400px] mx-auto px-6 py-14">
-      <div class="section-label mb-6">More from the directory</div>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <a href="/beginner/subnets/42-cortex" class="card rounded-md p-5">
-          <div class="flex items-baseline justify-between mb-3"><span class="font-mono text-2xl font-semibold">42</span><span class="cat cat-reason">Reasoning</span></div>
-          <div class="font-medium mb-1">Cortex ★</div>
-          <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">Fully-built reference page. See how the full subnet template looks.</p>
-        </a>
-        {related.map((r) => (
-          <a href={`/beginner/subnets/${r.slug}`} class="card rounded-md p-5">
-            <div class="flex items-baseline justify-between mb-3"><span class="font-mono text-2xl font-semibold">{r.netuid}</span><span class={`cat cat-${r.cat}`}>{r.catLabel}</span></div>
-            <div class="font-medium mb-1">{r.name}</div>
-            <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{r.description}</p>
-          </a>
-        ))}
-        <a href="/beginner/subnets" class="card rounded-md p-5" style="border-style: dashed; background: transparent;">
-          <div class="font-mono text-xs text-[color:var(--color-fg-dim)] mb-3">Browse all</div>
-          <div class="font-medium mb-1 text-[color:var(--color-fg-muted)]">128 subnets →</div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="border-b hairline">
-    <div class="max-w-[1400px] mx-auto px-6 py-12">
-      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
-        <div class="flex items-center gap-5">
-          <a href="#" class="hover:text-[color:var(--color-fg)]">Edit on GitHub</a>
-          <a href="#" class="hover:text-[color:var(--color-fg)]">Claim this subnet</a>
+      <script define:vars={{ netuid: subnet.netuid }}>
+        async function refreshLive() {
+          try {
+            const r = await fetch(`/api/subnet/${netuid}`, { headers: { accept: 'application/json' } });
+            if (!r.ok) return;
+            const d = await r.json();
+            const set = (k, v) => document.querySelectorAll(`[data-live="${k}"]`).forEach((el) => { el.textContent = String(v); });
+            if (d.burn_cost_tao  != null) set('burn-cost', d.burn_cost_tao.toFixed(2) + ' τ');
+            if (d.miner_count    != null) set('miners',    d.miner_count);
+            if (d.validator_count!= null) set('validators',d.validator_count);
+          } catch (err) { console.warn('[subnet] live data unavailable:', err); }
+        }
+        refreshLive();
+      </script>
+    </>
+  ) : (
+    /* ──────────────────────────────────── Lightweight stub fallback ────── */
+    <>
+      <section class="border-b hairline">
+        <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
+          <div class="hero-bcrumb">
+            <a href="/">OpenTAO</a><span class="sep">/</span>
+            <a href="/beginner/subnets">Subnets</a><span class="sep">/</span>
+            <span class="curr">{subnet.netuid} · {subnet.name}</span>
+          </div>
+          <div class="flex items-end justify-between gap-8 flex-wrap mb-10">
+            <div>
+              <div class="flex items-center gap-3 mb-4 flex-wrap">
+                <span class={`cat cat-${subnet.cat}`}>{subnet.catLabel}</span>
+                <span class="text-xs font-mono text-[color:var(--color-fg-dim)]"><span class="dot mr-1"></span>active · owner: {subnet.owner}</span>
+              </div>
+              <div class="flex items-baseline gap-5 mb-3">
+                <span class="font-mono text-[color:var(--color-fg-dim)] text-sm">netuid</span>
+                <span class="font-mono text-[64px] leading-none font-semibold tracking-tight">{subnet.netuid}</span>
+              </div>
+              <h1 class="font-serif text-[44px] font-medium leading-tight tracking-[-0.015em]">{subnet.name}</h1>
+              <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{subnet.description}</p>
+            </div>
+          </div>
+          <div class="stub-banner">
+            <div class="label">Lightweight page</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
+              This subnet doesn't have a full write-up yet. The on-chain stats below are live; the rest is being authored.
+              For an example of the fully-built template, see <a class="inline" href="/beginner/subnets/18-zeus" style="color: #b8470b">SN18 Zeus</a>.
+              <a class="inline" href="https://github.com/opentao-ai/opentao/blob/main/src/data/subnets/" target="_blank" rel="noopener" style="color: #b8470b">Help write this page →</a>
+            </p>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-6 border hairline rounded-md overflow-hidden bg-[color:var(--color-surface)] mt-8">
+            <div class="stub-stat"><div class="section-label">Emission · 24h</div><div class="stub-stat-num">{subnet.emission}</div></div>
+            <div class="stub-stat"><div class="section-label">Market cap</div><div class="stub-stat-num">{subnet.mcap}</div></div>
+            <div class="stub-stat"><div class="section-label">α-price (τ)</div><div class="stub-stat-num">{subnet.price}</div></div>
+            <div class="stub-stat"><div class="section-label">Miners</div><div class="stub-stat-num">{subnet.miners}</div></div>
+            <div class="stub-stat"><div class="section-label">Validators</div><div class="stub-stat-num">{subnet.validators}</div></div>
+            <div class="stub-stat"><div class="section-label">Registered</div><div class="stub-stat-num text-base">{subnet.registered}</div></div>
+          </div>
         </div>
-        <span>Stub · chain data refreshed 3 min ago</span>
-      </div>
-      <div class="mt-6 text-center"><a href="/beginner/subnets" class="text-sm hover:text-[color:var(--color-accent)] text-[color:var(--color-fg-muted)]">← All 128 subnets</a></div>
-    </div>
-  </section>
+      </section>
+
+      <section class="border-b hairline">
+        <div class="max-w-[1400px] mx-auto px-6 py-14">
+          <div class="section-label mb-6">More from the directory</div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <a href="/beginner/subnets/18-zeus" class="card rounded-md p-5">
+              <div class="flex items-baseline justify-between mb-3"><span class="font-mono text-2xl font-semibold">18</span><span class="cat cat-data">Data</span></div>
+              <div class="font-medium mb-1">Zeus ★</div>
+              <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">Fully-built reference page.</p>
+            </a>
+            {related.slice(0, 3).map((r) => (
+              <a href={`/beginner/subnets/${r.slug}`} class="card rounded-md p-5">
+                <div class="flex items-baseline justify-between mb-3"><span class="font-mono text-2xl font-semibold">{r.netuid}</span><span class={`cat cat-${r.cat}`}>{r.catLabel}</span></div>
+                <div class="font-medium mb-1">{r.name}</div>
+                <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed line-clamp-2">{r.description}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  )}
 </BaseLayout>
 
 <style>
-  .stat-cell { padding: 16px 20px; border-right: 1px solid rgba(15,15,18,0.07); }
+  /* ──────────────────────────────────── HERO */
+  .hero-full { padding-bottom: 48px; border-bottom: 1px solid var(--color-border, rgba(15,15,18,0.08)); }
+  .hero-bcrumb { display: flex; gap: 6px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: #767680; margin-bottom: 20px; }
+  .hero-bcrumb a { color: #767680; text-decoration: none; }
+  .hero-bcrumb a:hover { color: #0c0c10; }
+  .hero-bcrumb .sep { opacity: 0.4; }
+  .hero-bcrumb .curr { color: #0c0c10; }
+
+  .hero-meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .hero-meta .light { font-family: var(--font-mono); font-size: 11px; color: #767680; }
+  .hero-meta .dot { width: 7px; height: 7px; border-radius: 999px; background: #15803d; box-shadow: 0 0 8px rgba(22,163,74,0.45); display: inline-block; vertical-align: middle; margin-right: 6px; }
+
+  .hero-id { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+  .hero-id .lbl { font-family: var(--font-mono); font-size: 12px; color: #767680; }
+  .hero-id .num { font-family: var(--font-mono); font-size: 56px; font-weight: 600; letter-spacing: -0.02em; color: #0c0c10; line-height: 1; }
+  h1 { font-family: var(--font-serif); font-weight: 500; font-size: 44px; letter-spacing: -0.015em; line-height: 1.1; margin: 6px 0 18px; }
+  .pitch { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.45; color: #0c0c10; max-width: 760px; margin: 0; }
+  .pitch strong { font-style: normal; font-weight: 500; color: #b8470b; }
+
+  /* ──────────────────────────────────── STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; overflow: hidden; background: #fafaf9; margin-top: 28px; }
+  @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 640px)  { .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat-cell { padding: 16px 18px; border-right: 1px solid rgba(15,15,18,0.08); border-bottom: 1px solid rgba(15,15,18,0.08); background: #ffffff; }
   .stat-cell:last-child { border-right: 0; }
-  .stat-num { font-weight: 600; letter-spacing: -0.01em; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .stat-cell .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 6px; }
+  .stat-cell .v { font-family: var(--font-mono); font-weight: 600; font-size: 20px; color: #0c0c10; font-variant-numeric: tabular-nums; }
+  .stat-cell .v.stat-v-small, .stat-cell .stat-v-small { font-size: 16px; }
+  .stat-cell .sub { font-family: var(--font-mono); font-size: 10px; color: #767680; margin-top: 3px; }
+  .live-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #15803d; padding: 4px 10px; border-radius: 999px; background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); margin-top: 14px; }
+  .live-badge .pulse { width: 6px; height: 6px; border-radius: 999px; background: #15803d; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
-  .cat-llm    { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
-  .cat-vision { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
-  .cat-audio  { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
-  .cat-robotics { color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
-  .cat-data   { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
-  .cat-reason { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
-  .cat-storage { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+  /* ──────────────────────────────────── 2-col body */
+  .body-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; }
+  @media (max-width: 980px) { .body-grid { grid-template-columns: 1fr; gap: 32px; } }
+  .body-main { min-width: 0; }
+  .body-main > section { padding-bottom: 48px; margin-bottom: 48px; border-bottom: 1px solid rgba(15,15,18,0.08); }
+  .body-main > section:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .body-side { display: flex; flex-direction: column; gap: 14px; }
+  @media (min-width: 981px) {
+    .body-side { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow-y: auto; padding-right: 4px; }
+    .body-side::-webkit-scrollbar { width: 4px; }
+    .body-side::-webkit-scrollbar-thumb { background: rgba(15,15,18,0.15); border-radius: 999px; }
+  }
 
-  .dot-active { width: 7px; height: 7px; border-radius: 999px; background: #16a34a; box-shadow: 0 0 8px rgba(22,163,74,0.4); display: inline-block; }
-  .pos { color: #15803d; }
-  .neg { color: #b91c1c; }
+  .section-h { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.01em; margin: 0 0 24px; }
+  .section-h-inline { font-family: var(--font-serif); font-weight: 500; font-size: 28px; letter-spacing: -0.01em; margin: 0; }
 
+  /* ──────────────────────────────────── CYCLE */
+  .cycle-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+  .tempo { font-family: var(--font-mono); font-size: 11px; color: #767680; padding: 5px 11px; border: 1px solid rgba(15,15,18,0.08); border-radius: 999px; }
+  .stage-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid rgba(15,15,18,0.08); border-radius: 14px; overflow: hidden; background: #fafaf9; }
+  @media (max-width: 1100px) { .stage-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px)  { .stage-row { grid-template-columns: 1fr; } }
+  .stage { position: relative; padding: 22px 18px 20px; border-right: 1px solid rgba(15,15,18,0.08); background: #ffffff; }
+  .stage:last-child { border-right: 0; }
+  .stage .step { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 10px; }
+  .stage .actor { font-family: var(--font-mono); font-size: 11px; color: #767680; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .stage h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; color: #0c0c10; }
+  .stage p { font-size: 13px; color: #4a4a52; margin: 0; line-height: 1.55; }
+  .stage .data { font-family: var(--font-mono); font-size: 10px; color: #767680; margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(15,15,18,0.08); }
+  .stage .data .v { color: #0c0c10; }
+  .stage[data-side="miner"] .actor { color: #b8470b; }
+  .stage[data-side="validator"] .actor { color: #1c6ea4; }
+  .stage[data-side="chain"] .actor { color: #15803d; }
+
+  /* ──────────────────────────────────── ROLES */
+  .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .roles-grid { grid-template-columns: 1fr; } }
+  .role-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; padding: 22px; }
+  .role-card .role-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .role-card .role-dot { width: 12px; height: 12px; border-radius: 999px; }
+  .role-card[data-role="miner"] .role-dot     { background: #b8470b; }
+  .role-card[data-role="validator"] .role-dot { background: #1c6ea4; }
+  .role-card .role-name { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+  .role-card h3 { font-family: var(--font-serif); font-weight: 500; font-size: 20px; margin: 0 0 12px; }
+  .role-card .field { display: grid; grid-template-columns: 90px 1fr; gap: 14px; padding: 8px 0; font-size: 13px; border-top: 1px solid rgba(15,15,18,0.08); }
+  .role-card .field:first-of-type { border-top: 0; padding-top: 0; }
+  .role-card .field .k { font-family: var(--font-mono); font-size: 10px; color: #767680; padding-top: 1px; letter-spacing: 0.04em; }
+  .role-card .field .v { color: #0c0c10; line-height: 1.5; }
+
+  /* ──────────────────────────────────── PROSE / callouts */
   .prose { max-width: 720px; }
-  .prose p { color: #1c1c22; line-height: 1.75; margin: 18px 0; font-size: 17px; }
-  .prose p.lead { font-size: 19px; color: #0c0c10; }
-  .prose h2 { font-family: var(--font-serif); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin: 48px 0 12px; color: #0c0c10; }
+  .prose p { font-size: 16px; line-height: 1.75; color: #0c0c10; margin: 0 0 16px; }
+  .prose p.lead { font-family: var(--font-serif); font-style: italic; font-size: 19px; color: #0c0c10; }
+  .prose strong { font-weight: 500; }
+  .callout-red { background: rgba(185,28,28,0.04); border-left: 3px solid #b91c1c; padding: 16px 22px; border-radius: 0 6px 6px 0; margin: 22px 0; max-width: 720px; }
+  .callout-red .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #b91c1c; margin-bottom: 8px; }
+  .callout-red p { font-size: 14px; color: #0c0c10; line-height: 1.65; margin: 0; }
 
-  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 28px 0; }
+  /* ──────────────────────────────────── COMPETITIVE */
+  .compete-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; margin: 32px 0 16px; }
+  .compete-head h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 0; }
+  .scope { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; padding: 3px 10px; border: 1px solid rgba(15,15,18,0.08); border-radius: 999px; }
+  .compete-table { width: 100%; border-collapse: collapse; background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; overflow: hidden; }
+  .compete-table thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; text-align: left; padding: 11px 16px; background: #fafaf9; border-bottom: 1px solid rgba(15,15,18,0.08); font-weight: 400; }
+  .compete-table tbody td { padding: 12px 16px; border-bottom: 1px solid rgba(15,15,18,0.08); font-size: 12.5px; line-height: 1.55; vertical-align: top; }
+  .compete-table tbody tr:last-child td { border-bottom: 0; }
+  .compete-table tbody tr.self { background: rgba(184,71,11,0.04); }
+  .compete-table tbody tr.self td:first-child { font-weight: 500; color: #b8470b; }
+  .badge { display: inline-block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; border: 1px solid; margin-left: 4px; vertical-align: middle; }
+  .badge.open   { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .badge.closed { color: #b91c1c; border-color: rgba(185,28,28,0.3); background: rgba(185,28,28,0.05); }
+  .badge.decn   { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .compete-note { font-size: 13px; color: #4a4a52; line-height: 1.65; margin-top: 14px; max-width: 720px; }
+
+  /* ──────────────────────────────────── TEAM */
+  .ph-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; padding: 3px 8px; border-radius: 3px; background: rgba(184,71,11,0.06); border: 1px dashed rgba(184,71,11,0.4); margin-left: 8px; vertical-align: middle; }
+  .team-intro { max-width: 720px; margin-bottom: 24px; }
+  .team-intro p { font-size: 16px; line-height: 1.75; color: #0c0c10; margin: 0 0 14px; }
+  .founders-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+  @media (max-width: 1100px) { .founders-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px)  { .founders-grid { grid-template-columns: 1fr; } }
+  .founder { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .founder .top { display: flex; align-items: center; gap: 12px; }
+  .founder .avatar { width: 42px; height: 42px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-weight: 500; font-size: 16px; color: #fff; flex-shrink: 0; }
+  .founder[data-c="v"] .avatar { background: linear-gradient(135deg, #6741d9, #1c6ea4); }
+  .founder[data-c="a"] .avatar { background: linear-gradient(135deg, #b8470b, #c2410c); }
+  .founder[data-c="g"] .avatar { background: linear-gradient(135deg, #15803d, #1c6ea4); }
+  .founder .name { font-size: 14px; font-weight: 500; color: #0c0c10; }
+  .founder .role { font-family: var(--font-mono); font-size: 10px; color: #767680; margin-top: 2px; }
+  .founder .bio { font-size: 12.5px; color: #4a4a52; line-height: 1.6; margin: 0; }
+  .founder .socials { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 10px; padding-top: 10px; border-top: 1px dashed rgba(15,15,18,0.08); margin-top: auto; }
+  .founder .socials a { color: #4a4a52; text-decoration: none; }
+  .founder .socials a:hover { color: #b8470b; }
+  .team-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .team-meta { grid-template-columns: 1fr; } }
+  .team-meta .cell .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 5px; }
+  .team-meta .cell .v { font-size: 13.5px; color: #0c0c10; line-height: 1.5; }
+  .backers-row { padding: 14px 18px; border: 1px dashed rgba(15,15,18,0.08); border-radius: 8px; background: #fafaf9; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .backers-row .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; }
+  .backers-row .v { font-size: 13px; color: #0c0c10; }
+  .backers-row .v em { color: #4a4a52; font-style: italic; }
+  .ph-banner { margin-top: 16px; padding: 12px 16px; font-size: 12px; color: #4a4a52; font-family: var(--font-mono); line-height: 1.6; background: rgba(184,71,11,0.04); border: 1px dashed rgba(184,71,11,0.3); border-radius: 6px; }
+
+  /* ──────────────────────────────────── HISTORY */
+  .timeline { display: flex; flex-direction: column; max-width: 720px; }
+  .milestone { display: grid; grid-template-columns: 80px 1fr; gap: 16px; padding: 12px 0; border-top: 1px solid rgba(15,15,18,0.08); align-items: baseline; }
+  .milestone:first-child { border-top: 0; padding-top: 0; }
+  .milestone .mdate { font-family: var(--font-mono); font-size: 12px; color: #b8470b; letter-spacing: 0.05em; }
+  .milestone .mtext { font-size: 14px; color: #0c0c10; line-height: 1.6; }
+
+  /* ──────────────────────────────────── JOIN */
+  .join-card { background: linear-gradient(90deg, rgba(184,71,11,0.06), rgba(184,71,11,0.02), rgba(184,71,11,0)); border: 1px solid rgba(184,71,11,0.28); border-radius: 14px; padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  @media (max-width: 700px) { .join-card { grid-template-columns: 1fr; } }
+  .join-card .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+  .join-card h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 0 0 6px; }
+  .join-card p { font-size: 13.5px; color: #4a4a52; margin: 0; line-height: 1.6; max-width: 460px; }
+  .join-card .cta { display: inline-flex; align-items: center; gap: 8px; background: #0c0c10; color: #ffffff; padding: 13px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .join-card .cta:hover { background: #b8470b; }
+  .join-card .cta svg { transition: transform 0.15s; }
+  .join-card .cta:hover svg { transform: translateX(3px); }
+  .join-card .aside-note { font-size: 12px; color: #4a4a52; margin-top: 10px; font-style: italic; }
+
+  /* ──────────────────────────────────── SIDEBAR */
+  .side-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; padding: 18px; }
+  .side-card .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 12px; }
+  .side-card .row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; font-size: 12px; border-top: 1px solid rgba(15,15,18,0.08); }
+  .side-card .row:first-of-type { border-top: 0; padding-top: 0; }
+  .side-card .row .k { font-family: var(--font-mono); font-size: 10px; color: #767680; }
+  .side-card .row .v { color: #0c0c10; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag-list .tag { font-family: var(--font-mono); font-size: 10px; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(15,15,18,0.08); color: #4a4a52; background: #fafaf9; }
+  .ext-list a { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 4px; color: #0c0c10; text-decoration: none; font-size: 12px; border-top: 1px solid rgba(15,15,18,0.08); transition: background 0.12s; }
+  .ext-list a:first-of-type { border-top: 0; }
+  .ext-list a:hover { background: #fafaf9; color: #b8470b; }
+  .ext-list a .arrow { color: #b8470b; font-family: var(--font-mono); }
+  .tw-mini { display: flex; flex-direction: column; gap: 8px; }
+  .tw-mini .item { padding: 10px; background: #fafaf9; border-radius: 6px; font-size: 12px; color: #4a4a52; line-height: 1.5; }
+  .tw-mini .item .when { font-family: var(--font-mono); font-size: 10px; color: #767680; margin-bottom: 3px; }
+  .tw-mini .more { margin-top: 8px; text-align: right; font-family: var(--font-mono); font-size: 10px; }
+  .tw-mini .more a { color: #b8470b; text-decoration: none; }
+
+  /* ──────────────────────────────────── RELATED + FOOTER */
+  .related { padding: 48px 0; border-top: 1px solid rgba(15,15,18,0.08); border-bottom: 1px solid rgba(15,15,18,0.08); }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); border-radius: 10px; padding: 18px; text-decoration: none; color: inherit; transition: all 0.15s; }
+  .related-card:hover { border-color: rgba(184,71,11,0.35); transform: translateY(-2px); }
+  .related-card .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .related-card .net { font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: #0c0c10; }
+  .related-card .cat-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid; }
+  .related-card .name { font-size: 14px; font-weight: 500; color: #0c0c10; margin-bottom: 4px; }
+  .related-card .desc { font-size: 12px; color: #4a4a52; line-height: 1.55; }
+  .pg-footer { padding: 28px 0; }
+  .pg-footer .row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-family: var(--font-mono); font-size: 12px; color: #767680; }
+  .pg-footer a { color: #4a4a52; text-decoration: none; }
+  .pg-footer a:hover { color: #0c0c10; }
+
+  /* ──────────────────────────────────── Category badges */
+  .cat { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; border: 1px solid; display: inline-block; }
+  .cat-llm      { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision   { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio    { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics { color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data     { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason   { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-storage  { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+  .cat-compute  { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
+
+  /* ──────────────────────────────────── Stub fallback */
+  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 16px 0; }
   .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
-
-  .tabular { font-variant-numeric: tabular-nums; }
+  .stub-stat { padding: 14px 18px; border-right: 1px solid rgba(15,15,18,0.07); border-bottom: 1px solid rgba(15,15,18,0.07); background: #fff; }
+  .stub-stat:last-child { border-right: 0; }
+  .stub-stat-num { font-family: var(--font-mono); font-weight: 600; font-size: 18px; color: #0c0c10; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .section-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #767680; }
 </style>
