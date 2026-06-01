@@ -72,6 +72,7 @@ opentao.ai — Builder's Gateway to Bittensor。Astro 6 静态站,Cloudflare Pag
 - chrome(Nav/Footer)已 locale-aware,**所有页面**自动按 URL 语言双语;`BaseLayout` 的 `<html lang>` 动态。
 - **加一个中文页**:① 建 `src/pages/zh/<path>.astro`(翻译版);② 把它的英文 base route 加进 `utils.ts` 的 `ZH_ROUTES`(切换器才会深链而不是回退首页);③ 新 UI 文案进 `ui.ts`。
 - 未翻译页**回退英文**,不要做成 404。深层数据页(子网/playbook)body 来自 taostats 英文,翻译需缓存层(见 PRD I18N-4)。
+- **中文写法:达意,不要逐句翻译。** 当成原本就用中文写,别跟英文句式;术语(subnet/miner/validator/emission/playbook/hotkey…)保留英文;少形容词、靠换行断句。逐句直译 = AI 味,用户明确反对。
 
 ## 5. 数据口径约定(taostats)
 
