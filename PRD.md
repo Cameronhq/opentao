@@ -27,12 +27,12 @@
 
 | # | 决策 | 状态 | 备注 |
 |---|---|---|---|
-| PB-1 | 排布改成类似子网目录的**信息密集、可比较、可排序**表格 | 🚧 计划中 | 现状是稀疏大卡片,信息量低 |
-| PB-2 | 列换成挖矿决策相关:**挖矿门槛(硬件 tier)、当前矿工数(同 SD-4 格式)、当前 miner emission、emission 分配方式(集中度)** | 🚧 计划中 | |
-| PB-3 | 把 `filter · coming soon` 的**硬件筛选真正做出来** | 🚧 计划中 | 复用 `data-filter-cat` 那套 → `data-filter-hw` |
-| PB-4 | 把死的 `Sort · emission ↓` 标签换成**真排序** | 🚧 计划中 | |
-| PB-5 | 修 `playbooks.ts` 里 emission 的 bug(`τ 11026561 / day` 是没换算的原始 rao) | 🚧 计划中 | `playbooks.ts` 是手维护文件 |
-| PB-6 | playbooks 数据要接 taostats 才能有真矿工数/emission | 🚧 计划中 | 需新写 fetch 脚本或并进 `refresh-subnets.ts` |
+| PB-1 | 排布改成类似子网目录的**信息密集、可比较、可排序**表格 | ✅ 2026-06-01 | 卡片网格 → `pb-table` 密集表 |
+| PB-2 | 列:**当前矿工数(同 SD-4 格式)、当前 miner emission、emission 分配方式(Reward spread:Concentrated/Mixed/Spread)、7d、category、playbook 状态** | ✅ 2026-06-01 | 硬件门槛列**砍掉**(无数据源,见 PB-3) |
+| PB-3 | ~~硬件筛选~~ | ❌ 2026-06-01 | 任何数据源都没有"每个子网要什么硬件";原来的 4 个 tier 卡片是编的,**整段删除**,不造假。等有数据源再议 |
+| PB-4 | 把死的 `Sort` 标签换成**真排序**(表头点击) | ✅ 2026-06-01 | 默认 emission desc |
+| PB-5 | 修 `playbooks.ts` 里 emission 的 rao bug | ✅ 2026-06-01 | 改为忽略 playbook.emission,直接用 join 来的子网 emission |
+| PB-6 | playbooks 接真实矿工数/emission | ✅ 2026-06-01 | **不用新 API**:在页面里按 netuid join `subnets.ts`(已含真实字段)。Reward spread = earning/registered 比例分桶 |
 
 ---
 
@@ -55,6 +55,6 @@
 
 ## 待办 / 开放问题
 
-- [ ] **PB-1~6**:playbooks 重排(用户已认可方向,等开工)。
 - [ ] 子网详情页 `[slug].astro` 的 `data-live` 从 `opentao-api` 抓 `miner_count`,口径可能还是旧的 `active_miners`,需与 SD-4 统一。
-- [ ] 把累积的 38+ 未提交改动 commit 固化(见 CLAUDE.md §3)。
+- [ ] playbooks 的"硬件门槛"列:若日后拿到每个子网硬件需求数据源,再加回(PB-3)。
+- [ ] playbooks 的 emission/矿工数依赖 `subnets.ts` 快照,会随手动刷新过期(同 INF-1)。

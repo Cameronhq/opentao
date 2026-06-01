@@ -5,6 +5,10 @@
 
 ## 2026-06-01
 
+- **Mining playbooks 页重排** — 稀疏卡片网格 → 密集可排序表格(`pb-table`),列:netuid、子网名+blurb、category、Emission·24h、Miners·earning(`注册/槽位·N earning`)、Reward spread(Concentrated/Mixed/Spread)、7d、Playbook 状态。[PRD PB-1/2/4]
+  - 真实数据靠按 netuid **join `src/data/subnets.ts`**(已含真实字段),不新建 API;顺手绕过 `playbooks.ts` 的 emission rao bug。[PRD PB-5/6]
+  - **删掉编造的硬件 tier 卡片区**和死的"coming soon / Sort"标签;无硬件数据源,不造假。[PRD PB-3]
+  - 文件:`src/pages/mine/playbooks.astro`(整页重写)。
 - **移除子网目录的 "featured subnet" 机制**(橙色高亮行 + ★ full page 徽章),三层同改 — `scripts/refresh-subnets.ts`(`RICH_SLUGS` 清空)、`src/data/subnets.ts`(去 Zeus 的 `rich:true`)、`src/pages/beginner/subnets.astro`(去接口字段/映射/渲染 + `.featured`/`.featured-callout`/`.ref-badge`/`.pill-select` 死 CSS)。[PRD SD-6]
 - **新增 PRD.md / CHANGELOG.md / CLAUDE.md**,建立跨会话记忆与工作规则。
 - 诊断记录:"改了又回来" = ① 生成文件 `subnets.ts` 被刷新脚本覆盖;② 5/30 起所有工作未提交,看线上像"回退"。

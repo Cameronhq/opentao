@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SubNav from '../../components/SubNav.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { playbooks as allPlaybooks, stats } from '../../data/playbooks';
+import { subnets } from '../../data/subnets';
 
 const subnav = [
   { href: '/mine/general-setup', label: 'General setup' },
@@ -10,34 +11,72 @@ const subnav = [
   { href: '/mine/resources', label: 'Resources' },
 ];
 
-const hardwareTiers = [
-  { dots: 1, name: 'CPU only', meta: '11 subnets · easiest start' },
-  { dots: 2, name: 'Single GPU', meta: '62 subnets · most common' },
-  { dots: 3, name: '2–4 GPU', meta: '42 subnets' },
-  { dots: 4, name: 'Cluster', meta: '13 subnets · advanced' },
-];
+// Join real on-chain data from the generated subnet registry by netuid. This
+// supplies emission / miner counts / 7d / reward-spread so the table shows live
+// numbers instead of playbooks.ts's stale, partly-broken emission strings.
+const subByNetuid = new Map(subnets.map((s) => [s.netuid, s]));
 
-// Show verified playbooks first, then missing — both grouped, full 128 in DOM.
-const playbooks = [...allPlaybooks].sort((a, b) => {
-  const order: Record<string, number> = { verified: 0, stale: 1, missing: 2 };
-  if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
-  return Number(a.netuid) - Number(b.netuid);
-});
+const parseSI = (raw: string | number | undefined): number => {
+  const m = String(raw ?? '').match(/([\d.]+)\s*([KMBk]?)/);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const u = m[2].toUpperCase();
+  return n * (u === 'B' ? 1e9 : u === 'M' ? 1e6 : u === 'K' ? 1e3 : 1);
+};
+const parsePct = (raw: string | undefined, sign: 'pos' | 'neg' | undefined): number => {
+  const n = parseFloat(String(raw ?? '').replace(/[^0-9.]/g, '') || '0');
+  return sign === 'neg' ? -n : n;
+};
+
+// Reward spread: of the registered miners, how many actually earn. Few earning
+// = winner-take-all (hard to break in); many earning = accessible.
+function rewardSpread(reg: number, earning: number): { label: string; cls: string; ratio: number } {
+  if (!reg || earning < 0) return { label: '—', cls: 'spread-na', ratio: -1 };
+  const r = earning / reg;
+  if (r < 0.15) return { label: 'Concentrated', cls: 'spread-hi', ratio: r };
+  if (r < 0.4)  return { label: 'Mixed',        cls: 'spread-mid', ratio: r };
+  return { label: 'Spread', cls: 'spread-lo', ratio: r };
+}
+
+const statusOrder: Record<string, number> = { verified: 0, stale: 1, missing: 2 };
+
+const rows = allPlaybooks.map((p) => {
+  const s = subByNetuid.get(Number(p.netuid));
+  const regN = parseSI(s?.miners);
+  const earnN = parseSI(s?.minersEarning);
+  const spread = rewardSpread(regN, earnN);
+  return {
+    ...p,
+    cat: s?.cat ?? p.category,
+    catLabel: s?.catLabel ?? p.categoryLabel,
+    emission: s?.emission ?? '—',
+    emissionN: parseSI(s?.emission),
+    minersText: s ? `${s.miners} / ${s.minerSlots}` : '—',
+    minersEarning: s?.minersEarning ?? '—',
+    minersN: regN,
+    earnN,
+    delta7d: s?.delta7d ?? '—',
+    delta7dSign: s?.delta7dSign ?? 'pos',
+    delta7dN: parsePct(s?.delta7d, s?.delta7dSign),
+    spread,
+  };
+})
+  // default sort: emission desc
+  .sort((a, b) => b.emissionN - a.emissionN);
 
 const pctVerified = Math.round((stats.verified / stats.total) * 100);
 const pctStale = Math.round((stats.stale / stats.total) * 100);
 const pctMissing = 100 - pctVerified - pctStale;
-
 ---
 <BaseLayout
   title="Subnet Playbooks — Start Mining — OpenTAO"
-  description="One playbook per subnet. Every command copy-pasteable. Every step verified by a real miner, with a date attached."
+  description="One playbook per subnet, with live miner counts, emission and reward spread. Every command copy-pasteable, every step dated."
   section="mine"
 >
   <SubNav items={subnav} active="/mine/playbooks" rightMeta={`${stats.verified} verified · ${stats.stale} stale · ${stats.missing} missing`} />
 
   <section class="border-b hairline">
-    <div class="max-w-[1400px] mx-auto px-6 pt-12 pb-10">
+    <div class="max-w-[1500px] mx-auto px-6 pt-12 pb-10">
       <Breadcrumb crumbs={[
         { href: '/', label: 'OpenTAO' },
         { href: '/mine/playbooks', label: 'Start mining' },
@@ -47,7 +86,7 @@ const pctMissing = 100 - pctVerified - pctStale;
       <div class="flex items-end justify-between gap-6 flex-wrap mb-10">
         <div>
           <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">Subnet playbooks</h1>
-          <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[600px]">One playbook per subnet. Every command copy-pasteable. Every step verified by a real miner, with a date attached.</p>
+          <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[640px]">One playbook per subnet — sortable by live emission, miner count and reward spread, so you can see where mining is worth it before reading a single command.</p>
         </div>
         <a href="/mine/general-setup" class="text-sm hover:text-[color:var(--color-accent)] inline-flex items-center gap-2 px-4 py-2 border hairline-strong rounded-md">↑ Start with General setup</a>
       </div>
@@ -62,19 +101,19 @@ const pctMissing = 100 - pctVerified - pctStale;
         <span><span class="inline-block w-3 h-3 rounded-sm align-middle mr-1.5" style="background: #16a34a;"></span>Verified · {stats.verified}</span>
         <span><span class="inline-block w-3 h-3 rounded-sm align-middle mr-1.5" style="background: #b91c1c; opacity: 0.7;"></span>Stale · {stats.stale}</span>
         <span><span class="inline-block w-3 h-3 rounded-sm align-middle mr-1.5" style="background: rgba(15,15,18,0.08); border: 1px solid rgba(15,15,18,0.15);"></span>Missing · {stats.missing}</span>
-        <a href="https://github.com/opentao-ai/opentao" target="_blank" rel="noopener" class="ml-auto hover:text-[color:var(--color-fg)] underline underline-offset-2">Help us write the missing {stats.missing} →</a>
+        <a href="https://github.com/Cameronhq/opentao" target="_blank" rel="noopener" class="ml-auto hover:text-[color:var(--color-fg)] underline underline-offset-2">Help us write the missing {stats.missing} →</a>
       </div>
     </div>
   </section>
 
-  <section class="border-b hairline nav-blur">
-    <div class="max-w-[1400px] mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
+  <section class="border-b hairline sticky top-[57px] z-40 nav-blur">
+    <div class="max-w-[1500px] mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
       <div class="flex items-center gap-2 px-3 py-2 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] w-full sm:w-64">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="playbook-search" type="text" placeholder="Search playbooks…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+        <input id="playbook-search" type="text" placeholder="Search by name, netuid, category…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
       </div>
       <div class="flex items-center gap-2 overflow-x-auto">
-        <button class="pill active" data-filter-cat="all">All categories</button>
+        <button class="pill active" data-filter-cat="all">All</button>
         <button class="pill" data-filter-cat="llm">LLM</button>
         <button class="pill" data-filter-cat="vision">Vision</button>
         <button class="pill" data-filter-cat="audio">Audio</button>
@@ -89,100 +128,128 @@ const pctMissing = 100 - pctVerified - pctStale;
         <button class="pill" data-filter-status="verified">Verified</button>
         <button class="pill" data-filter-status="stale">Stale</button>
         <button class="pill" data-filter-status="missing">Missing</button>
-        <span class="pill" style="cursor: default; opacity: 0.55;">Sort · emission ↓</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="border-b hairline">
-    <div class="max-w-[1400px] mx-auto px-6 py-10">
-      <div class="section-label mb-4 flex items-center gap-3">
-        <span>Pick by what's plugged in</span>
-        <span class="coming-soon">filter · coming soon</span>
-      </div>
-      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
-        {hardwareTiers.map((t) => (
-          <div class="card rounded-md p-5">
-            <div class="flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4].map((i) => (
-                <span class={`hw-icon ${i <= t.dots ? 'on' : ''}`}></span>
-              ))}
-            </div>
-            <h3 class="font-medium mb-1">{t.name}</h3>
-            <div class="text-xs text-[color:var(--color-fg-dim)] font-mono">{t.meta}</div>
-          </div>
-        ))}
       </div>
     </div>
   </section>
 
   <section>
-    <div class="max-w-[1400px] mx-auto px-6 py-10">
-      <div class="section-label mb-5">Playbooks · sorted by emission</div>
-
-      <div class="grid lg:grid-cols-2 gap-3" id="playbook-grid">
-        {playbooks.map((p) => (
-          <a
-            href={p.href}
-            class={`pcard card rounded-md p-6 block`}
-            style={p.dashed ? 'border-style: dashed;' : ''}
-            data-cat={p.category}
-            data-status={p.status}
-            data-search={`${p.name} ${p.netuid} ${p.categoryLabel} ${p.blurb}`.toLowerCase()}
-          >
-            <div class="flex items-baseline justify-between mb-4">
-              <div class="flex items-baseline gap-3">
-                <span class={`netuid text-2xl font-semibold ${p.faded ? 'text-[color:var(--color-fg-muted)]' : 'text-[color:var(--color-fg)]'}`}>{p.netuid}</span>
-                <span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">{p.emission}</span>
-              </div>
-              <span class={`cat cat-${p.category}`}>{p.categoryLabel}</span>
-            </div>
-            <h3 class={`text-lg font-semibold mb-1 ${p.faded ? 'text-[color:var(--color-fg-muted)]' : ''}`}>{p.name}</h3>
-            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">{p.blurb}</p>
-            {p.hardware ? (
-              <div class="grid grid-cols-3 gap-3 text-xs font-mono mb-5 pt-4 border-t hairline">
-                <div><div class="text-[color:var(--color-fg-dim)]">Hardware</div><div class="text-[color:var(--color-fg)] mt-0.5">{p.hardware}</div></div>
-                <div><div class="text-[color:var(--color-fg-dim)]">Setup time</div><div class="text-[color:var(--color-fg)] mt-0.5">{p.setupTime}</div></div>
-                <div><div class="text-[color:var(--color-fg-dim)]">First emission</div><div class="text-[color:var(--color-fg)] mt-0.5">{p.firstEmission}</div></div>
-              </div>
-            ) : (
-              <div class="mt-4 pt-4 border-t hairline"></div>
-            )}
-            <div class="flex items-center justify-between text-xs font-mono">
-              <span class={`pb-${p.status}`}>{p.statusText}</span>
-              <span class={p.status === 'missing' ? 'text-[color:var(--color-accent)]' : 'text-[color:var(--color-fg-muted)]'}>
-                {p.status === 'missing' ? '→ start a draft' : '→ open playbook'}
-              </span>
-            </div>
-          </a>
-        ))}
+    <div class="max-w-[1500px] mx-auto px-6 py-8">
+      <div class="overflow-x-auto">
+        <table class="pb-table tabular">
+          <thead>
+            <tr>
+              <th class="left sortable" data-sort="netuid"   data-sort-default="asc"><span class="lbl">#</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="netuid"   data-sort-default="asc"><span class="lbl">Subnet</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="cat"      data-sort-default="asc"><span class="lbl">Category</span><span class="sort">↕</span></th>
+              <th class="sortable sorted" data-sort="emission" data-sort-default="desc" data-sort-active="desc"><span class="lbl">Emission · 24h</span><span class="sort">↓</span></th>
+              <th class="sortable" data-sort="miners"   data-sort-default="desc"><span class="lbl">Miners · earning</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="spread"   data-sort-default="desc"><span class="lbl">Reward spread</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="delta7d"  data-sort-default="desc"><span class="lbl">7d</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="status" data-sort-default="asc"><span class="lbl">Playbook</span><span class="sort">↕</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                data-href={r.href}
+                data-cat={r.cat}
+                data-status={r.status}
+                data-netuid={String(r.netuid).padStart(4, '0')}
+                data-emission-n={String(r.emissionN)}
+                data-miners-n={String(r.minersN)}
+                data-spread-n={String(r.spread.ratio)}
+                data-delta7d-n={String(r.delta7dN)}
+                data-status-n={String(statusOrder[r.status] ?? 9)}
+                data-search={`${r.name} ${r.netuid} ${r.catLabel} ${r.blurb}`.toLowerCase()}
+              >
+                <td class="left"><span class="netuid">{r.netuid}</span></td>
+                <td class="left">
+                  <div class="name">{r.name}</div>
+                  <div class="blurb">{r.blurb}</div>
+                </td>
+                <td class="left"><span class={`cat cat-${r.cat}`}>{r.catLabel}</span></td>
+                <td><span class="text-[color:var(--color-fg)]">{r.emission}</span></td>
+                <td>
+                  <span class="text-[color:var(--color-fg)]">{r.minersText}</span>
+                  <span class="text-[color:var(--color-fg-dim)] text-xs"> · {r.minersEarning} earning</span>
+                </td>
+                <td><span class={`spread ${r.spread.cls}`}>{r.spread.label}</span></td>
+                <td class={r.delta7dSign}>{r.delta7d}</td>
+                <td class="left"><span class={`pb-${r.status}`}>{r.statusText}</span></td>
+                <td><span class={r.status === 'missing' ? 'go-accent' : 'go-muted'}>{r.status === 'missing' ? '→ draft' : '→ open'}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      <div class="mt-8 text-center text-xs font-mono text-[color:var(--color-fg-dim)]" id="playbook-count">
-        Showing <span class="text-[color:var(--color-fg)]" data-visible>{stats.total}</span> of {stats.total} subnets · sorted verified → missing
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t hairline pt-5">
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]" id="playbook-count">Showing <span class="text-[color:var(--color-fg)]" data-visible>{rows.length}</span> of {rows.length} subnets</div>
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">Live emission · miners · 7d joined from <a href="/beginner/subnets" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">subnet registry</a></div>
       </div>
     </div>
   </section>
 
   <script>
+    document.querySelectorAll<HTMLTableRowElement>('tr[data-href]').forEach((tr) => {
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', () => {
+        const href = tr.getAttribute('data-href');
+        if (href) window.location.href = href;
+      });
+    });
+
     let cat = 'all';
     let status = 'all';
     let query = '';
+    let sortKey = 'emission';
+    let sortDir: 'asc' | 'desc' = 'desc';
 
-    const cards = Array.from(document.querySelectorAll<HTMLAnchorElement>('#playbook-grid > a.pcard'));
-    const visible = document.querySelector<HTMLSpanElement>('#playbook-count [data-visible]');
+    const tbody = document.querySelector<HTMLTableSectionElement>('.pb-table tbody');
+    const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('tbody tr[data-href]'));
+    const visibleCount = document.querySelector<HTMLSpanElement>('#playbook-count [data-visible]');
+    const headers = Array.from(document.querySelectorAll<HTMLTableCellElement>('th.sortable'));
+
+    const COMPARE: Record<string, { attr: string; kind: 'number' | 'string' }> = {
+      netuid:   { attr: 'netuid',     kind: 'string' },
+      cat:      { attr: 'cat',        kind: 'string' },
+      emission: { attr: 'emissionN',  kind: 'number' },
+      miners:   { attr: 'minersN',    kind: 'number' },
+      spread:   { attr: 'spreadN',    kind: 'number' },
+      delta7d:  { attr: 'delta7dN',   kind: 'number' },
+      status:   { attr: 'statusN',    kind: 'number' },
+    };
 
     function apply() {
       let shown = 0;
-      for (const c of cards) {
-        const matchCat = cat === 'all' || c.dataset.cat === cat;
-        const matchStatus = status === 'all' || c.dataset.status === status;
-        const matchSearch = !query || (c.dataset.search || '').includes(query);
+      const visible: HTMLTableRowElement[] = [];
+      for (const r of rows) {
+        const matchCat = cat === 'all' || r.dataset.cat === cat;
+        const matchStatus = status === 'all' || r.dataset.status === status;
+        const matchSearch = !query || (r.dataset.search || '').includes(query);
         const show = matchCat && matchStatus && matchSearch;
-        c.style.display = show ? '' : 'none';
-        if (show) shown++;
+        r.style.display = show ? '' : 'none';
+        if (show) { shown++; visible.push(r); }
       }
-      if (visible) visible.textContent = String(shown);
+      const spec = COMPARE[sortKey] || COMPARE.emission;
+      const flip = sortDir === 'asc' ? 1 : -1;
+      const sorted = [...visible].sort((a, b) => {
+        const av = a.dataset[spec.attr] || '';
+        const bv = b.dataset[spec.attr] || '';
+        if (spec.kind === 'number') return (Number(av) - Number(bv)) * flip;
+        return av.localeCompare(bv) * flip;
+      });
+      if (tbody) for (const r of sorted) tbody.appendChild(r);
+      if (visibleCount) visibleCount.textContent = String(shown);
+
+      for (const th of headers) {
+        const key = th.dataset.sort;
+        const isActive = key === sortKey;
+        th.classList.toggle('sorted', isActive);
+        const arrow = th.querySelector<HTMLSpanElement>('.sort');
+        if (arrow) arrow.textContent = isActive ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
+      }
     }
 
     document.querySelectorAll<HTMLButtonElement>('[data-filter-cat]').forEach((btn) => {
@@ -208,78 +275,75 @@ const pctMissing = 100 - pctVerified - pctStale;
         apply();
       });
     }
+
+    for (const th of headers) {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (!key) return;
+        if (sortKey === key) {
+          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortKey = key;
+          sortDir = (th.dataset.sortDefault as 'asc' | 'desc') || 'desc';
+        }
+        apply();
+      });
+    }
   </script>
 </BaseLayout>
 
 <style>
-  .coverage-bar {
-    display: flex;
-    height: 32px;
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid rgba(15, 15, 18, 0.1);
-  }
+  .coverage-bar { display: flex; height: 32px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(15, 15, 18, 0.1); }
   .cov-verified { background: #16a34a; }
-  .cov-aging { background: #b8470b; }
   .cov-stale { background: #b91c1c; opacity: 0.7; }
   .cov-missing { background: rgba(15, 15, 18, 0.08); }
 
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border: 1px solid rgba(15, 15, 18, 0.12);
-    border-radius: 6px;
-    font-size: 13px;
-    color: #4a4a52;
-    background: transparent;
-    white-space: nowrap;
-  }
-  .pill:hover {
-    border-color: rgba(15, 15, 18, 0.28);
-    color: #0c0c10;
-  }
-  .pill.active {
-    color: #b8470b;
-    border-color: rgba(184, 71, 11, 0.4);
-    background: rgba(184, 71, 11, 0.06);
-  }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15, 15, 18, 0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; background: transparent; white-space: nowrap; }
+  .pill:hover { border-color: rgba(15, 15, 18, 0.28); color: #0c0c10; }
+  .pill.active { color: #b8470b; border-color: rgba(184, 71, 11, 0.4); background: rgba(184, 71, 11, 0.06); }
 
-  .cat {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 3px;
-    border: 1px solid;
-  }
-  .cat-llm     { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
-  .cat-vision  { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
-  .cat-audio   { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
-  .cat-robotics{ color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
-  .cat-data    { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
-  .cat-reason  { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
-  .cat-storage { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
-  .cat-compute { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
+  table.pb-table { width: 100%; border-collapse: collapse; }
+  .pb-table thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #767680; font-weight: 400; padding: 14px 12px; text-align: right; border-bottom: 1px solid rgba(15,15,18,0.12); white-space: nowrap; background: #ffffff; user-select: none; }
+  .pb-table thead th.left { text-align: left; }
+  .pb-table thead th.sortable { cursor: pointer; transition: color .12s; }
+  .pb-table thead th.sortable:hover { color: #0c0c10; }
+  .pb-table thead th.sortable:hover .sort { opacity: 0.85; }
+  .pb-table thead th .sort { opacity: 0.35; margin-left: 4px; transition: opacity .12s, color .12s; }
+  .pb-table thead th.sorted .sort { opacity: 1; color: #b8470b; }
+  .pb-table thead th.sorted { color: #0c0c10; }
+  .pb-table tbody td { padding: 13px 12px; border-bottom: 1px solid rgba(15,15,18,0.05); font-size: 13px; text-align: right; vertical-align: middle; }
+  .pb-table tbody td.left { text-align: left; }
+  .pb-table tbody tr { transition: background .12s; }
+  .pb-table tbody tr:hover { background: #fafaf9; }
+  .pb-table tbody tr:hover .netuid { color: #b8470b; }
 
-  .pb-verified { color: #15803d; }
-  .pb-stale { color: #b91c1c; }
-  .pb-missing { color: #767680; }
+  .netuid { font-family: var(--font-mono); font-weight: 500; transition: color .15s; color: #0c0c10; }
+  .name { font-weight: 500; color: #0c0c10; }
+  .blurb { font-size: 11px; color: #767680; margin-top: 2px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .pcard:hover .netuid { color: #b8470b; }
-  .netuid {
-    font-family: var(--font-mono);
-    transition: color 0.15s;
-  }
+  .cat { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid; display: inline-block; }
+  .cat-llm      { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision   { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio    { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics { color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data     { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason   { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-compute  { color: #475569; border-color: rgba(71,85,105,0.3); background: rgba(71,85,105,0.06); }
+  .cat-storage  { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
 
-  .hw-icon {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 1px;
-    background: rgba(15, 15, 18, 0.18);
-  }
-  .hw-icon.on { background: #16a34a; }
+  .spread { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; border: 1px solid; display: inline-block; }
+  .spread-hi  { color: #b91c1c; border-color: rgba(185,28,28,0.3); background: rgba(185,28,28,0.05); }
+  .spread-mid { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.05); }
+  .spread-lo  { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.05); }
+  .spread-na  { color: #b8b8be; border-color: rgba(15,15,18,0.12); }
+
+  .pos { color: #15803d; }
+  .neg { color: #b91c1c; }
+  .pb-verified { color: #15803d; font-family: var(--font-mono); font-size: 10px; }
+  .pb-stale { color: #b91c1c; font-family: var(--font-mono); font-size: 10px; }
+  .pb-missing { color: #767680; font-family: var(--font-mono); font-size: 10px; }
+  .go-accent { color: #b8470b; font-family: var(--font-mono); font-size: 10px; }
+  .go-muted { color: #767680; font-family: var(--font-mono); font-size: 10px; }
+
+  .tabular { font-variant-numeric: tabular-nums; }
 </style>
