@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SubNav from '../../components/SubNav.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import { insights } from '../../data/insights';
 
 const subnav = [
   { href: '/community/events', label: 'Events' },
@@ -9,21 +10,27 @@ const subnav = [
   { href: '/community/insights', label: 'Insights' },
 ];
 
-const latest = [
-  { href: '/community/insights/why-dtao-changed-everything',  cover: 'cover-2', coverText: 'cover · dtao-one-year.svg', type: 'Retrospective · 14 min', title: 'Why dTAO changed everything (and three things it didn\'t).', body: 'One year in. The data, the surprises, the second-order effects nobody warned about.', meta: 'by @ke.ng · 2026·05·11' },
-  { href: '/community/insights/sn-18-interview',              cover: 'cover-3', coverText: 'cover · sn18-interview.svg', type: 'Interview · 32 min', title: '"We almost shipped a centralized API and called it a subnet." — SN-18.', body: 'The founders of one of Bittensor\'s longest-running subnets on the temptation of shortcuts.', meta: 'by editorial · 2026·05·04' },
-  { href: '/community/insights/validator-bonding-tutorial',   cover: 'cover-4', coverText: 'cover · validator-tuning.svg', type: 'Tutorial · 18 min', title: 'Tuning a validator\'s bonding parameters without getting penalized.', body: 'The advanced moves nobody documents. With numbers from three production validators.', meta: 'by @reza · 2026·04·28' },
-  { href: '/community/insights/scoring-function-field-guide', cover: 'cover-5', coverText: 'cover · subnet-incentive-design.svg', type: 'Deep dive · 25 min', title: 'Designing a subnet\'s scoring function: a field guide.', body: 'Six patterns that work, three that don\'t, and how to know which you have.', meta: 'by @maya · 2026·04·22' },
-  { href: '/community/insights/emission-curve-halving',       cover: 'cover-6', coverText: 'cover · emission-charts.svg', type: 'Field notes · 8 min', title: 'What the emission-curve halving will actually look like in practice.', body: 'Three charts and a short take. We\'re closer than most miners realize.', meta: 'by @yuki · 2026·04·18' },
-  { href: '/community/insights/governance-hyperparam-votes',  cover: 'cover-1', coverText: 'cover · governance-process.svg', type: 'Retrospective · 12 min', title: 'How the last three hyperparameter votes played out.', body: 'A look at who voted, who didn\'t, and what\'s about to change.', meta: 'by @sasha · 2026·04·09' },
-];
+// One source of truth — both this listing and [slug].astro read from insights.ts.
+const featured = insights.find((i) => i.featured) ?? insights[0];
+const latest = insights
+  .filter((i) => i.slug !== featured.slug)
+  .map((i) => ({
+    href: `/community/insights/${i.slug}`,
+    cover: i.cover,
+    coverText: i.coverText,
+    type: `${i.type} · ${i.readTime}`,
+    title: i.title,
+    body: i.lead,
+    meta: `by ${i.authorHandle ?? i.author} · ${i.date}`,
+  }));
+const types = [...new Set(insights.map((i) => i.type))];
 ---
 <BaseLayout
   title="Insights — Community — OpenTAO"
   description="Deep dives, retrospectives, and interviews from people doing the work."
   section="community"
 >
-  <SubNav items={subnav} active="/community/insights" rightMeta="28 articles · weekly" />
+  <SubNav items={subnav} active="/community/insights" rightMeta={`${insights.length} articles`} />
 
   <section class="border-b hairline">
     <div class="max-w-[1200px] mx-auto px-6 pt-20 pb-14">
@@ -52,12 +59,10 @@ const latest = [
         </div>
       </div>
       <div class="mt-12 flex flex-wrap items-center gap-2">
-        <button class="pill active" data-filter-type="all">All</button>
-        <button class="pill" data-filter-type="Deep dive">Deep dive</button>
-        <button class="pill" data-filter-type="Retrospective">Retrospective</button>
-        <button class="pill" data-filter-type="Interview">Interview</button>
-        <button class="pill" data-filter-type="Tutorial">Tutorial</button>
-        <button class="pill" data-filter-type="Field notes">Field notes</button>
+        <button class="pill active" data-filter-type="all">全部</button>
+        {types.map((t) => (
+          <button class="pill" data-filter-type={t}>{t}</button>
+        ))}
         <a href="/feed.xml" class="pill ml-auto">RSS</a>
       </div>
     </div>
@@ -66,17 +71,15 @@ const latest = [
   <section class="border-b hairline">
     <div class="max-w-[1200px] mx-auto px-6 py-14">
       <div class="section-label mb-6">Featured</div>
-      <a href="/community/insights/yuma-walk-through" class="grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center group" data-type="Deep dive">
-        <div class="cover cover-1 rounded-md">cover · yuma-walkthrough.svg</div>
+      <a id="featured-card" href={`/community/insights/${featured.slug}`} class="grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center group" data-type={featured.type}>
+        <div class={`cover ${featured.cover} rounded-md`}>{featured.coverText}</div>
         <div>
-          <div class="flex items-center gap-3 mb-4"><span class="type-tag" style="color: #b8470b;">Deep dive · 22 min</span><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">2026·05·19</span></div>
-          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.1] mb-4">
-            <span class="font-serif italic font-normal">Yuma</span> consensus, slowly: a hand-traced walk through one block.
-          </h2>
-          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6 max-w-[520px]">We pause at every variable. By the end you can predict what every validator's weight does to emission — without opening the paper.</p>
+          <div class="flex items-center gap-3 mb-4"><span class="type-tag" style="color: #b8470b;">{featured.type} · {featured.readTime}</span><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">{featured.date}</span></div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.1] mb-4">{featured.title}</h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6 max-w-[520px]">{featured.lead}</p>
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #6741d9, #1c6ea4);"></div>
-            <div><div class="text-sm text-[color:var(--color-fg)]">Rho Carter</div><div class="text-xs font-mono text-[color:var(--color-fg-dim)]">@rho.lab</div></div>
+            <div><div class="text-sm text-[color:var(--color-fg)]">{featured.author}</div>{featured.authorHandle && <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">{featured.authorHandle}</div>}</div>
           </div>
         </div>
       </a>
@@ -121,7 +124,7 @@ const latest = [
 
   <script>
     const grid = document.getElementById('insights-grid');
-    const featured = document.querySelector<HTMLAnchorElement>('a[data-type][href="/community/insights/yuma-walk-through"]');
+    const featured = document.getElementById('featured-card') as HTMLAnchorElement | null;
     const cards = grid ? Array.from(grid.querySelectorAll<HTMLAnchorElement>('a[data-type]')) : [];
 
     document.querySelectorAll<HTMLButtonElement>('[data-filter-type]').forEach((btn) => {

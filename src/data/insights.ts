@@ -1,93 +1,104 @@
-// Insights registry. Stub pages render from this directly; rich insight pages
-// (rich === true, e.g. yuma-walk-through) live as their own .astro files and
-// are filtered out of the dynamic [slug].astro route.
+// Insights registry — real long-form posts by @quack_builder, brought over from
+// X (Twitter). Both the listing (/community/insights) and the detail route
+// ([slug].astro) read from this single source. Body kept in the original
+// Chinese; `sourceUrl` links back to the original post.
 
 export interface Insight {
   slug: string;
   title: string;
   lead: string;
-  body: string;
-  type: string;            // "Deep dive", "Retrospective", "Interview", "Tutorial", "Field notes"
-  readTime: string;        // "22 min"
+  body: string;            // full text; blank lines separate paragraphs
+  type: string;            // "观点" / "解读" / "深度" / "现场"
+  readTime: string;        // "3 分钟"
   cover: string;           // cover gradient class, e.g. "cover-1"
-  coverText: string;       // placeholder text on the cover tile
-  author: string;          // "@ke.ng" or "editorial"
-  authorHandle?: string;   // "@rho.lab"
-  date: string;            // "2026·05·19"
-  rich?: boolean;
+  coverText: string;       // short label on the cover tile
+  author: string;
+  authorHandle?: string;
+  date: string;            // "2026·05·08"
+  sourceUrl?: string;      // original post on X
+  featured?: boolean;      // one entry shown in the hero slot
+  rich?: boolean;          // has its own standalone .astro page (skipped by [slug].astro)
 }
 
 export const insights: Insight[] = [
   {
-    slug: 'yuma-walk-through',
-    title: 'Yuma consensus, slowly: a hand-traced walk through one block.',
-    lead: 'We pause at every variable. By the end you can predict what every validator\'s weight does to emission — without opening the paper.',
-    body: '',
-    type: 'Deep dive', readTime: '22 min',
-    cover: 'cover-1', coverText: 'cover · yuma-walkthrough.svg',
-    author: 'Rho Carter', authorHandle: '@rho.lab',
-    date: '2026·05·19',
-    rich: true,
+    slug: 'price-is-nothing-and-everything',
+    title: '对 Bittensor 来说,币价 is nothing & everything',
+    lead: '币价直接决定子网 emission 的真实价值,也决定矿工还有没有动力继续 mining;但对真正的 HODLer,短期波动其实什么都不是。',
+    body: `bittensor:native 重新站上 300,大家都很兴奋。对 Bittensor 生态来说,币价 is nothing & everything。
+
+PRICE is EVERYTHING:
+和比特币价格决定矿工成本与收益一样,Bittensor 这种完全靠激励驱动的网络,bittensor:native 的价格直接决定了子网 emission 到手的真实价值。在一些算力价格非常透明的领域尤其明显——币价直接决定矿工还有没有动力继续 mining。所以你会看到,币价高的时候子网里矿工扎堆,币价低的时候算力则严重不足。
+
+PRICE is NOTHING:
+对真正相信 bittensor:native 的 HODLER 来说,短期波动其实不重要。这次拉升不过是 Templar rug 负面情绪的出清而已。把时间线拉长,一个有价值的生态波动是十倍、百倍甚至千倍——别因为一时的涨而兴奋,也别因为将来的跌而看衰。`,
+    type: '深度', readTime: '3 分钟',
+    cover: 'cover-1', coverText: 'PRICE · emission',
+    author: 'quack_builder', authorHandle: '@quack_builder',
+    date: '2026·05·08',
+    sourceUrl: 'https://x.com/quack_builder/status/2052582711840375121',
+    featured: true,
   },
   {
-    slug: 'why-dtao-changed-everything',
-    title: 'Why dTAO changed everything (and three things it didn\'t).',
-    lead: 'One year in. The data, the surprises, the second-order effects nobody warned about.',
-    body: 'A retrospective on the year since dTAO went live. Subnet-level price discovery did most of what the design doc predicted — emission concentration on top subnets, a real signal for "is this subnet valuable" beyond founder vibes, and a market for staking attention. The three things that did not change: validator concentration at the top, the difficulty of bootstrapping a new subnet from zero, and the fact that most TAO holders still do not actively participate in any single subnet\'s economics.',
-    type: 'Retrospective', readTime: '14 min',
-    cover: 'cover-2', coverText: 'cover · dtao-one-year.svg',
-    author: '@ke.ng',
-    date: '2026·05·11',
+    slug: 'building-a-subnet-is-like-a-startup',
+    title: '做子网和创业非常像(但有两点关键不同)',
+    lead: '启动资金、商业模式、marketing——子网创业三件套;不同的是 Bittensor 帮你雇了 256 个员工,还给你 4 个月的试错保护期。',
+    body: `做子网和创业非常像:
+1. 你需要一笔启动资金(子网注册费,目前大概 1200 tao;当然你也可以找投资人来帮你 cover 这笔钱)
+2. 你需要想清楚你的商业模式(怎么产生有价值的成果,且不被人钻机制的空子)
+3. 你需要做 marketing,让 miner/validator/retail 了解你的子网,并愿意 HODL 你的 alpha token
+
+但是不一样的地方在:
+A. 如果你的机制设计的正确,相当于 Bittensor 为你雇了 256 个员工来工作,他们的工资是通过 emission 支付的,而你可以用他们的成果来进行商业化。
+B. 你一共有 4 个月的时间可以试错(新子网有 4 个月保护期),就算你最后发现你的 idea 行不通,在当前子网需求火热的情况下,你把子网挂牌售出也不会亏的太多。`,
+    type: '解读', readTime: '3 分钟',
+    cover: 'cover-4', coverText: 'subnet · startup',
+    author: 'quack_builder', authorHandle: '@quack_builder',
+    date: '2026·05·05',
+    sourceUrl: 'https://x.com/quack_builder/status/2051524862380785813',
   },
   {
-    slug: 'sn-18-interview',
-    title: '"We almost shipped a centralized API and called it a subnet." — SN-18.',
-    lead: 'The founders of one of Bittensor\'s longest-running subnets on the temptation of shortcuts.',
-    body: 'A frank conversation with the SN-18 team about the moment in 2024 they considered cutting the validator-incentive layer entirely and shipping a wrapped centralized API instead. Why they didn\'t, what they learned about scoring functions in the process, and what a subnet actually owes the network beyond serving requests.',
-    type: 'Interview', readTime: '32 min',
-    cover: 'cover-3', coverText: 'cover · sn18-interview.svg',
-    author: 'editorial',
-    date: '2026·05·04',
+    slug: 'two-reasons-bullish-on-bittensor',
+    title: '和人聊 Bittensor,我看到两个截然不同的出发点',
+    lead: '一个是投资视角——TAO 在熊市依然坚挺;另一个是对抗 AI 霸权——我们需要去中心化的 AI infra。',
+    body: `最近跟人聊 Bittensor 大家基本都很 bullish,但能看出有很明显的两个出发点:
+
+一个当然是从投资的角度看,#TAO 在熊市依然非常坚挺,不论从叙事还是价值层面都是 crypto 生态里顶级的。
+
+另一个更多——那就是看到现在美国的 AI 霸权,最强大的武器被掌控在几个疯狂的人手中,我们需要 Bittensor 这样去中心化的 AI infra。`,
+    type: '观点', readTime: '2 分钟',
+    cover: 'cover-2', coverText: 'TAO · two angles',
+    author: 'quack_builder', authorHandle: '@quack_builder',
+    date: '2026·05·01',
+    sourceUrl: 'https://x.com/quack_builder/status/2050051499905208333',
   },
   {
-    slug: 'validator-bonding-tutorial',
-    title: 'Tuning a validator\'s bonding parameters without getting penalized.',
-    lead: 'The advanced moves nobody documents. With numbers from three production validators.',
-    body: 'A practical guide to the bonding/EMA parameters that govern validator trust. Where the safe ranges are, what happens at the edges, and three real validators\' actual numbers (anonymized but real). Includes a small script for sanity-checking your config against the current consensus median.',
-    type: 'Tutorial', readTime: '18 min',
-    cover: 'cover-4', coverText: 'cover · validator-tuning.svg',
-    author: '@reza',
-    date: '2026·04·28',
+    slug: 'tao-will-be-top-20',
+    title: '为什么我认为 Bittensor 市值至少会进前 20',
+    lead: '把时间维度拉到 3-5 年,crypto 里只有真正有 utility 的项目才可能撑起足够高的市值。',
+    body: `今天 bittensor:native 的市值刚好排在整个市场的第 30 名。一个非常简单的逻辑判断:把时间维度拉长到 3-5 年,crypto 里面只有真正有 utility 的项目才可能支撑起足够高的市值。基于此我认为 Bittensor 的市值至少会进入前 20 名。
+
+大家觉得目前 top 30 的项目里面哪个市值是最虚的?欢迎留下你的评论。`,
+    type: '观点', readTime: '2 分钟',
+    cover: 'cover-6', coverText: 'TAO · top 20',
+    author: 'quack_builder', authorHandle: '@quack_builder',
+    date: '2026·05·03',
+    sourceUrl: 'https://x.com/quack_builder/status/2050879181802688796',
   },
   {
-    slug: 'scoring-function-field-guide',
-    title: 'Designing a subnet\'s scoring function: a field guide.',
-    lead: 'Six patterns that work, three that don\'t, and how to know which you have.',
-    body: 'A taxonomy of subnet scoring functions, with worked examples. The six patterns that have shipped successfully — pairwise comparisons, reference-model matching, downstream-task scoring, peer-review aggregation, deterministic verification, and synthetic stress tests. The three failure modes that keep appearing — gameable proxies, validator-only-knows-the-answer, and metric drift over time.',
-    type: 'Deep dive', readTime: '25 min',
-    cover: 'cover-5', coverText: 'cover · subnet-incentive-design.svg',
-    author: '@maya',
-    date: '2026·04·22',
-  },
-  {
-    slug: 'emission-curve-halving',
-    title: 'What the emission-curve halving will actually look like in practice.',
-    lead: 'Three charts and a short take. We\'re closer than most miners realize.',
-    body: 'A short field-notes piece with three charts: projected emission per block before and after the next halving, the historical 30-day-window comparison from 2025\'s halving, and a per-subnet payout simulation assuming current weight distribution. The take: most miners and validators have not modeled what their P&L looks like at half the emission rate.',
-    type: 'Field notes', readTime: '8 min',
-    cover: 'cover-6', coverText: 'cover · emission-charts.svg',
-    author: '@yuki',
-    date: '2026·04·18',
-  },
-  {
-    slug: 'governance-hyperparam-votes',
-    title: 'How the last three hyperparameter votes played out.',
-    lead: 'A look at who voted, who didn\'t, and what\'s about to change.',
-    body: 'A breakdown of the last three chain-wide hyperparameter votes — proposer, the change, voting window participation, coalitions visible from the on-chain record, and outcome. Two of the three passed; the third revealed a stable opposition bloc of mid-stake validators. A short read on how Bittensor governance is actually behaving versus how the docs say it should.',
-    type: 'Retrospective', readTime: '12 min',
-    cover: 'cover-1', coverText: 'cover · governance-process.svg',
-    author: '@sasha',
-    date: '2026·04·09',
+    slug: 'shanghai-ideathon-recap',
+    title: '上海 Bittensor Ideathon 现场:50+ proposal 超出预期',
+    lead: '周六的 Shanghai Ideathon 收到超过 50 份 proposal,我 vibe code 了个网页把大家的提案都放上来。',
+    body: `周六的 Shanghai Ideathon 大家的热情远超我们的预期,我们在现场一共收到了超过 50 份 proposal,可惜因为时间关系,在 Demo 环节只有 20 多支团队有机会 pitch,而且也只有 3 分钟时间。
+
+为了更好的让大家的 idea 得到展示,今天我 vibe code 了一个网页把大家的 proposal 都放上来,欢迎大家给自己喜欢的 proposal 点赞。
+
+(提醒:大家的点赞数量和最终评奖结果没有关系,请大家不要刷赞哦)`,
+    type: '现场', readTime: '1 分钟',
+    cover: 'cover-3', coverText: 'Shanghai · ideathon',
+    author: 'quack_builder', authorHandle: '@quack_builder',
+    date: '2026·05·25',
+    sourceUrl: 'https://x.com/quack_builder/status/2058876473575174232',
   },
 ];
 

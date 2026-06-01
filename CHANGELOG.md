@@ -5,6 +5,13 @@
 
 ## 2026-06-01
 
+- **Insights 换成 @quack_builder 的真实长文** — 用 X long-form(note_tweet)抓回 5 篇,替换全部 placeholder。中文原文保留,带 sourceUrl 回链。[PRD IN-1~4]
+  - `src/data/insights.ts`:重写为 5 篇真实条目(+ `sourceUrl`/`featured` 字段)。
+  - `src/pages/community/insights.astro`:改为**读 `insights.ts` 单一数据源**(原来 listing 自己硬编码一份),featured + 类型 pill 动态生成。
+  - `src/pages/community/insights/[slug].astro`:去掉"essay coming"stub banner,渲染真实多段正文 + "原文首发于 X"回链。
+  - `src/pages/index.astro` & `community/insights/contribute.astro`:把指向已删 placeholder slug 的卡片改指真实文章。
+  - `src/components/Nav.astro`:insights 计数 28 → 5。
+  - 删除孤立的 placeholder 页 `community/insights/yuma-walk-through.astro`。
 - **Mining playbooks 页重排** — 稀疏卡片网格 → 密集可排序表格(`pb-table`),列:netuid、子网名+blurb、category、Emission·24h、Miners·earning(`注册/槽位·N earning`)、Reward spread(Concentrated/Mixed/Spread)、7d、Playbook 状态。[PRD PB-1/2/4]
   - 真实数据靠按 netuid **join `src/data/subnets.ts`**(已含真实字段),不新建 API;顺手绕过 `playbooks.ts` 的 emission rao bug。[PRD PB-5/6]
   - **删掉编造的硬件 tier 卡片区**和死的"coming soon / Sort"标签;无硬件数据源,不造假。[PRD PB-3]

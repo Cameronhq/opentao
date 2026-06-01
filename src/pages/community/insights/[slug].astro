@@ -56,18 +56,15 @@ const subnav = [
 
   <main class="border-b hairline">
     <article class="article px-6 py-16">
-      <div class="stub-banner">
-        <div class="label">Editor's note</div>
-        <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed m-0">
-          The full essay is being written and edited. Below is the short version — the full {insight.readTime} treatment will land here as soon as it's reviewed. For a sense of what the finished version looks like, see <a class="inline" href="/community/insights/yuma-walk-through">Yuma consensus, slowly</a>.
-        </p>
-      </div>
+      {insight.body.split(/\n{2,}/).map((para) => (
+        <p class="ws">{para}</p>
+      ))}
 
-      <h2 id="short-version"><span class="index">I.</span>The short version</h2>
-      <p>{insight.body}</p>
-
-      <h2 id="what-is-coming"><span class="index">II.</span>What's coming in the full piece</h2>
-      <p>The full essay will expand the short version above with worked examples, on-chain data where relevant, and a longer take from {insight.author}. We publish one new essay every other Friday — to get notified when this one lands, subscribe from the <a class="inline" href="/community/insights">Insights index</a>.</p>
+      {insight.sourceUrl && (
+        <div class="source-note">
+          原文首发于 X · <a class="inline" href={insight.sourceUrl} target="_blank" rel="noopener">@{insight.authorHandle?.replace('@','') ?? insight.author} 的原帖 →</a>
+        </div>
+      )}
     </article>
   </main>
 
@@ -75,7 +72,6 @@ const subnav = [
     <div class="article px-6 py-10">
       <div class="flex flex-wrap items-center gap-3 text-sm">
         <a href="/community/insights" class="pill">← All insights</a>
-        <a href="/community/insights/yuma-walk-through" class="pill">See a finished essay</a>
         <a href="/community/insights/contribute" class="pill">Pitch us your own →</a>
       </div>
     </div>
@@ -90,8 +86,9 @@ const subnav = [
   .article a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
   .article a.inline:hover { text-decoration-color: #b8470b; }
 
-  .stub-banner { background: linear-gradient(180deg, rgba(184,71,11,0.05), rgba(184,71,11,0)); border-left: 3px solid #b8470b; padding: 18px 22px; border-radius: 0 6px 6px 0; margin: 0 0 28px; }
-  .stub-banner .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #b8470b; margin-bottom: 6px; }
+  .article p.ws { white-space: pre-line; }
+  .source-note { margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(15,15,18,0.1); font-family: var(--font-mono); font-size: 12px; color: #767680; }
+  .source-note a.inline { color: #4a4a52; }
 
   .type-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #4a4a52; }
   .cover { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); aspect-ratio: 16/8; display: flex; align-items: center; justify-content: center; color: #767680; font-family: 'JetBrains Mono', monospace; font-size: 11px; }

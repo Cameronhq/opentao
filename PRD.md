@@ -36,6 +36,17 @@
 
 ---
 
+## 社区 Insights `/community/insights`
+
+**定位**:放 @quack_builder 的真实长文(不是占位/编造内容)。
+
+| # | 决策 | 状态 | 备注 |
+|---|---|---|---|
+| IN-1 | 用 @quack_builder 在 X 的真实长文替换所有 placeholder | ✅ 2026-06-01 | 首批 5 篇 |
+| IN-2 | **保留中文原文**(不译英),带 `sourceUrl` 回链原帖 | ✅ 2026-06-01 | 与 TAO 中文社区定位一致 |
+| IN-3 | listing 与详情页都读 `src/data/insights.ts` 单一数据源 | ✅ 2026-06-01 | 原来 listing 自己硬编码一份,易漂移 |
+| IN-4 | 抓取靠 X API 的 `note_tweet` 字段(真 long-form 全文);普通 timeline 只给 280 字截断 | ✅ 参考 | 脚本 `~/.claude/skills/bittensor-kol/collectors/fetch_my_tweets.py`(需加 `note_tweet` field);free tier 限额紧,省着抓 |
+
 ## 挖矿通用设置 `/mine/general-setup`
 
 | # | 决策 | 状态 | 备注 |
