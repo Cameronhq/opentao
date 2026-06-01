@@ -55,7 +55,7 @@
 |---|---|---|---|
 | MCP-1 | 先做 MCP(不是 Skill):agent 无关、中心化、远程挂 Cloudflare Workers,用户填 URL 即用 | ✅ 决策 2026-06-02 | Skill 留到"本地执行"阶段再做 |
 | MCP-2 | **单一数据源** `/mining-data.json`:build 时合并 subnets + playbooks + playbook-rich,网站和 MCP 共用 | ✅ 2026-06-02 | `src/pages/mining-data.json.ts`;taostats 刷新一次两边都新 |
-| MCP-3 | 工具:`list_subnets` / `get_subnet` / `get_playbook` / `get_setup_guide` / `recommend_subnets` / `get_resources` | 🚧 进行中 | `recommend_subnets(hardware,budget,goal)` 是核心护城河 |
+| MCP-3 | 工具:`list_subnets` / `get_subnet` / `get_playbook` / `get_setup_guide` / `recommend_subnets` / `get_resources` | ✅ 2026-06-02 | server 在 `../opentao-mcp`(Cloudflare Agents SDK `McpAgent`,streamable HTTP `/mcp`)。本地验证通过,**待部署**。`recommend_subnets` 是核心护城河 |
 | MCP-4 | **安全红线**:无写操作;花钱/动钱包的命令只返回文本 + cost/risk 字段,必须人确认 | ✅ 决策 2026-06-02 | 不自动注册、不自动跑 miner |
 | MCP-5 | 前端露出:`/mine/agent` 落地页(接入配置 + 示例 prompt)+ playbooks/subnet 页"问 agent"复制按钮 + SubNav 加项 | 🚧 计划中 | MCP 跑通后做 |
 
