@@ -30,6 +30,7 @@ opentao.ai — Builder's Gateway to Bittensor。Astro 6 静态站,Cloudflare Pag
 | `src/data/subnets.ts` | `scripts/refresh-subnets.ts`(拉 taostats) | `source ~/.claude/credentials/taostats.env && bun run scripts/refresh-subnets.ts > src/data/subnets.ts` |
 | `src/data/subnet-rich.ts`(注册块) | `scripts/gen-rich-registry.ts` | `bun run scripts/gen-rich-registry.ts` |
 | `src/data/playbook-rich.ts`(注册块) | `scripts/gen-playbook-registry.ts` | `bun run scripts/gen-playbook-registry.ts` |
+| `src/data/insights.ts` | `scripts/gen-insights.ts`(读 `scripts/insights-source.json`) | `bun run scripts/gen-insights.ts` |
 
 例:子网"featured 高亮"这种,改 `subnets.ts` 没用,要改 `RICH_SLUGS`(在 refresh 脚本里)+ `subnets.astro`。
 注意:重跑 `refresh-subnets.ts` 会**覆盖整个 `subnets.ts`**,会冲掉里面任何手改——动它之前先确认。
