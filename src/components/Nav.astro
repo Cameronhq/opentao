@@ -1,58 +1,67 @@
 ---
 import SearchModal from './SearchModal.tsx';
+import { getLangFromUrl, useTranslations, toBaseRoute, localizePath, hasZh } from '../i18n/utils';
 
 interface Props {
   section?: 'beginner' | 'build' | 'mine' | 'community' | null;
 }
 const { section = null } = Astro.props;
 
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const baseRoute = toBaseRoute(Astro.url.pathname);
+
+// Internal links point to the current locale's version when a /zh/ page exists,
+// otherwise to English — so nav never dead-links during the gradual rollout.
+const link = (route: string) => localizePath(route, hasZh(route) ? lang : 'en');
+
 const sections = [
   {
     key: 'beginner' as const,
-    label: 'Beginner',
+    label: t('nav.beginner'),
     items: [
-      { href: '/beginner/wiki', label: 'Wiki', meta: '25 concepts' },
-      { href: '/beginner/subnets', label: 'Subnet directory', meta: '128 · 11 rich' },
-      {
-        href: 'https://www.hackquest.io/learning-track/Bittensor',
-        label: 'Learning track',
-        meta: 'HackQuest ↗',
-        external: true,
-      },
+      { href: link('/beginner/wiki'), label: t('nav.wiki'), meta: t('nav.wiki.meta') },
+      { href: link('/beginner/subnets'), label: t('nav.subnets'), meta: t('nav.subnets.meta') },
+      { href: 'https://www.hackquest.io/learning-track/Bittensor', label: t('nav.learning'), meta: t('nav.learning.meta'), external: true },
     ],
   },
   {
     key: 'build' as const,
-    label: 'Build a subnet',
+    label: t('nav.build'),
     items: [
-      { href: '/build/hackathon', label: 'Hackathon', meta: 'S1 live' },
-      { href: '/build/incubator', label: 'Incubator', meta: 'C2 open' },
-      { href: '/build/idea-bank', label: 'Idea bank', meta: '12 open' },
+      { href: link('/build/hackathon'), label: t('nav.hackathon'), meta: t('nav.hackathon.meta') },
+      { href: link('/build/incubator'), label: t('nav.incubator'), meta: t('nav.incubator.meta') },
+      { href: link('/build/idea-bank'), label: t('nav.ideabank'), meta: t('nav.ideabank.meta') },
     ],
   },
   {
     key: 'mine' as const,
-    label: 'Start mining',
+    label: t('nav.mine'),
     items: [
-      { href: '/mine/general-setup', label: 'General setup', meta: '8 steps' },
-      { href: '/mine/playbooks', label: 'Subnet playbooks', meta: '128 · 12 verified' },
-      { href: '/mine/resources', label: 'Resources', meta: 'wallets · GPUs' },
+      { href: link('/mine/general-setup'), label: t('nav.setup'), meta: t('nav.setup.meta') },
+      { href: link('/mine/playbooks'), label: t('nav.playbooks'), meta: t('nav.playbooks.meta') },
+      { href: link('/mine/resources'), label: t('nav.resources'), meta: t('nav.resources.meta') },
     ],
   },
   {
     key: 'community' as const,
-    label: 'Community',
+    label: t('nav.community'),
     items: [
-      { href: '/community/events', label: 'Events', meta: '12 upcoming' },
-      { href: '/community/chapters', label: 'Chapters', meta: '12 cities' },
-      { href: '/community/insights', label: 'Insights', meta: '6 articles' },
+      { href: link('/community/events'), label: t('nav.events'), meta: t('nav.events.meta') },
+      { href: link('/community/chapters'), label: t('nav.chapters'), meta: t('nav.chapters.meta') },
+      { href: link('/community/insights'), label: t('nav.insights'), meta: t('nav.insights.meta') },
     ],
   },
 ];
+
+// Language switcher targets. Toggle to the other locale's version of this page
+// when available, else that locale's homepage (never a 404).
+const enHref = baseRoute;
+const zhHref = hasZh(baseRoute) ? localizePath(baseRoute, 'zh') : '/zh/';
 ---
 <nav class="nav-blur sticky top-0 z-50">
   <div class="max-w-[1200px] mx-auto px-6 h-14 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2">
+    <a href={lang === 'zh' ? '/zh/' : '/'} class="flex items-center gap-2">
       <img src="/opentaoai.jpeg" alt="OpenTAO" class="logo h-7 w-auto" />
       <span class="text-[color:var(--color-fg-dim)] text-xs font-mono ml-1 mt-0.5">v0.1</span>
     </a>
@@ -87,12 +96,25 @@ const sections = [
 
     <div class="flex items-center gap-3 text-sm">
       <SearchModal client:load />
-      <a href="https://github.com/opentao-ai/opentao" class="text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)]" title="GitHub" aria-label="GitHub" target="_blank" rel="noopener">
+      <div class="lang-switch" role="group" aria-label="Language">
+        <a href={enHref} class={`lang-opt ${lang === 'en' ? 'active' : ''}`} hreflang="en">EN</a>
+        <span class="lang-sep">·</span>
+        <a href={zhHref} class={`lang-opt ${lang === 'zh' ? 'active' : ''}`} hreflang="zh">中</a>
+      </div>
+      <a href="https://github.com/Cameronhq/opentao" class="text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)]" title="GitHub" aria-label="GitHub" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.96-3.2.69-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.25 3.34.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 015.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.13 0 1.54-.01 2.78-.01 3.16 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
       </a>
     </div>
   </div>
 </nav>
+
+<style>
+  .lang-switch { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 12px; }
+  .lang-opt { color: var(--color-fg-dim); padding: 2px 2px; transition: color .12s; }
+  .lang-opt:hover { color: var(--color-fg); }
+  .lang-opt.active { color: var(--color-accent); }
+  .lang-sep { color: var(--color-fg-dim); opacity: 0.5; }
+</style>
 
 <script>
   // Belt-and-braces: pure CSS :hover already drives the dropdowns. This script
@@ -104,7 +126,6 @@ const sections = [
     dd.addEventListener('mouseenter', () => {
       dropdowns.forEach((other) => {
         if (other === dd) return;
-        // Force-blur any focused descendant in sibling dropdowns
         const focused = other.querySelector(':focus') as HTMLElement | null;
         if (focused) focused.blur();
       });

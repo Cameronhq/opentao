@@ -3,6 +3,17 @@
 > 每次实际改动后在顶部加一条。格式:`## 日期`,下列 `- 改了什么 — 涉及文件`。
 > 决策性的"为什么"记在 `PRD.md`,这里只记"改了什么"。
 
+## 2026-06-01 (晚)
+
+- **全站 i18n 地基 + 中文(Phase 1)** [PRD I18N-1~4]
+  - 新增 `src/i18n/ui.ts`(en/zh 字典,zh 缺失键回退 en)+ `src/i18n/utils.ts`(`getLangFromUrl`/`useTranslations`/`localizePath`/`ZH_ROUTES`)。
+  - `Nav.astro` / `Footer.astro` 改为 locale-aware:按 URL 语言渲染中/英 chrome,内链按 `hasZh()` 指向已翻译的 /zh 版或回退英文。
+  - `Nav` 加 **EN · 中 语言切换器**:有中文版的页面互切,没有的页面 → /zh 首页(不 404)。
+  - `BaseLayout` 的 `<html lang>` 按 URL 动态(en / zh-CN)。
+  - 新增**中文首页** `src/pages/zh/index.astro`(全文翻译)。
+  - 深层数据页(子网/playbook 等)暂未翻译,切中文时回退英文(见 PRD I18N 决策)。
+- **修复 404 回归**:上一轮换 insights slug 后,首页 + contribute 的精选卡片仍指向已删的推文 slug;改指真实文章 slug(`bittensor-ecosystem-guide` 等)。
+
 ## 2026-06-01
 
 - **Insights 换成 @quack_builder 的真实 X Articles(长文章,非推文)** — 6 篇 Bittensor 长文替换全部 placeholder。中文原文保留,带 sourceUrl 回链。[PRD IN-1~4]

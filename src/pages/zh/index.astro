@@ -1,55 +1,53 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import chainStats from '../data/chain-stats.json';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import chainStats from '../../data/chain-stats.json';
 
 const paths = [
   {
     href: '/beginner/wiki',
     n: '01',
-    label: "I'm new to Bittensor",
-    title: 'Beginner',
-    blurb: 'Wiki of every core concept, a page for every subnet, and an interactive learning track.',
-    cta: 'Start learning',
+    label: '我是 Bittensor 新手',
+    title: '入门',
+    blurb: '每个核心概念的 Wiki、每个子网的页面,以及一条互动式学习路径。',
+    cta: '开始学习',
     icon: '<path d="M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6"/>',
   },
   {
     href: '/build/hackathon',
     n: '02',
-    label: 'I want to build a subnet',
-    title: 'Build a subnet',
-    blurb:
-      'Hackathon and incubator programs that take ideas from prototype to mainnet — paired with a design guide and an open idea catalog.',
-    cta: 'Submit an idea',
+    label: '我想做一个子网',
+    title: '做子网',
+    blurb: '黑客松与孵化器项目,把 idea 从原型带到主网——配套设计指南和开放的 idea 目录。',
+    cta: '提交 idea',
     icon: '<path d="M12 2l9 4.5v9L12 22l-9-6.5v-9L12 2z"/><path d="M3.5 7L12 12l8.5-5M12 12v10"/>',
   },
   {
     href: '/mine/playbooks',
     n: '03',
-    label: 'I want to mine',
-    title: 'Start mining',
-    blurb: 'A general setup guide plus a fresh, verified playbook for each of the 128 subnets.',
-    cta: 'Open the playbooks',
+    label: '我想挖矿',
+    title: '开始挖矿',
+    blurb: '一份通用配置指南,外加 128 个子网各自一份最新、经验证的 playbook。',
+    cta: '打开 playbook',
     icon: '<path d="M3 13l4-8 5 4 5-6 4 7"/><path d="M3 21h18"/>',
   },
   {
     href: '/community/events',
     n: '04',
-    label: 'I want to gather',
-    title: 'Community',
-    blurb: 'Events around the world, host your own chapter, and read the long-form Insights.',
-    cta: "See what's happening",
+    label: '我想参与社区',
+    title: '社区',
+    blurb: '全球各地的活动、组织你自己的城市分会,以及阅读长文洞察。',
+    cta: '看看正在发生什么',
     icon: '<circle cx="9" cy="9" r="3"/><circle cx="17" cy="11" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 2-3.5 4-3.5s4 1.5 4 3.5"/>',
   },
 ];
 
 const stats = [
-  { label: 'Live subnets',  value: chainStats.subnets.totalText,    caption: chainStats.subnets.deltaText },
-  { label: 'Active miners', value: chainStats.miners.totalText,     caption: chainStats.miners.deltaText },
-  { label: 'TAO staked',    value: chainStats.tao.stakedText,        unit: chainStats.tao.unit, caption: chainStats.tao.deltaText },
-  { label: 'Validators',    value: chainStats.validators.totalText, caption: chainStats.validators.deltaText },
+  { label: '活跃子网',   value: chainStats.subnets.totalText,    caption: chainStats.subnets.deltaText },
+  { label: '活跃矿工',   value: chainStats.miners.totalText,     caption: chainStats.miners.deltaText },
+  { label: 'TAO 质押量', value: chainStats.tao.stakedText,        unit: chainStats.tao.unit, caption: chainStats.tao.deltaText },
+  { label: '验证者',     value: chainStats.validators.totalText, caption: chainStats.validators.deltaText },
 ];
 
-// "2026·05·29 13:35 UTC" — match the existing dotted date style on the page.
 const _f = new Date(chainStats.fetchedAt);
 const _pad = (n: number) => String(n).padStart(2, '0');
 const lastSyncText =
@@ -57,8 +55,8 @@ const lastSyncText =
   `${_pad(_f.getUTCHours())}:${_pad(_f.getUTCMinutes())} UTC`;
 ---
 <BaseLayout
-  title="OpenTAO — Builder's Gateway to Bittensor"
-  description="Builder's Gateway to Bittensor. Learn the concepts. Mine the subnets. Build the next one. Gather with the community."
+  title="OpenTAO — Bittensor 建设者门户"
+  description="Bittensor 建设者门户。学懂概念,挖遍子网,做出下一个,与社区相聚。"
 >
   <!-- Hero -->
   <section class="relative overflow-hidden">
@@ -66,29 +64,28 @@ const lastSyncText =
     <div class="hero-glow"></div>
     <div class="relative max-w-[1200px] mx-auto px-6 pt-24 pb-20">
       <div class="flex items-center gap-3 mb-6">
-        <span class="section-label section-index">[ 00 / Intro ]</span>
+        <span class="section-label section-index">[ 00 / 引言 ]</span>
         <span class="accent-dot"></span>
-        <span class="section-label">an independent, community-built knowledge layer</span>
+        <span class="section-label">一个独立、社区共建的知识层</span>
       </div>
       <h1 class="text-[56px] md:text-[68px] leading-[1.04] tracking-[-0.03em] font-semibold max-w-[860px]">
-        Builder's Gateway<br />
-        to <span class="text-[color:var(--color-fg-muted)]">Bittensor.</span>
+        Bittensor<br />
+        <span class="text-[color:var(--color-fg-muted)]">建设者门户。</span>
       </h1>
       <p class="mt-8 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">
-        Learn the concepts. Mine the subnets. Build the next one. Gather with the community —
-        from your first
-        <span class="term" title="The native token of the Bittensor network">TAO</span>
-        to launching a subnet on mainnet.
+        学懂概念,挖遍子网,做出下一个,与社区相聚——从你的第一枚
+        <span class="term" title="Bittensor 网络的原生代币">TAO</span>
+        到在主网上线一个子网。
       </p>
       <div class="mt-10 flex flex-wrap items-center gap-3">
         <a href="/beginner/wiki" class="btn-primary inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md">
-          Get started
+          开始上手
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
         <a href="/beginner/subnets" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md">
-          Explore 128 subnets
+          浏览 128 个子网
         </a>
-        <span class="ml-2 text-xs text-[color:var(--color-fg-dim)] font-mono">CC BY-SA · independent · community-built</span>
+        <span class="ml-2 text-xs text-[color:var(--color-fg-dim)] font-mono">CC BY-SA · 独立 · 社区共建</span>
       </div>
 
       <div class="mt-16 grid md:grid-cols-[1.1fr_0.9fr] gap-6 items-stretch">
@@ -97,23 +94,23 @@ const lastSyncText =
             <span class="w-2.5 h-2.5 rounded-full" style="background: #e8e6e2;"></span>
             <span class="w-2.5 h-2.5 rounded-full" style="background: #e8e6e2;"></span>
             <span class="w-2.5 h-2.5 rounded-full" style="background: #e8e6e2;"></span>
-            <span class="ml-3 text-[color:var(--color-fg-dim)] text-[11px] font-mono">$ first mining session</span>
+            <span class="ml-3 text-[color:var(--color-fg-dim)] text-[11px] font-mono">$ 第一次挖矿</span>
           </div>
           <div><span class="prompt">$</span> btcli wallet new_coldkey --wallet.name miner</div>
           <div><span class="prompt">$</span> btcli wallet new_hotkey  --wallet.name miner --wallet.hotkey default</div>
           <div><span class="prompt">$</span> btcli subnet register    --netuid <span class="text-[color:var(--color-accent)]">1</span> --wallet.name miner</div>
-          <div class="muted">  → registration cost: 0.4081 τ</div>
-          <div class="muted">  → broadcasting…</div>
-          <div class="ok">  ✓ registered on subnet 1 — hotkey 5G…7Hx</div>
+          <div class="muted">  → 注册成本: 0.4081 τ</div>
+          <div class="muted">  → 正在广播…</div>
+          <div class="ok">  ✓ 已在子网 1 注册 — hotkey 5G…7Hx</div>
           <div class="mt-2"><span class="prompt">$</span> <span class="text-[color:var(--color-fg-muted)]">cd</span> opentao/playbooks/sn1 &amp;&amp; <span class="text-[color:var(--color-fg-muted)]">make</span> mine</div>
         </div>
         <div class="card rounded-md p-6 flex flex-col justify-between">
           <div>
-            <div class="section-label mb-3">From day-zero to subnet</div>
+            <div class="section-label mb-3">从第零天到子网</div>
             <p class="text-[color:var(--color-fg)] leading-relaxed text-[15px]">
-              OpenTAO collects every concept, every <span class="term" title="A specialized network">subnet</span>,
-              and every mining playbook into one place — so a curious developer can go from "what is Bittensor?"
-              to running a hotkey in an afternoon.
+              OpenTAO 把每个概念、每个 <span class="term" title="一个专门的网络">子网</span>、
+              每份挖矿 playbook 收进同一个地方——让一个好奇的开发者,能在一个下午里从"Bittensor 是什么?"
+              走到跑起一个 hotkey。
             </p>
           </div>
         </div>
@@ -128,13 +125,13 @@ const lastSyncText =
         <div></div>
         <div class="flex items-center gap-3">
           <span class="section-label section-index">[ 01 ]</span>
-          <span class="section-label">Who are you</span>
+          <span class="section-label">你是谁</span>
         </div>
         <div></div>
       </div>
-      <h2 class="text-3xl md:text-4xl tracking-tight font-semibold max-w-[600px] mb-3">Four paths. Pick the one you arrived on.</h2>
+      <h2 class="text-3xl md:text-4xl tracking-tight font-semibold max-w-[600px] mb-3">四条路径。选你走进来的那一条。</h2>
       <p class="text-[color:var(--color-fg-muted)] max-w-[560px] mb-12">
-        OpenTAO is organized by intent — not by abstract topic. The fastest way through is to tell us who you are right now.
+        OpenTAO 按"意图"组织,而不是按抽象主题。最快的路径,就是告诉我们你现在是谁。
       </p>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -165,7 +162,7 @@ const lastSyncText =
         <div></div>
         <div class="flex items-center gap-3">
           <span class="section-label section-index">[ 02 ]</span>
-          <span class="section-label">What's happening now</span>
+          <span class="section-label">现在正在发生</span>
         </div>
         <div></div>
       </div>
@@ -174,42 +171,42 @@ const lastSyncText =
           <div class="flex items-start justify-between gap-4">
             <div class="max-w-[560px]">
               <div class="flex items-center gap-2 mb-4">
-                <span class="accent-dot"></span><span class="section-label">Live · Hackathon S1</span>
+                <span class="accent-dot"></span><span class="section-label">进行中 · 黑客松 S1</span>
               </div>
-              <h3 class="text-3xl font-semibold tracking-tight mb-3 leading-tight">OpenTAO Hackathon · Season 1</h3>
-              <p class="text-[color:var(--color-fg-muted)] leading-relaxed">$250k in prizes across four tracks — LLM, Robotics, Data, and Open. Submissions close on July 14. Top three teams move directly to the Incubator interview.</p>
+              <h3 class="text-3xl font-semibold tracking-tight mb-3 leading-tight">OpenTAO 黑客松 · 第一季</h3>
+              <p class="text-[color:var(--color-fg-muted)] leading-relaxed">四个赛道共 25 万美元奖金——LLM、机器人、数据、开放赛道。报名 7 月 14 日截止。前三名直接进入孵化器面试。</p>
               <div class="mt-6 flex items-center gap-3">
                 <a href="/build/hackathon" class="btn-primary inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md">
-                  Submit your idea
+                  提交你的 idea
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
-                <a href="/build/hackathon" class="text-sm text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)]">View tracks &amp; judges →</a>
+                <a href="/build/hackathon" class="text-sm text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)]">查看赛道与评委 →</a>
               </div>
             </div>
             <div class="hidden md:flex flex-col items-end gap-1 font-mono text-xs text-[color:var(--color-fg-muted)]">
-              <div><span class="text-[color:var(--color-fg-dim)]">opens</span> 2026·05·12</div>
-              <div><span class="text-[color:var(--color-fg-dim)]">closes</span> 2026·07·14</div>
-              <div><span class="text-[color:var(--color-fg-dim)]">demo</span>  2026·07·22</div>
+              <div><span class="text-[color:var(--color-fg-dim)]">开放</span> 2026·05·12</div>
+              <div><span class="text-[color:var(--color-fg-dim)]">截止</span> 2026·07·14</div>
+              <div><span class="text-[color:var(--color-fg-dim)]">Demo</span>  2026·07·22</div>
             </div>
           </div>
         </div>
         <div class="grid grid-rows-2 gap-4">
           <div class="card rounded-md p-6">
-            <div class="section-label mb-3">Next community event</div>
-            <h4 class="text-lg font-semibold tracking-tight">Bittensor Tokyo Meetup #03</h4>
-            <p class="text-sm text-[color:var(--color-fg-muted)] mt-1">Shibuya · June 8, 19:00 JST · hosted by Tokyo Chapter</p>
+            <div class="section-label mb-3">下一场社区活动</div>
+            <h4 class="text-lg font-semibold tracking-tight">Bittensor 东京 Meetup #03</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] mt-1">涩谷 · 6 月 8 日 19:00 JST · 由东京分会主办</p>
             <div class="mt-4 flex items-center justify-between">
-              <a href="/community/events" class="text-sm text-[color:var(--color-accent)] hover:underline">Register on Luma →</a>
-              <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">12 days</span>
+              <a href="/community/events" class="text-sm text-[color:var(--color-accent)] hover:underline">在 Luma 报名 →</a>
+              <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">还有 12 天</span>
             </div>
           </div>
           <div class="card rounded-md p-6">
-            <div class="section-label mb-3">Incubator · Cohort 02</div>
-            <h4 class="text-lg font-semibold tracking-tight">Applications open</h4>
-            <p class="text-sm text-[color:var(--color-fg-muted)] mt-1">10-week program · $50k pre-seed · mentors from 8 live subnets.</p>
+            <div class="section-label mb-3">孵化器 · 第 02 期</div>
+            <h4 class="text-lg font-semibold tracking-tight">报名开放中</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] mt-1">10 周项目 · 5 万美元 pre-seed · 来自 8 个在线子网的导师。</p>
             <div class="mt-4 flex items-center justify-between">
-              <a href="/build/incubator" class="text-sm text-[color:var(--color-accent)] hover:underline">Apply →</a>
-              <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">closes Jun 30</span>
+              <a href="/build/incubator" class="text-sm text-[color:var(--color-accent)] hover:underline">申请 →</a>
+              <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">6 月 30 日截止</span>
             </div>
           </div>
         </div>
@@ -224,7 +221,7 @@ const lastSyncText =
         <div></div>
         <div class="flex items-center gap-3">
           <span class="section-label section-index">[ 03 ]</span>
-          <span class="section-label">Bittensor at a glance</span>
+          <span class="section-label">Bittensor 概览</span>
         </div>
         <div></div>
       </div>
@@ -241,7 +238,7 @@ const lastSyncText =
         ))}
       </div>
       <div class="mt-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
-        Data refreshed from chain · last sync {lastSyncText} · methodology coming
+        数据来自链上 · 最近同步 {lastSyncText} · 方法论待补
       </div>
     </div>
   </section>
@@ -253,56 +250,56 @@ const lastSyncText =
         <div></div>
         <div class="flex items-center gap-3">
           <span class="section-label section-index">[ 04 ]</span>
-          <span class="section-label">Featured reading</span>
+          <span class="section-label">精选阅读</span>
         </div>
         <div></div>
       </div>
       <div class="grid lg:grid-cols-[2fr_1fr] gap-4">
         <div class="grid sm:grid-cols-2 gap-4">
           <a href="/community/insights/bittensor-ecosystem-guide" class="card rounded-md p-6 block">
-            <div class="section-label mb-4">Insight · 指南</div>
+            <div class="section-label mb-4">洞察 · 指南</div>
             <h3 class="text-lg font-semibold tracking-tight leading-snug mb-3">万字长文:可能是中文世界最完整的 Bittensor 生态指南</h3>
-            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">中文世界很少有人认真讲 Bittensor 的机制。这篇从零讲清它是什么、怎么运转、你该怎么参与。</p>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">从零讲清 Bittensor 是什么、怎么运转、你该怎么参与。</p>
             <div class="mt-5 flex items-center justify-between text-xs text-[color:var(--color-fg-dim)] font-mono">
               <span>by @quack_builder</span><span>30 分钟 · 2026·04·30</span>
             </div>
           </a>
           <a href="/community/insights/bittensor-bitcoin-of-ai-cn" class="card rounded-md p-6 block">
-            <div class="section-label mb-4">Insight · 译文</div>
+            <div class="section-label mb-4">洞察 · 译文</div>
             <h3 class="text-lg font-semibold tracking-tight leading-snug mb-3">Bittensor 是 AI 时代的比特币吗?— 译 Jacob 在清华的演讲</h3>
             <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">用 Jacob 在清华的演讲,讲清 Bittensor 如何把比特币的逻辑应用到 AI。</p>
             <div class="mt-5 flex items-center justify-between text-xs text-[color:var(--color-fg-dim)] font-mono">
               <span>by @quack_builder</span><span>18 分钟 · 2026·05·02</span>
             </div>
           </a>
-          <a href="/community/insights/bittensor-mechanics-part-1" class="card rounded-md p-6 block sm:col-span-2">
+          <a href="/community/insights/tao-and-the-dao" class="card rounded-md p-6 block sm:col-span-2">
             <div class="flex items-start gap-6">
               <div class="flex-1">
-                <div class="section-label mb-3">Insight · 深度</div>
-                <h3 class="text-lg font-semibold tracking-tight leading-snug mb-2">Bittensor 核心机制拆解(上)— TAO 的 emission 是怎么分配给 128 个子网的</h3>
-                <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed max-w-[640px]">Bittensor 的理解门槛很高。这篇从 emission 分配讲起,把核心机制一步步拆开。</p>
+                <div class="section-label mb-3">洞察 · 随笔</div>
+                <h3 class="text-lg font-semibold tracking-tight leading-snug mb-2">TAO 与道 - Bittensor 生态的有为与无为</h3>
+                <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed max-w-[640px]">从 Jacob 的传奇经历讲起,把技术叙事和更大的命题连起来。</p>
               </div>
               <div class="hidden md:flex flex-col items-end gap-1 font-mono text-[11px] text-[color:var(--color-fg-dim)]">
-                <span>by @quack_builder</span><span>18 分钟</span><span>2026·05·18</span>
+                <span>by @quack_builder</span><span>24 分钟</span><span>2026·05·08</span>
               </div>
             </div>
           </a>
         </div>
         <div class="card rounded-md p-6 flex flex-col">
-          <div class="section-label mb-4">Subnet of the week</div>
+          <div class="section-label mb-4">本周子网</div>
           <div class="flex items-baseline gap-3">
             <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">netuid</span>
             <span class="text-3xl font-semibold tracking-tight">18</span>
           </div>
-          <h3 class="text-xl font-semibold tracking-tight mt-2">Zeus · weather forecasts beyond ECMWF</h3>
-          <p class="text-sm text-[color:var(--color-fg-muted)] mt-3 leading-relaxed">Miners run atmospheric models against held-out ERA5 reanalysis. Validators score by anomaly-correlation-coefficient. Customer: energy traders.</p>
+          <h3 class="text-xl font-semibold tracking-tight mt-2">Zeus · 超越 ECMWF 的天气预报</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] mt-3 leading-relaxed">矿工用大气模型对held-out 的 ERA5 再分析数据做预测,验证者按异常相关系数(ACC)打分。客户:能源交易员。</p>
           <div class="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-mono">
-            <div class="text-[color:var(--color-fg-dim)]">operator</div><div>Orpheus AI</div>
-            <div class="text-[color:var(--color-fg-dim)]">hardware</div><div>1×H100 80G</div>
-            <div class="text-[color:var(--color-fg-dim)]">verifier</div><div>ACC vs ERA5</div>
-            <div class="text-[color:var(--color-fg-dim)]">status</div><div class="text-[color:var(--color-accent)]">active</div>
+            <div class="text-[color:var(--color-fg-dim)]">运营方</div><div>Orpheus AI</div>
+            <div class="text-[color:var(--color-fg-dim)]">硬件</div><div>1×H100 80G</div>
+            <div class="text-[color:var(--color-fg-dim)]">验证</div><div>ACC vs ERA5</div>
+            <div class="text-[color:var(--color-fg-dim)]">状态</div><div class="text-[color:var(--color-accent)]">活跃</div>
           </div>
-          <a href="/beginner/subnets/18-zeus" class="mt-auto pt-6 text-sm text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] inline-flex items-center gap-1">Read the subnet page →</a>
+          <a href="/beginner/subnets/18-zeus" class="mt-auto pt-6 text-sm text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] inline-flex items-center gap-1">阅读子网页面 →</a>
         </div>
       </div>
     </div>
@@ -313,17 +310,17 @@ const lastSyncText =
     <div class="max-w-[1200px] mx-auto px-6 py-20">
       <div class="grid md:grid-cols-[1fr_auto] gap-8 items-center">
         <div>
-          <div class="section-label mb-3">Every page is editable</div>
+          <div class="section-label mb-3">每一页都可编辑</div>
           <h3 class="text-2xl font-semibold tracking-tight max-w-[560px] leading-snug">
-            OpenTAO is a public good. Spot a stale playbook or a missing concept? Open a PR.
+            OpenTAO 是一份公共品。发现过时的 playbook 或缺失的概念?提个 PR。
           </h3>
         </div>
         <div class="flex flex-wrap gap-3">
-          <a href="https://github.com/opentao-ai/opentao" target="_blank" rel="noopener" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md">
+          <a href="https://github.com/Cameronhq/opentao" target="_blank" rel="noopener" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.96-3.2.69-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.25 3.34.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 015.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.13 0 1.54-.01 2.78-.01 3.16 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
-            Contribute on GitHub
+            在 GitHub 上贡献
           </a>
-          <a href="https://github.com/opentao-ai/opentao/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md">Read the style guide</a>
+          <a href="https://github.com/Cameronhq/opentao/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md">阅读风格指南</a>
         </div>
       </div>
     </div>

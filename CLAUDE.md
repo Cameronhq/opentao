@@ -65,7 +65,15 @@ opentao.ai — Builder's Gateway to Bittensor。Astro 6 静态站,Cloudflare Pag
 
 ---
 
-## 4. 数据口径约定(taostats)
+## 4. i18n / 中文(`/zh/`)
+
+- 字典:`src/i18n/ui.ts`(`en` 为真相源,`zh` 覆盖;缺失的 zh 键自动回退 en)。
+- 助手:`src/i18n/utils.ts` — `getLangFromUrl` / `useTranslations(lang)` / `localizePath` / `ZH_ROUTES`。
+- chrome(Nav/Footer)已 locale-aware,**所有页面**自动按 URL 语言双语;`BaseLayout` 的 `<html lang>` 动态。
+- **加一个中文页**:① 建 `src/pages/zh/<path>.astro`(翻译版);② 把它的英文 base route 加进 `utils.ts` 的 `ZH_ROUTES`(切换器才会深链而不是回退首页);③ 新 UI 文案进 `ui.ts`。
+- 未翻译页**回退英文**,不要做成 404。深层数据页(子网/playbook)body 来自 taostats 英文,翻译需缓存层(见 PRD I18N-4)。
+
+## 5. 数据口径约定(taostats)
 
 - **7d 涨跌**:直接取 `dtao/pool/latest` 的 `price_change_1_week`(已是百分比),不要自己算、不要画折线。
 - **矿工数**显示 `注册 / 总槽位 · N earning`:`注册 = active_keys − validators`,`总槽位 = max_neurons`,`earning = active_miners`(= 链上 incentive>0)。单独显示 `active_miners` 会误导(常常是个位数)。

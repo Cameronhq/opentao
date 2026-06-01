@@ -47,6 +47,19 @@
 | IN-3 | listing 与详情页都读 `src/data/insights.ts` 单一数据源 | ✅ 2026-06-01 | 原来 listing 自己硬编码一份,易漂移 |
 | IN-4 | **关键区分**:X **Article** 全文在 API 的 `tweet.fields=article` → `article.plain_text`;**不是** `note_tweet`(那是长推文/long post),也不是 timeline 的 280 字截断 | ✅ 参考 | `insights.ts` 由 `scripts/gen-insights.ts` 从 `scripts/insights-source.json` 生成;刷新源需 X API(free tier 紧) |
 
+## 全站 i18n / 中文 `/zh/`
+
+**定位**:全站支持中英切换;最终全站中文,未翻译页回退英文。
+
+| # | 决策 | 状态 | 备注 |
+|---|---|---|---|
+| I18N-1 | 全站语言切换器 + 加中文 | 🚧 进行中 | Phase 1 已上:地基 + chrome + 中文首页 |
+| I18N-2 | 未翻译页**回退英文**(不 404、不隐藏) | ✅ 决策 2026-06-01 | 切换器在无中文版的页面 → /zh 首页;深层页内容回退英文 |
+| I18N-3 | 架构:`src/i18n/ui.ts` 字典(zh 缺键回退 en)+ `utils.ts` 助手;chrome 在 Nav/Footer 组件里自动双语 | ✅ 2026-06-01 | 加一个中文页:建 `src/pages/zh/<path>.astro` + 把 base route 加进 `ZH_ROUTES` |
+| I18N-4 | 翻译范围:**全站全部(含数据页)** | 🚧 计划中 | Phase 2 手写页;Phase 3 让 `[slug]` 路由同时产出 /zh 变体(数据 body 来自 taostats 英文,需翻译缓存层) |
+
+**已翻译(/zh)**:首页。**待翻译**:其余 25 手写页 + 300+ 数据页。
+
 ## 挖矿通用设置 `/mine/general-setup`
 
 | # | 决策 | 状态 | 备注 |

@@ -1,0 +1,88 @@
+// i18n string dictionary. `en` is the source of truth; `zh` overrides where
+// translated. useTranslations() falls back to `en` for any missing zh key, so
+// partial translation degrades gracefully (English fallback, per product spec).
+//
+// Keys are dotted by area: nav.*, foot.*, common.*, home.* …
+
+export const languages = { en: 'EN', zh: '中文' } as const;
+export type Lang = keyof typeof languages;
+export const defaultLang: Lang = 'en';
+
+export const ui = {
+  en: {
+    // chrome — nav
+    'nav.beginner': 'Beginner',
+    'nav.build': 'Build a subnet',
+    'nav.mine': 'Start mining',
+    'nav.community': 'Community',
+    'nav.wiki': 'Wiki',
+    'nav.wiki.meta': '25 concepts',
+    'nav.subnets': 'Subnet directory',
+    'nav.subnets.meta': '128 subnets',
+    'nav.learning': 'Learning track',
+    'nav.learning.meta': 'HackQuest ↗',
+    'nav.hackathon': 'Hackathon',
+    'nav.hackathon.meta': 'S1 live',
+    'nav.incubator': 'Incubator',
+    'nav.incubator.meta': 'C2 open',
+    'nav.ideabank': 'Idea bank',
+    'nav.ideabank.meta': '12 open',
+    'nav.setup': 'General setup',
+    'nav.setup.meta': '8 steps',
+    'nav.playbooks': 'Subnet playbooks',
+    'nav.playbooks.meta': '128 subnets',
+    'nav.resources': 'Resources',
+    'nav.resources.meta': 'wallets · GPUs',
+    'nav.events': 'Events',
+    'nav.events.meta': '12 upcoming',
+    'nav.chapters': 'Chapters',
+    'nav.chapters.meta': '12 cities',
+    'nav.insights': 'Insights',
+    'nav.insights.meta': '6 articles',
+    'nav.search': 'Search…',
+    // chrome — footer
+    'foot.learn': 'Learn',
+    'foot.buildmine': 'Build & mine',
+    'foot.community': 'Community',
+    'foot.tagline': "Builder's Gateway to Bittensor. Independent and community-built. Licensed CC BY-SA 4.0.",
+    'foot.disclaimer': 'Not affiliated with the Opentensor Foundation.',
+    'foot.copyright': '© 2026 OpenTAO contributors · CC BY-SA 4.0',
+  },
+  zh: {
+    'nav.beginner': '入门',
+    'nav.build': '做子网',
+    'nav.mine': '开始挖矿',
+    'nav.community': '社区',
+    'nav.wiki': 'Wiki 词条',
+    'nav.wiki.meta': '25 个概念',
+    'nav.subnets': '子网目录',
+    'nav.subnets.meta': '128 个子网',
+    'nav.learning': '学习路径',
+    'nav.learning.meta': 'HackQuest ↗',
+    'nav.hackathon': '黑客松',
+    'nav.hackathon.meta': 'S1 进行中',
+    'nav.incubator': '孵化器',
+    'nav.incubator.meta': 'C2 开放',
+    'nav.ideabank': 'Idea 库',
+    'nav.ideabank.meta': '12 个开放',
+    'nav.setup': '通用配置',
+    'nav.setup.meta': '8 步',
+    'nav.playbooks': '子网 Playbook',
+    'nav.playbooks.meta': '128 个子网',
+    'nav.resources': '资源',
+    'nav.resources.meta': '钱包 · GPU',
+    'nav.events': '活动',
+    'nav.events.meta': '12 场即将开始',
+    'nav.chapters': '城市分会',
+    'nav.chapters.meta': '12 座城市',
+    'nav.insights': '洞察长文',
+    'nav.insights.meta': '6 篇文章',
+    'nav.search': '搜索…',
+    'foot.learn': '学习',
+    'foot.buildmine': '构建与挖矿',
+    'foot.community': '社区',
+    'foot.tagline': 'Bittensor 建设者门户。独立、社区共建。采用 CC BY-SA 4.0 协议。',
+    'foot.disclaimer': '与 Opentensor 基金会无隶属关系。',
+    'foot.copyright': '© 2026 OpenTAO 贡献者 · CC BY-SA 4.0',
+  },
+} as const;

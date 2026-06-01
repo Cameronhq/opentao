@@ -2,6 +2,9 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { getLangFromUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
 
 interface Props {
   title: string;
@@ -23,7 +26,7 @@ const ogSlug = Astro.url.pathname === '/' ? 'index' : Astro.url.pathname.replace
 const ogImage = new URL(`/og/${ogSlug}.png`, Astro.site ?? 'https://opentao.ai').toString();
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang === 'zh' ? 'zh-CN' : 'en'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
