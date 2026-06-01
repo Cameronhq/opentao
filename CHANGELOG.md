@@ -3,6 +3,10 @@
 > 每次实际改动后在顶部加一条。格式:`## 日期`,下列 `- 改了什么 — 涉及文件`。
 > 决策性的"为什么"记在 `PRD.md`,这里只记"改了什么"。
 
+## 2026-06-02
+
+- **MCP 数据层** `/mining-data.json` — 新增 `src/pages/mining-data.json.ts`,build 时把 `subnets.ts`(实时经济数据)+ `playbooks.ts`(状态)+ `playbook-rich.ts`(硬件/命令/scoring/盈利)合并成单一 JSON。网站与即将做的 OpenTAO MCP server 共用一个源。128 子网,数值字段已解析好(emission τ/day、矿工 registered/earning、rewardConcentration、7d %)。只读,带 notice 说明动钱包动作需人确认。[PRD MCP-2]
+
 ## 2026-06-01 (晚)
 
 - **全站 i18n 地基 + 中文(Phase 1)** [PRD I18N-1~4]

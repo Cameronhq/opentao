@@ -47,6 +47,20 @@
 | IN-3 | listing 与详情页都读 `src/data/insights.ts` 单一数据源 | ✅ 2026-06-01 | 原来 listing 自己硬编码一份,易漂移 |
 | IN-4 | **关键区分**:X **Article** 全文在 API 的 `tweet.fields=article` → `article.plain_text`;**不是** `note_tweet`(那是长推文/long post),也不是 timeline 的 280 字截断 | ✅ 参考 | `insights.ts` 由 `scripts/gen-insights.ts` 从 `scripts/insights-source.json` 生成;刷新源需 X API(free tier 紧) |
 
+## Start mining → MCP(agent 优先)
+
+**定位**:miner 不读文档,走 agent。把整个 Start mining section 做成 agent 可调的 **MCP**(只读、不碰钱包),网站变成"人能浏览的镜像 + agent 接入入口"。
+
+| # | 决策 | 状态 | 备注 |
+|---|---|---|---|
+| MCP-1 | 先做 MCP(不是 Skill):agent 无关、中心化、远程挂 Cloudflare Workers,用户填 URL 即用 | ✅ 决策 2026-06-02 | Skill 留到"本地执行"阶段再做 |
+| MCP-2 | **单一数据源** `/mining-data.json`:build 时合并 subnets + playbooks + playbook-rich,网站和 MCP 共用 | ✅ 2026-06-02 | `src/pages/mining-data.json.ts`;taostats 刷新一次两边都新 |
+| MCP-3 | 工具:`list_subnets` / `get_subnet` / `get_playbook` / `get_setup_guide` / `recommend_subnets` / `get_resources` | 🚧 进行中 | `recommend_subnets(hardware,budget,goal)` 是核心护城河 |
+| MCP-4 | **安全红线**:无写操作;花钱/动钱包的命令只返回文本 + cost/risk 字段,必须人确认 | ✅ 决策 2026-06-02 | 不自动注册、不自动跑 miner |
+| MCP-5 | 前端露出:`/mine/agent` 落地页(接入配置 + 示例 prompt)+ playbooks/subnet 页"问 agent"复制按钮 + SubNav 加项 | 🚧 计划中 | MCP 跑通后做 |
+
+待办:`get_setup_guide` 的步骤目前硬编码在 `general-setup.astro`,MCP 用时需抽成数据或在 server 内置。playbooks.ts 的 status 与 playbook-rich 的存在性不一致(如 Zeus 有 rich 但 status=missing),需对齐。
+
 ## 全站 i18n / 中文 `/zh/`
 
 **定位**:全站支持中英切换;最终全站中文,未翻译页回退英文。
