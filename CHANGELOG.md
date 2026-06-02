@@ -5,6 +5,8 @@
 
 ## 2026-06-02
 
+- **数据刷新自动化**:6 小时的 GitHub Action 现在同时刷新 `subnets.ts`(原来只刷 chain-stats.json)。push → CF 重新部署 → `/mining-data.json` 重生成 → MCP 数据自动新。workflow 改名 "Refresh chain data"。
+- **opentao-mcp 建仓 + git 部署**:新仓库 `github.com/Cameronhq/opentao-mcp`(public),加 `.github/workflows/deploy.yml`,push 到 main 自动 `wrangler deploy`。**一次性设置**:在该仓库加 secret `CLOUDFLARE_API_TOKEN`(CF dashboard → API Tokens → "Edit Cloudflare Workers" 模板)。
 - **MCP 前端露出** [PRD MCP-5] — server 已部署 `https://opentao-mcp.cameron-530.workers.dev/mcp`(线上验证通过)。
   - 新增落地页 `/mine/agent`:接入配置(Claude Code / Cursor / Claude Desktop,带复制按钮)+ 示例 prompt + 6 工具说明 + 安全说明。
   - Start mining SubNav 四个页面都加 "Mine with agent" 标签(置首)。

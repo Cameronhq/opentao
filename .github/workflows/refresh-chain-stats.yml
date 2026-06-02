@@ -1,12 +1,13 @@
-name: Refresh chain stats
+name: Refresh chain data
 
-# Pulls live numbers from Taostats every 6 hours and commits the updated
-# src/data/chain-stats.json to main. The commit triggers Cloudflare's
-# auto-deploy of opentao.ai.
+# Every 6 hours, pull live numbers from Taostats and commit:
+#   - src/data/chain-stats.json  (landing-page glance stats)
+#   - src/data/subnets.ts        (subnet registry — also powers /mining-data.json + the MCP)
+# The commit triggers Cloudflare's auto-deploy of opentao.ai, which rebuilds
+# /mining-data.json, so the site and the OpenTAO MCP stay in sync.
 
 on:
   schedule:
-    # Every 6 hours, on the hour (UTC).
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
@@ -14,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: refresh-chain-stats
+  group: refresh-chain-data
   cancel-in-progress: false
 
 jobs:
@@ -24,7 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # We need to push back to main.
           persist-credentials: true
 
       - name: Setup bun
@@ -32,10 +32,15 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Fetch latest Taostats numbers
+      - name: Fetch chain-stats glance numbers
         env:
           TAOSTATS_API_KEY: ${{ secrets.TAOSTATS_API_KEY }}
         run: bun run scripts/fetch-chain-stats.ts
+
+      - name: Refresh subnet registry
+        env:
+          TAOSTATS_API_KEY: ${{ secrets.TAOSTATS_API_KEY }}
+        run: bun run scripts/refresh-subnets.ts > src/data/subnets.ts
 
       - name: Commit & push if changed
         run: |
@@ -43,11 +48,11 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- src/data/chain-stats.json; then
-            echo "chain-stats.json unchanged — nothing to commit."
+          git add src/data/chain-stats.json src/data/subnets.ts
+          if git diff --cached --quiet; then
+            echo "No chain data changed — nothing to commit."
             exit 0
           fi
 
-          git add src/data/chain-stats.json
-          git commit -m "chore: refresh chain stats (auto)"
+          git commit -m "chore: refresh chain data (auto)"
           git push
