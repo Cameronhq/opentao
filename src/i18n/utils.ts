@@ -23,10 +23,12 @@ export function useTranslations(lang: Lang) {
   };
 }
 
-/** Strip the /zh prefix → the underlying English route ('/' for home). */
+/** Strip the /zh prefix and any trailing slash → the underlying English route
+ *  ('/' for home). Normalizing the trailing slash is required because Astro URL
+ *  pathnames are directory-style ('/mine/agent/') while ZH_ROUTES is slash-free. */
 export function toBaseRoute(pathname: string): string {
-  const stripped = pathname.replace(/^\/zh(?=\/|$)/, '');
-  return stripped === '' ? '/' : stripped;
+  let p = pathname.replace(/^\/zh(?=\/|$)/, '').replace(/\/+$/, '');
+  return p === '' ? '/' : p;
 }
 
 /** Prefix a base route with the locale ('/zh' for zh, unchanged for en). */
