@@ -103,7 +103,7 @@ The push to main from the Action triggers Cloudflare's auto-deploy — the site 
 Option A — **Git integration** (push to deploy):
 
 1. `git init && git add . && git commit -m "init"`
-2. Push to GitHub: `https://github.com/opentao-ai/opentao`
+2. Push to GitHub: `https://github.com/Cameronhq/opentao`
 3. In Cloudflare dashboard → Pages → Connect to Git → pick repo
 4. Build settings:
    - Build command: `bun run build`
@@ -122,12 +122,32 @@ bunx wrangler pages deploy dist --project-name=opentao
 
 Pagefind generates the search index into `dist/pagefind/` during `bun run build`. It ships ~1MB of indexed content for 73 pages / ~3000 words. The ⌘K modal lazy-loads `/pagefind/pagefind.js` on first open.
 
+## Agent surface (MCP)
+
+The "Start mining" section is also exposed to AI agents via the **OpenTAO MCP**
+server (separate repo: [`Cameronhq/opentao-mcp`](https://github.com/Cameronhq/opentao-mcp)).
+Both read one source — `/mining-data.json` (built from `subnets.ts` + `playbooks.ts`
++ `playbook-rich.ts`), so the site and the agent never diverge.
+
+- Endpoint: `https://opentao-mcp.cameron-530.workers.dev/mcp` (streamable HTTP)
+- Tools: `list_subnets`, `get_subnet`, `get_playbook`, `get_setup_guide`,
+  `recommend_subnets`, `estimate_pnl`, `get_resources` — read-only.
+- Surfaced on-site at `/mine/agent` and via "Ask your agent" buttons on subnet pages.
+
+## i18n
+
+- Switcher (EN · 中) is live in the nav on every page; `<html lang>` is dynamic.
+- Chrome (nav/footer) is bilingual via `src/i18n/ui.ts` (zh falls back to en).
+- Translated so far: `/zh/` homepage. Untranslated routes fall back to English.
+  Add a page: create `src/pages/zh/<path>.astro` + add its base route to
+  `ZH_ROUTES` in `src/i18n/utils.ts`.
+
 ## v1 known gaps
 
 - Forms (host application, insights pitch) POST to the `opentao-api` Cloudflare Worker, which files them as GitHub Issues on this repo. See `../opentao-api/README.md` for one-time setup (PAT, Turnstile, KV namespace, deploy).
-- No `/zh/` content yet — i18n routing config is in place, no translated pages exist.
 - Luma "Register" buttons read `lumaUrl` from `src/data/events.ts` per event — events without a URL show a disabled "RSVP link · adding soon" state.
-- `/mine/playbooks/{slug}` detail pages don't exist — playbooks listing links them but they 404. Stub or remove anchors.
+- Insights "Subscribe" and the events Calendar/Map views are placeholder (disabled) UI.
+- Full Chinese translation is incremental — only the homepage is translated today.
 
 ## License
 

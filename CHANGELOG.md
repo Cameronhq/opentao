@@ -3,6 +3,13 @@
 > 每次实际改动后在顶部加一条。格式:`## 日期`,下列 `- 改了什么 — 涉及文件`。
 > 决策性的"为什么"记在 `PRD.md`,这里只记"改了什么"。
 
+## 2026-06-02 (下午)
+
+- **首页露出 MCP** [audit 8] — 首页(EN + /zh)hero 下加 agent/MCP strip:一行接入命令 + 示例问答 + CTA 到 /mine/agent。
+- **MCP 加 `estimate_pnl`** [audit 10] — 给定硬件成本/币价,估算某子网日/月 P&L(用 rich.profitability + rentalUsdPerHr)。已部署、线上验证(7 工具)。/mine/agent 工具列表 + README 同步。注:部分子网 profitability 是占位 0,估算会偏(B5 数据质量待补)。
+- **修子网详情页 data-live(fix 6)** — `/api/subnet/{netuid}` 这个端点 opentao-api 根本没有,fetch 一直静默 404、是死代码。删掉;矿工数改为和目录一致的 `注册/槽位 · earning` + 加 7d 列。
+- **修 README(fix 7)** — 删过时的"playbook 404"(已修),加 MCP / i18n 章节,修 repo URL(opentao-ai → Cameronhq)。
+
 ## 2026-06-02
 
 - **数据刷新自动化**:6 小时的 GitHub Action 现在同时刷新 `subnets.ts`(原来只刷 chain-stats.json)。push → CF 重新部署 → `/mining-data.json` 重生成 → MCP 数据自动新。workflow 改名 "Refresh chain data"。

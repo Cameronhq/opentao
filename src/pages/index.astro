@@ -121,6 +121,41 @@ const lastSyncText =
     </div>
   </section>
 
+  <!-- Agent / MCP -->
+  <section class="border-t hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid lg:grid-cols-[1fr_0.9fr] gap-8 items-center">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="accent-dot"></span><span class="section-label">New · OpenTAO MCP</span>
+          </div>
+          <h2 class="text-3xl md:text-[34px] font-semibold tracking-tight leading-[1.1] mb-3 max-w-[460px]">Don't read 128 playbooks. Ask your agent.</h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed max-w-[480px]">
+            Connect Claude, Cursor or any MCP agent to OpenTAO. It scans live subnet economics, pulls the verified
+            playbook, estimates P&L for your hardware, and hands you the exact commands — read-only, you stay in control.
+          </p>
+          <a href="/mine/agent" class="mt-6 btn-primary inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md">
+            Connect your agent
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+        <div class="code rounded-md p-5">
+          <div class="flex items-center gap-1.5 mb-3">
+            <span class="w-2.5 h-2.5 rounded-full" style="background: #e8e6e2;"></span>
+            <span class="w-2.5 h-2.5 rounded-full" style="background: #e8e6e2;"></span>
+            <span class="w-2.5 h-2.5 rounded-full" style="background: #e8e6e2;"></span>
+            <span class="ml-3 text-[color:var(--color-fg-dim)] text-[11px] font-mono">$ connect in one line</span>
+          </div>
+          <div><span class="prompt">$</span> claude mcp add --transport http opentao \</div>
+          <div class="muted">    https://opentao-mcp.cameron-530.workers.dev/mcp</div>
+          <div class="mt-2 muted"># then just ask:</div>
+          <div class="text-[color:var(--color-fg)]">"I've got a 4090 — which subnet should I mine?"</div>
+          <div class="ok mt-1">  → SN54 Yanez MIID · 80% of miners earn · ~170 τ/day · fits 24GB</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Who are you -->
   <section class="border-t hairline">
     <div class="max-w-[1200px] mx-auto px-6 py-24">

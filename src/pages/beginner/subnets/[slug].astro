@@ -30,7 +30,7 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
           </div>
           <div class="hero-meta">
             <span class={`cat cat-${subnet.cat}`}>{subnet.catLabel}</span>
-            <span class="light"><span class="dot"></span>active · <span data-live="miners" data-fallback={subnet.miners}>{subnet.miners}</span> miners · <span data-live="validators" data-fallback={subnet.validators}>{subnet.validators}</span> validators</span>
+            <span class="light"><span class="dot"></span>active · {subnet.miners}/{subnet.minerSlots} miners ({subnet.minersEarning} earning) · {subnet.validators} validators</span>
           </div>
           <div class="hero-id"><span class="lbl">netuid</span><span class="num">{subnet.netuid}</span></div>
           <h1>{subnet.name}</h1>
@@ -38,10 +38,10 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
           <button class="ask-agent" data-ask={`Use the OpenTAO MCP to evaluate and help me start mining subnet ${subnet.netuid} (${subnet.name}). My hardware is: `}>◆ Ask your agent about SN{subnet.netuid} <span class="aa-hint">copy prompt</span></button>
 
           <div class="stats-row">
-            <div class="stat-cell"><div class="k">Emission · 24h</div><div class="v"><span data-live="emission" data-fallback={subnet.emission}>{subnet.emission}</span></div></div>
-            <div class="stat-cell"><div class="k">Burn-cost</div><div class="v"><span data-live="burn-cost">—</span></div></div>
+            <div class="stat-cell"><div class="k">Emission · 24h</div><div class="v">{subnet.emission}</div></div>
+            <div class="stat-cell"><div class="k">7d</div><div class={`v ${subnet.delta7dSign}`}>{subnet.delta7d}</div></div>
             <div class="stat-cell"><div class="k">α-price</div><div class="v">{subnet.price} τ</div><div class="sub">mcap {subnet.mcap}</div></div>
-            <div class="stat-cell"><div class="k">Active miners</div><div class="v"><span data-live="miners" data-fallback={subnet.miners}>{subnet.miners}</span></div></div>
+            <div class="stat-cell"><div class="k">Miners</div><div class="v">{subnet.miners}<span class="sub-inline"> / {subnet.minerSlots}</span></div><div class="sub">{subnet.minersEarning} earning</div></div>
             <div class="stat-cell"><div class="k">Registered</div><div class="v stat-v-small">{subnet.registered}</div></div>
           </div>
           <span class="live-badge"><span class="pulse"></span>Live · via taostats · refreshed daily</span>
@@ -281,21 +281,6 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
           </div>
         </div>
       </footer>
-
-      <script define:vars={{ netuid: subnet.netuid }}>
-        async function refreshLive() {
-          try {
-            const r = await fetch(`/api/subnet/${netuid}`, { headers: { accept: 'application/json' } });
-            if (!r.ok) return;
-            const d = await r.json();
-            const set = (k, v) => document.querySelectorAll(`[data-live="${k}"]`).forEach((el) => { el.textContent = String(v); });
-            if (d.burn_cost_tao  != null) set('burn-cost', d.burn_cost_tao.toFixed(2) + ' τ');
-            if (d.miner_count    != null) set('miners',    d.miner_count);
-            if (d.validator_count!= null) set('validators',d.validator_count);
-          } catch (err) { console.warn('[subnet] live data unavailable:', err); }
-        }
-        refreshLive();
-      </script>
     </>
   ) : (
     /* ──────────────────────────────────── Lightweight stub fallback ────── */
@@ -334,7 +319,7 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
             <div class="stub-stat"><div class="section-label">Emission · 24h</div><div class="stub-stat-num">{subnet.emission}</div></div>
             <div class="stub-stat"><div class="section-label">Market cap</div><div class="stub-stat-num">{subnet.mcap}</div></div>
             <div class="stub-stat"><div class="section-label">α-price (τ)</div><div class="stub-stat-num">{subnet.price}</div></div>
-            <div class="stub-stat"><div class="section-label">Miners</div><div class="stub-stat-num">{subnet.miners}</div></div>
+            <div class="stub-stat"><div class="section-label">Miners</div><div class="stub-stat-num">{subnet.miners}<span class="text-base text-[color:var(--color-fg-dim)]"> / {subnet.minerSlots}</span></div><div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">{subnet.minersEarning} earning</div></div>
             <div class="stub-stat"><div class="section-label">Validators</div><div class="stub-stat-num">{subnet.validators}</div></div>
             <div class="stub-stat"><div class="section-label">Registered</div><div class="stub-stat-num text-base">{subnet.registered}</div></div>
           </div>
@@ -413,6 +398,9 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
   .stat-cell .v { font-family: var(--font-mono); font-weight: 600; font-size: 20px; color: #0c0c10; font-variant-numeric: tabular-nums; }
   .stat-cell .v.stat-v-small, .stat-cell .stat-v-small { font-size: 16px; }
   .stat-cell .sub { font-family: var(--font-mono); font-size: 10px; color: #767680; margin-top: 3px; }
+  .stat-cell .sub-inline { font-size: 14px; color: #b8b8be; font-weight: 400; }
+  .stat-cell .v.pos { color: #15803d; }
+  .stat-cell .v.neg { color: #b91c1c; }
   .live-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #15803d; padding: 4px 10px; border-radius: 999px; background: rgba(21,128,61,0.06); border: 1px solid rgba(21,128,61,0.3); margin-top: 14px; }
   .live-badge .pulse { width: 6px; height: 6px; border-radius: 999px; background: #15803d; animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }

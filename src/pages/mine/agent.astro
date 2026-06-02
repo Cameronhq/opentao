@@ -45,7 +45,7 @@ const prompts = [
   "I've got a single RTX 4090. Which subnet should I mine, and why?",
   'Walk me through mining subnet 9 (IOTA) step by step — hardware, repo, commands.',
   'Is mining subnet 18 worth it right now? What does the reward distribution look like?',
-  'Which subnets are most beginner-friendly — low competition, has a playbook?',
+  'If I rent an H100 at $2/hr, what subnet gives me the best P&L?',
 ];
 
 const tools = [
@@ -53,6 +53,7 @@ const tools = [
   { name: 'recommend_subnets', desc: 'Rank subnets for your hardware, budget and goal — with a reason for each.' },
   { name: 'get_subnet', desc: 'Full economics + hardware + links for one subnet.' },
   { name: 'get_playbook', desc: 'Step-by-step: hardware, repo, install/run commands, scoring, profitability.' },
+  { name: 'estimate_pnl', desc: 'Rough daily/monthly P&L for a subnet given your hardware cost and token price.' },
   { name: 'get_setup_guide', desc: 'The one-time wallet + btcli setup before you register anywhere.' },
   { name: 'get_resources', desc: 'Wallet and GPU-rental pointers.' },
 ];
@@ -127,7 +128,7 @@ const tools = [
   <!-- Tools -->
   <section class="border-b hairline">
     <div class="max-w-[1100px] mx-auto px-6 py-12">
-      <div class="section-label mb-5">What it can do · 6 tools</div>
+      <div class="section-label mb-5">What it can do · 7 tools</div>
       <div class="grid md:grid-cols-2 gap-x-10 gap-y-4">
         {tools.map((t) => (
           <div class="flex gap-3 items-baseline border-b hairline pb-4">
