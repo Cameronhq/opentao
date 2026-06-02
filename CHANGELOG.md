@@ -5,6 +5,11 @@
 
 ## 2026-06-02
 
+- **MCP 前端露出** [PRD MCP-5] — server 已部署 `https://opentao-mcp.cameron-530.workers.dev/mcp`(线上验证通过)。
+  - 新增落地页 `/mine/agent`:接入配置(Claude Code / Cursor / Claude Desktop,带复制按钮)+ 示例 prompt + 6 工具说明 + 安全说明。
+  - Start mining SubNav 四个页面都加 "Mine with agent" 标签(置首)。
+  - playbooks 页加 "◆ Mine with an agent" CTA。
+  - 子网详情页(rich + stub 两分支)加 "◆ Ask your agent about SN{n}" 复制 prompt 按钮。
 - **MCP server**(新仓库 `../opentao-mcp`)— Cloudflare Agents SDK `McpAgent`,6 个只读工具(`list_subnets`/`get_subnet`/`get_playbook`/`get_setup_guide`/`recommend_subnets`/`get_resources`),streamable HTTP `/mcp`。读 `/mining-data.json`。本地 SDK client 验证:握手 + tools/list + recommend + get_playbook 全部返回实时数据。**待用户部署**(`wrangler deploy`)。[PRD MCP-3]
 - **MCP 数据层** `/mining-data.json` — 新增 `src/pages/mining-data.json.ts`,build 时把 `subnets.ts`(实时经济数据)+ `playbooks.ts`(状态)+ `playbook-rich.ts`(硬件/命令/scoring/盈利)合并成单一 JSON。网站与即将做的 OpenTAO MCP server 共用一个源。128 子网,数值字段已解析好(emission τ/day、矿工 registered/earning、rewardConcentration、7d %)。只读,带 notice 说明动钱包动作需人确认。[PRD MCP-2]
 

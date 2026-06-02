@@ -35,6 +35,7 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
           <div class="hero-id"><span class="lbl">netuid</span><span class="num">{subnet.netuid}</span></div>
           <h1>{subnet.name}</h1>
           <p class="pitch" set:html={rich.shortPitch}></p>
+          <button class="ask-agent" data-ask={`Use the OpenTAO MCP to evaluate and help me start mining subnet ${subnet.netuid} (${subnet.name}). My hardware is: `}>◆ Ask your agent about SN{subnet.netuid} <span class="aa-hint">copy prompt</span></button>
 
           <div class="stats-row">
             <div class="stat-cell"><div class="k">Emission · 24h</div><div class="v"><span data-live="emission" data-fallback={subnet.emission}>{subnet.emission}</span></div></div>
@@ -318,6 +319,7 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
               </div>
               <h1 class="font-serif text-[44px] font-medium leading-tight tracking-[-0.015em]">{subnet.name}</h1>
               <p class="text-[color:var(--color-fg-muted)] mt-3 text-lg max-w-[640px]">{subnet.description}</p>
+              <button class="ask-agent" data-ask={`Use the OpenTAO MCP to evaluate and help me start mining subnet ${subnet.netuid} (${subnet.name}). My hardware is: `}>◆ Ask your agent about SN{subnet.netuid} <span class="aa-hint">copy prompt</span></button>
             </div>
           </div>
           <div class="stub-banner">
@@ -360,9 +362,28 @@ const related = subnets.filter((s) => s.cat === subnet.cat && s.slug !== subnet.
       </section>
     </>
   )}
+
+  <script>
+    // "Ask your agent" — copy a ready-to-paste prompt that targets the OpenTAO MCP.
+    document.querySelectorAll<HTMLButtonElement>('.ask-agent').forEach((btn) => {
+      const hint = btn.querySelector('.aa-hint');
+      const original = hint?.textContent || 'copy prompt';
+      btn.addEventListener('click', async () => {
+        const prompt = btn.getAttribute('data-ask') || '';
+        try {
+          await navigator.clipboard.writeText(prompt);
+          if (hint) { hint.textContent = 'copied ✓'; setTimeout(() => { hint.textContent = original; }, 1400); }
+        } catch {}
+      });
+    });
+  </script>
 </BaseLayout>
 
 <style>
+  .ask-agent { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 9px 16px; border-radius: 8px; border: 1px solid rgba(184,71,11,0.35); background: rgba(184,71,11,0.06); color: #b8470b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .12s; }
+  .ask-agent:hover { background: rgba(184,71,11,0.1); border-color: rgba(184,71,11,0.55); }
+  .ask-agent .aa-hint { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #767680; }
+
   /* ──────────────────────────────────── HERO */
   .hero-full { padding-bottom: 48px; border-bottom: 1px solid var(--color-border, rgba(15,15,18,0.08)); }
   .hero-bcrumb { display: flex; gap: 6px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: #767680; margin-bottom: 20px; }

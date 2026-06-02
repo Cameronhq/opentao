@@ -1,0 +1,182 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubNav from '../../components/SubNav.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const subnav = [
+  { href: '/mine/agent', label: 'Mine with agent' },
+  { href: '/mine/general-setup', label: 'General setup' },
+  { href: '/mine/playbooks', label: 'Subnet playbooks' },
+  { href: '/mine/resources', label: 'Resources' },
+];
+
+const MCP = 'https://opentao-mcp.cameron-530.workers.dev/mcp';
+
+const connectors = [
+  {
+    name: 'Claude Code',
+    note: 'one command in your terminal',
+    code: `claude mcp add --transport http opentao ${MCP}`,
+  },
+  {
+    name: 'Cursor / Windsurf',
+    note: 'add to ~/.cursor/mcp.json',
+    code: `{
+  "mcpServers": {
+    "opentao": { "url": "${MCP}" }
+  }
+}`,
+  },
+  {
+    name: 'Claude Desktop',
+    note: 'claude_desktop_config.json (via mcp-remote)',
+    code: `{
+  "mcpServers": {
+    "opentao": {
+      "command": "npx",
+      "args": ["mcp-remote", "${MCP}"]
+    }
+  }
+}`,
+  },
+];
+
+const prompts = [
+  "I've got a single RTX 4090. Which subnet should I mine, and why?",
+  'Walk me through mining subnet 9 (IOTA) step by step — hardware, repo, commands.',
+  'Is mining subnet 18 worth it right now? What does the reward distribution look like?',
+  'Which subnets are most beginner-friendly — low competition, has a playbook?',
+];
+
+const tools = [
+  { name: 'list_subnets', desc: 'Scan all 128 subnets by emission, miner count, reward spread, playbook status.' },
+  { name: 'recommend_subnets', desc: 'Rank subnets for your hardware, budget and goal — with a reason for each.' },
+  { name: 'get_subnet', desc: 'Full economics + hardware + links for one subnet.' },
+  { name: 'get_playbook', desc: 'Step-by-step: hardware, repo, install/run commands, scoring, profitability.' },
+  { name: 'get_setup_guide', desc: 'The one-time wallet + btcli setup before you register anywhere.' },
+  { name: 'get_resources', desc: 'Wallet and GPU-rental pointers.' },
+];
+---
+<BaseLayout
+  title="Mine with an Agent — OpenTAO"
+  description="Don't read 128 playbooks. Point your agent at OpenTAO's MCP and ask which subnet to mine and how. Live economics, verified playbooks, read-only."
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/agent" rightMeta="MCP · read-only · live data" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 pt-12 pb-10">
+      <Breadcrumb crumbs={[
+        { href: '/', label: 'OpenTAO' },
+        { href: '/mine/agent', label: 'Start mining' },
+        { label: 'Mine with agent' },
+      ]} />
+
+      <div class="flex items-center gap-2 mb-5">
+        <span class="accent-dot"></span><span class="section-label">OpenTAO MCP</span>
+      </div>
+      <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold max-w-[720px]">Don't read 128 playbooks.<br />Ask your agent.</h1>
+      <p class="text-[color:var(--color-fg-muted)] mt-4 max-w-[620px] leading-relaxed">
+        Connect any MCP-capable agent to OpenTAO. It can scan every subnet's live economics, pull the verified
+        playbook, and tell you what to mine on your hardware — then hand you the exact commands.
+        <span class="text-[color:var(--color-fg)]">It never spends your TAO or runs anything itself</span> — read-only, you stay in control.
+      </p>
+    </div>
+  </section>
+
+  <!-- Connect -->
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 py-12">
+      <div class="section-label mb-2">Connect in 30 seconds</div>
+      <div class="flex items-center gap-2 mb-6 text-sm">
+        <span class="text-[color:var(--color-fg-muted)]">Endpoint</span>
+        <code class="endpoint" data-copy>{MCP}</code>
+        <button class="copy-btn" data-copy-target>copy</button>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        {connectors.map((c) => (
+          <div class="card rounded-md p-5 flex flex-col">
+            <div class="font-medium mb-0.5">{c.name}</div>
+            <div class="text-xs text-[color:var(--color-fg-dim)] font-mono mb-3">{c.note}</div>
+            <div class="code-snip relative">
+              <pre>{c.code}</pre>
+              <button class="copy-btn abs" data-copy-target>copy</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Try it -->
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 py-12">
+      <div class="section-label mb-5">Then just ask</div>
+      <div class="grid sm:grid-cols-2 gap-3">
+        {prompts.map((p) => (
+          <div class="prompt-card">
+            <span class="quote">"</span>{p}
+            <button class="copy-btn inline-c" data-copy-text={p}>copy</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="border-b hairline">
+    <div class="max-w-[1100px] mx-auto px-6 py-12">
+      <div class="section-label mb-5">What it can do · 6 tools</div>
+      <div class="grid md:grid-cols-2 gap-x-10 gap-y-4">
+        {tools.map((t) => (
+          <div class="flex gap-3 items-baseline border-b hairline pb-4">
+            <code class="tool-name">{t.name}</code>
+            <span class="text-sm text-[color:var(--color-fg-muted)]">{t.desc}</span>
+          </div>
+        ))}
+      </div>
+      <p class="mt-6 text-xs font-mono text-[color:var(--color-fg-dim)] max-w-[680px]">
+        Same data as the rest of this site (<a href="/mining-data.json" class="underline underline-offset-2 hover:text-[color:var(--color-fg)]">/mining-data.json</a>), refreshed from chain.
+        Anything that costs TAO or GPU — registration, running a miner — comes back as commands for you to run and confirm. The agent never executes them.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    function flash(btn: HTMLElement) {
+      const prev = btn.textContent;
+      btn.textContent = 'copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = prev; btn.classList.remove('copied'); }, 1200);
+    }
+    // copy the code/text nearest the button
+    document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        let text = btn.getAttribute('data-copy-text') || '';
+        if (!text) {
+          const card = btn.closest('.code-snip, section, .prompt-card, div');
+          const pre = card?.querySelector('pre');
+          const ep = card?.querySelector('.endpoint');
+          text = (pre?.textContent || ep?.textContent || '').trim();
+        }
+        if (!text) return;
+        try { await navigator.clipboard.writeText(text); flash(btn); } catch {}
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .endpoint { font-family: var(--font-mono); font-size: 12px; background: #fafaf9; border: 1px solid rgba(15,15,18,0.1); padding: 4px 8px; border-radius: 4px; color: #0c0c10; }
+  .copy-btn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #767680; cursor: pointer; background: transparent; border: 0; padding: 2px 4px; transition: color .12s; }
+  .copy-btn:hover { color: #0c0c10; }
+  .copy-btn.copied { color: #15803d; }
+  .copy-btn.abs { position: absolute; top: 8px; right: 8px; }
+  .copy-btn.inline-c { position: absolute; bottom: 10px; right: 10px; }
+  .code-snip { background: #0c0c10; border-radius: 6px; padding: 14px 14px; margin-top: auto; }
+  .code-snip pre { font-family: var(--font-mono); font-size: 11.5px; line-height: 1.55; color: #e8e6e2; white-space: pre-wrap; word-break: break-all; margin: 0; }
+  .prompt-card { position: relative; border: 1px solid rgba(15,15,18,0.1); border-radius: 8px; padding: 16px 18px 30px; font-size: 14px; color: #1c1c22; line-height: 1.5; background: #fff; }
+  .prompt-card .quote { font-family: var(--font-serif); color: #b8470b; font-size: 20px; margin-right: 2px; }
+  .tool-name { font-family: var(--font-mono); font-size: 12px; color: #b8470b; white-space: nowrap; }
+</style>

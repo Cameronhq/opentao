@@ -6,6 +6,7 @@ import { playbooks as allPlaybooks, stats } from '../../data/playbooks';
 import { subnets } from '../../data/subnets';
 
 const subnav = [
+  { href: '/mine/agent', label: 'Mine with agent' },
   { href: '/mine/general-setup', label: 'General setup' },
   { href: '/mine/playbooks', label: 'Subnet playbooks' },
   { href: '/mine/resources', label: 'Resources' },
@@ -88,7 +89,10 @@ const pctMissing = 100 - pctVerified - pctStale;
           <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">Subnet playbooks</h1>
           <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[640px]">One playbook per subnet — sortable by live emission, miner count and reward spread, so you can see where mining is worth it before reading a single command.</p>
         </div>
-        <a href="/mine/general-setup" class="text-sm hover:text-[color:var(--color-accent)] inline-flex items-center gap-2 px-4 py-2 border hairline-strong rounded-md">↑ Start with General setup</a>
+        <div class="flex items-center gap-2">
+          <a href="/mine/agent" class="text-sm inline-flex items-center gap-2 px-4 py-2 rounded-md btn-primary">◆ Mine with an agent</a>
+          <a href="/mine/general-setup" class="text-sm hover:text-[color:var(--color-accent)] inline-flex items-center gap-2 px-4 py-2 border hairline-strong rounded-md">↑ General setup</a>
+        </div>
       </div>
 
       <div class="section-label mb-3">Coverage · {stats.total} subnets total</div>

@@ -57,7 +57,7 @@
 | MCP-2 | **单一数据源** `/mining-data.json`:build 时合并 subnets + playbooks + playbook-rich,网站和 MCP 共用 | ✅ 2026-06-02 | `src/pages/mining-data.json.ts`;taostats 刷新一次两边都新 |
 | MCP-3 | 工具:`list_subnets` / `get_subnet` / `get_playbook` / `get_setup_guide` / `recommend_subnets` / `get_resources` | ✅ 2026-06-02 | server 在 `../opentao-mcp`(Cloudflare Agents SDK `McpAgent`,streamable HTTP `/mcp`)。本地验证通过,**待部署**。`recommend_subnets` 是核心护城河 |
 | MCP-4 | **安全红线**:无写操作;花钱/动钱包的命令只返回文本 + cost/risk 字段,必须人确认 | ✅ 决策 2026-06-02 | 不自动注册、不自动跑 miner |
-| MCP-5 | 前端露出:`/mine/agent` 落地页(接入配置 + 示例 prompt)+ playbooks/subnet 页"问 agent"复制按钮 + SubNav 加项 | 🚧 计划中 | MCP 跑通后做 |
+| MCP-5 | 前端露出:`/mine/agent` 落地页(接入配置 + 示例 prompt)+ playbooks/subnet 页"问 agent"复制按钮 + SubNav 加项 | ✅ 2026-06-02 | server 已部署 `https://opentao-mcp.cameron-530.workers.dev/mcp` |
 
 待办:`get_setup_guide` 的步骤目前硬编码在 `general-setup.astro`,MCP 用时需抽成数据或在 server 内置。playbooks.ts 的 status 与 playbook-rich 的存在性不一致(如 Zeus 有 rich 但 status=missing),需对齐。
 
