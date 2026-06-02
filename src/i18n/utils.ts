@@ -6,6 +6,8 @@ import { ui, defaultLang, type Lang } from './ui';
 // Use trailing-slash-free, leading-slash form. '/' is the homepage.
 export const ZH_ROUTES = new Set<string>([
   '/',
+  '/mine/agent',
+  '/mine/resources',
 ]);
 
 /** Detect the active locale from the URL pathname. */

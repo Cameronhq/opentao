@@ -1,0 +1,150 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/mine/agent'), label: '用 agent 挖矿' },
+  { href: L('/mine/general-setup'), label: '通用配置' },
+  { href: L('/mine/playbooks'), label: 'Subnet Playbook' },
+  { href: L('/mine/resources'), label: '资源' },
+];
+
+type Trust = 'foundation' | 'community' | 'listed';
+interface Resource { name: string; trust: Trust; trustLabel: string; blurb: string; meta: string; href?: string }
+interface Section { id: string; label: string; title: string; count: string; items: Resource[]; footnote?: string; usedIn?: { label: string; href: string }[] }
+
+const sections: Section[] = [
+  {
+    id: 'wallets', label: '钱包', title: '放 TAO 和 hotkey 的地方。', count: '5 条',
+    usedIn: [
+      { label: '第 03 步 · 装 btcli', href: '/mine/general-setup#step-03' },
+      { label: '第 04 步 · 建钱包', href: '/mine/general-setup#step-04' },
+    ],
+    items: [
+      { name: 'bittensor-cli (btcli)', trust: 'foundation', trustLabel: '基金会', blurb: '官方 CLI,自托管。管理 cold/hotkey 最直接的方式。', meta: 'macOS · Linux · WSL · 开源' },
+      { name: 'Bittensor Wallet(浏览器)', trust: 'community', trustLabel: '社区', blurb: '浏览器插件分叉版。转账、staking 的界面友好——不用来配挖矿。', meta: 'Chrome · Brave · Edge' },
+      { name: 'Ledger(经 Polkadot.js)', trust: 'community', trustLabel: '社区', blurb: '硬件 coldkey 存储。流程慢一些,但长期持有最安全。', meta: 'Nano S+, Nano X' },
+    ],
+  },
+  {
+    id: 'exchanges', label: '交易所', title: '在哪买 TAO。', count: '6 条',
+    usedIn: [{ label: '第 05 步 · 弄到 TAO', href: '/mine/general-setup#step-05' }],
+    items: [
+      { name: 'Binance', trust: 'community', trustLabel: '社区', blurb: 'TAO/USDT、TAO/BTC 深度最好。支持 Bittensor 网络提币。', meta: 'CEX · 需 KYC · 限美国' },
+      { name: 'Kraken', trust: 'community', trustLabel: '社区', blurb: 'TAO/USD、TAO/EUR。对美国友好,手续费略高,法币通道快。', meta: 'CEX · 需 KYC · 美国可用' },
+      { name: 'MEXC', trust: 'listed', trustLabel: '收录', blurb: 'TAO/USDT。KYC 轻,亚洲友好。提币前确认网络选对。', meta: 'CEX · 轻 KYC' },
+    ],
+    footnote: '⚠ 买完把 TAO 转到你自己的 coldkey。别从交易所钱包挖矿——它们没法替你的 hotkey 签名。',
+  },
+  {
+    id: 'compute', label: '算力', title: '在哪租 GPU。', count: '8 条',
+    usedIn: [
+      { label: '第 06 步 · 注册 subnet', href: '/mine/general-setup#step-06' },
+      { label: 'Playbook · 各 subnet 硬件要求', href: '/mine/playbooks' },
+    ],
+    items: [
+      { name: 'Lambda Labs', trust: 'community', trustLabel: '社区', blurb: 'H100、A100、4090。开机稳、按小时计费、Ubuntu 镜像干净。', meta: '按需 · $$ · 美/欧' },
+      { name: 'RunPod', trust: 'community', trustLabel: '社区', blurb: '按秒计费、容器优先、GPU 选择多。Spot 档便宜约一半。', meta: '按需 + spot · $$ · 全球' },
+      { name: 'Vast.ai', trust: 'listed', trustLabel: '收录', blurb: 'P2P GPU 市场。最便宜但质量参差。适合一次性实验。', meta: 'p2p · $ · 全球' },
+    ],
+  },
+  {
+    id: 'tools', label: '工具', title: '区块浏览器、监控、看板。', count: '9 条',
+    usedIn: [
+      { label: '第 06 步 · 看实时 burn-cost', href: '/mine/general-setup#step-06' },
+      { label: '第 07 步 · 验证配置', href: '/mine/general-setup#step-07' },
+    ],
+    items: [
+      { name: 'Taostats', trust: 'community', trustLabel: '社区', blurb: '事实上的区块浏览器。subnet 数据、validator 榜单、emission 图表。', meta: '免费 · 浏览器' },
+      { name: 'btcli-tui', trust: 'listed', trustLabel: '收录', blurb: '套在 btcli 外的 TUI。hotkey 多的老手用更快。', meta: '开源 · CLI' },
+      { name: 'Grafana exporter', trust: 'listed', trustLabel: '收录', blurb: '从 miner 进程导出 Prometheus 指标,接进现有监控。', meta: '开源 · 监控' },
+    ],
+  },
+];
+---
+<BaseLayout
+  title="资源 — 开始挖矿 — OpenTAO"
+  description="矿工真正在用的钱包、交易所、算力、工具的精选目录。无返佣链接、无付费位。"
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/resources" rightMeta="精选 · 无返佣链接" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-14 pb-12">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/mine/playbooks', label: '开始挖矿' },
+        { label: '资源' },
+      ]} />
+      <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">钱包、交易所、算力、工具。</h1>
+      <p class="text-[color:var(--color-fg-muted)] mt-3 max-w-[600px]">矿工真正在用的东西,精选成一份目录。无返佣链接、无付费位。每条都标了信任来源,告诉你它怎么进的这个名单。</p>
+      <div class="mt-6 flex items-center gap-6 text-xs font-mono text-[color:var(--color-fg-dim)] flex-wrap">
+        <span><span class="trust trust-foundation">基金会</span> OTF 背书</span>
+        <span><span class="trust trust-community">社区</span> 广泛使用且可靠</span>
+        <span><span class="trust trust-listed">收录</span> 只是收录,不代表背书</span>
+      </div>
+    </div>
+  </section>
+
+  {sections.map((sec) => (
+    <section class="border-b hairline scroll-mt-16" id={sec.id}>
+      <div class="max-w-[1200px] mx-auto px-6 py-16">
+        <div class="flex items-baseline justify-between mb-4 gap-6 flex-wrap">
+          <div>
+            <div class="section-label mb-2">{sec.label}</div>
+            <h2 class="text-2xl font-semibold tracking-tight">{sec.title}</h2>
+          </div>
+          <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{sec.count}</span>
+        </div>
+        {sec.usedIn && sec.usedIn.length > 0 && (
+          <div class="used-in mb-8">
+            <span class="used-in-label">用在 →</span>
+            {sec.usedIn.map((u) => (<a href={u.href} class="used-in-link">{u.label}</a>))}
+          </div>
+        )}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {sec.items.map((it) => (
+            <a href={it.href ?? '#'} class="card rounded-md p-5 block">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold">{it.name}</h3>
+                <span class={`trust trust-${it.trust}`}>{it.trustLabel}</span>
+              </div>
+              <p class="text-sm text-[color:var(--color-fg-muted)] mb-3">{it.blurb}</p>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">{it.meta}</div>
+            </a>
+          ))}
+        </div>
+        {sec.footnote && (
+          <div class="mt-5 text-xs font-mono text-[color:var(--color-fg-dim)] border-l-2 pl-3" style="border-color: #b8470b">{sec.footnote}</div>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+        <div>
+          <div class="section-label mb-2">提交一个资源</div>
+          <h3 class="text-2xl font-semibold tracking-tight">发现有用但没收录的?提个 PR。</h3>
+          <p class="text-[color:var(--color-fg-muted)] text-sm mt-2 max-w-[500px]">所有条目都是 OpenTAO repo 里的 markdown 文件。默认徽章:收录。升到社区 / 基金会需要编辑审核。</p>
+        </div>
+        <a href="#" class="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md border hairline-strong hover:border-[color:var(--color-fg-muted)]">去 GitHub 提交</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .trust { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; padding: 2px 6px; border-radius: 3px; border: 1px solid; }
+  .trust-foundation { color: #15803d; border-color: rgba(21, 128, 61, 0.3); background: rgba(21, 128, 61, 0.06); }
+  .trust-community { color: #1c6ea4; border-color: rgba(28, 110, 164, 0.3); background: rgba(28, 110, 164, 0.06); }
+  .trust-listed { color: #4a4a52; border-color: rgba(15, 15, 18, 0.15); }
+  .used-in { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .used-in-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: #767680; }
+  .used-in-link { font-family: var(--font-mono); font-size: 11px; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(184, 71, 11, 0.22); color: #b8470b; background: rgba(184, 71, 11, 0.04); transition: all 0.12s; }
+  .used-in-link:hover { background: rgba(184, 71, 11, 0.1); border-color: rgba(184, 71, 11, 0.5); }
+</style>
