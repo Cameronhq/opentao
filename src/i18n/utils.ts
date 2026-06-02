@@ -8,6 +8,8 @@ export const ZH_ROUTES = new Set<string>([
   '/',
   '/mine/agent',
   '/mine/resources',
+  '/mine/general-setup',
+  '/mine/playbooks',
 ]);
 
 /** Detect the active locale from the URL pathname. */

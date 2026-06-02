@@ -1,0 +1,342 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/mine/agent'), label: '用 agent 挖矿' },
+  { href: L('/mine/general-setup'), label: '通用配置' },
+  { href: L('/mine/playbooks'), label: 'Subnet Playbook' },
+  { href: L('/mine/resources'), label: '资源' },
+];
+
+type CodeLine = { kind: 'comment' | 'prompt' | 'ok' | 'spacer'; text?: string };
+interface CodeBlock { lines: CodeLine[]; }
+interface Step {
+  id: string; n: string; title: string; time: string; body: string;
+  bullets?: string[];
+  code?: CodeBlock;
+  codeByOs?: { macos: CodeBlock; linux: CodeBlock; wsl: CodeBlock };
+  callout?: { tip: string; html: string };
+  seeAlso?: { label: string; href: string; meta?: string }[];
+}
+
+const R = '/zh/mine/resources';
+
+const steps: Step[] = [
+  {
+    id: 'step-01', n: '01 / 08', title: '系统要求', time: '约 2 分钟',
+    body: '先确认机器满足条件。多数现代笔记本都行;服务器通常要升一下 Python。',
+    bullets: [
+      'Python 3.10–3.12 · 磁盘 ≥ 50GB · 内存 ≥ 16GB',
+      'macOS 12+ / Ubuntu 22.04+ / Windows 11 带 WSL2(里面装 Ubuntu)',
+      '原生 Windows 不支持跑 subnet miner。WSL2 只用来做工具链,真正的挖矿负载在 Linux 上跑。',
+      '稳定宽带——注册时要和链通信;miner ↔ validator 之间是长连接 TCP。',
+    ],
+  },
+  {
+    id: 'step-02', n: '02 / 08', title: '装依赖', time: '约 4 分钟',
+    body: 'Python ≥ 3.10、git、编译工具。在上面选你的系统——之后的步骤都一样。',
+    codeByOs: {
+      macos: { lines: [
+        { kind: 'comment', text: '# macOS — 用 Homebrew' },
+        { kind: 'prompt', text: 'brew install python@3.12 git' },
+        { kind: 'prompt', text: 'python3 --version' },
+        { kind: 'ok', text: 'Python 3.12.7' },
+        { kind: 'spacer' },
+        { kind: 'comment', text: '# 另一条路:直接装 btcli(可跳过第 3 步)' },
+        { kind: 'prompt', text: 'brew install btcli' },
+      ] },
+      linux: { lines: [
+        { kind: 'comment', text: '# Ubuntu 22.04+ / Debian 12+' },
+        { kind: 'prompt', text: 'sudo apt update' },
+        { kind: 'prompt', text: 'sudo apt install -y python3.12 python3.12-venv python3-pip git build-essential' },
+        { kind: 'prompt', text: 'python3 --version' },
+        { kind: 'ok', text: 'Python 3.12.3' },
+      ] },
+      wsl: { lines: [
+        { kind: 'comment', text: '# 在 WSL2 里 — Ubuntu 22.04+' },
+        { kind: 'prompt', text: 'sudo apt update' },
+        { kind: 'prompt', text: 'sudo apt install -y python3.12 python3.12-venv python3-pip git build-essential' },
+        { kind: 'spacer' },
+        { kind: 'comment', text: '# miner 要在 WSL 里跑,不是 Windows PowerShell。' },
+      ] },
+    },
+  },
+  {
+    id: 'step-03', n: '03 / 08', title: '装 bittensor CLI', time: '约 3 分钟',
+    body: '把官方 btcli 装进一个 Python 虚拟环境,保持系统 Python 干净,也避免和旧的 `bittensor` SDK 起版本冲突。',
+    seeAlso: [
+      { label: 'btcli 参考 + 其它钱包', href: `${R}#wallets`, meta: '钱包 · 3 条' },
+    ],
+    code: { lines: [
+      { kind: 'prompt', text: 'python3 -m venv ~/.venv-bittensor' },
+      { kind: 'prompt', text: 'source ~/.venv-bittensor/bin/activate' },
+      { kind: 'prompt', text: 'pip install --upgrade pip' },
+      { kind: 'prompt', text: 'pip install bittensor-cli' },
+      { kind: 'spacer' },
+      { kind: 'prompt', text: 'btcli --version' },
+      { kind: 'ok', text: 'BTCLI version: 9.22.0' },
+    ] },
+    callout: {
+      tip: '⚠ 小贴士',
+      html: '— 把 <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">source ~/.venv-bittensor/bin/activate</code> 加进 <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">~/.zshrc</code> 或 <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">~/.bashrc</code>,新开终端就自动进 venv。如果第 2 步用了 <code class="font-mono text-xs px-1 py-0.5 rounded" style="background: #fafaf9; border: 1px solid rgba(15,15,18,0.1);">brew install btcli</code>,这步 pip 安装就跳过。',
+    },
+  },
+  {
+    id: 'step-04', n: '04 / 08', title: '建钱包', time: '约 5 分钟',
+    body: '生成 coldkey + hotkey。coldkey 拿着你的 TAO、给余额变动签名;hotkey 是你挖矿/验证用的身份。把 12 个助记词抄下来——丢了没法找回。',
+    code: { lines: [
+      { kind: 'comment', text: '# 一个交互流程里同时建 coldkey 和 hotkey' },
+      { kind: 'prompt', text: 'btcli wallet create --wallet.name my-coldkey --wallet.hotkey my-hot1' },
+      { kind: 'spacer' },
+      { kind: 'comment', text: '# 或者分开建:' },
+      { kind: 'prompt', text: 'btcli wallet new-coldkey --wallet.name my-coldkey' },
+      { kind: 'prompt', text: 'btcli wallet new-hotkey  --wallet.name my-coldkey --wallet.hotkey my-hot1' },
+      { kind: 'spacer' },
+      { kind: 'prompt', text: 'btcli wallet list' },
+    ] },
+    callout: {
+      tip: '🔐 安全',
+      html: '— coldkey 助记词是你弄丢 keystore 后唯一的退路。抄在纸上、离线保存。永远别贴进聊天、别截图、别 commit 进 git。条件允许的话,coldkey 单独放一台离线机器,只把 hotkey 拷到挖矿机上。',
+    },
+    seeAlso: [
+      { label: '钱包选择(CLI · 浏览器 · Ledger)', href: `${R}#wallets`, meta: '钱包 · 3 条' },
+    ],
+  },
+  {
+    id: 'step-05', n: '05 / 08', title: '弄到 TAO', time: '约 8 分钟',
+    body: '主网(finney):在 CEX 买,提到你的 coldkey ss58 地址。测试网:去官方 Discord 申请测试网 TAO——链上 PoW 水龙头在主网/finney 已停用,现在只在本地链能用。',
+    bullets: [
+      'CEX 上架(2026):Binance、Kraken、KuCoin、MEXC、Bybit、Gate.io、部分地区的 Coinbase。Binance 深度最好。',
+      '提币到 `btcli wallet list` 里显示的 coldkey ss58 地址——不要提到 hotkey。',
+      '测试网水龙头:Bittensor Discord 的 #testnet-faucet 频道。先看频道规则。',
+      '在 burn-cost 之外多留一点 buffer——注册价格会无规律地飙。',
+    ],
+    seeAlso: [
+      { label: 'CEX 对比 + KYC 说明', href: `${R}#exchanges`, meta: '交易所 · 3 条' },
+    ],
+  },
+  {
+    id: 'step-06', n: '06 / 08', title: '注册到一个 subnet', time: '约 5 分钟',
+    body: '注册是 burn 制:你付一笔被回收的 TAO 拿一个 UID 槽位。每成功注册一次,这个费用翻倍,然后按 block 平滑回落。注册前一定立刻重新查一遍 burn-cost。',
+    code: { lines: [
+      { kind: 'comment', text: '# 把 64 换成你的目标 subnet' },
+      { kind: 'prompt', text: 'btcli subnet burn-cost --netuid 64' },
+      { kind: 'ok', text: 'Current burn-cost: 0.421 τ' },
+      { kind: 'spacer' },
+      { kind: 'prompt', text: 'btcli subnet register --netuid 64 \\' },
+      { kind: 'prompt', text: '  --wallet.name my-coldkey --wallet.hotkey my-hot1' },
+      { kind: 'spacer' },
+      { kind: 'comment', text: '# 测试网 — 加上 network 标志' },
+      { kind: 'prompt', text: 'btcli subnet register --netuid 64 \\' },
+      { kind: 'prompt', text: '  --wallet.name my-coldkey --wallet.hotkey my-hot1 \\' },
+      { kind: 'prompt', text: '  --subtensor.network test' },
+    ] },
+    callout: {
+      tip: '⚠ 免疫期',
+      html: '— 刚注册的 hotkey 有约 4,096 个 block(约 13.7 小时)的免疫保护期。如果免疫期结束前你的 incentive 还没爬过最低的非免疫 miner,你会被 deregister,burn-cost 也打水漂。计划好在这个窗口内就开始拿到真实 incentive。',
+    },
+    seeAlso: [
+      { label: '实时 burn-cost & subnet 数据', href: `${R}#tools`, meta: '工具 · Taostats' },
+      { label: 'GPU 租用(Lambda · RunPod · Vast)', href: `${R}#compute`, meta: '算力 · 3 条' },
+    ],
+  },
+  {
+    id: 'step-07', n: '07 / 08', title: '验证配置', time: '约 2 分钟',
+    body: '确认注册成功:你的 hotkey 应该出现在这个 subnet metagraph 的某个 UID 上,coldkey 应该显示扣掉了 burn-cost。',
+    code: { lines: [
+      { kind: 'prompt', text: 'btcli wallet overview --wallet.name my-coldkey' },
+      { kind: 'comment', text: '# 显示余额、所有 hotkey,以及它们在各 subnet 占的 UID。' },
+      { kind: 'spacer' },
+      { kind: 'prompt', text: 'btcli subnet metagraph --netuid 64' },
+      { kind: 'comment', text: '# 在表里找到你的 hotkey,确认 UID 分配好了。' },
+      { kind: 'spacer' },
+      { kind: 'prompt', text: 'btcli subnet list' },
+      { kind: 'comment', text: '# 所有 subnet 的快照:当前 burn-cost、validator 数量。' },
+    ] },
+    seeAlso: [
+      { label: 'Taostats 浏览器 · btcli-tui · Grafana exporter', href: `${R}#tools`, meta: '工具 · 3 条' },
+    ],
+  },
+  {
+    id: 'step-08', n: '08 / 08', title: '常见错误(速查)', time: '速查',
+    body: '吞掉大多数新矿工的五个真实坑。收藏这一节。',
+    bullets: [
+      '没赚到就被 deregister:你的 incentive 在 4,096 block 免疫窗口内没越过 prune 阈值。办法:注册前先摸清这个 subnet 上最低的非免疫 incentive,并提前把 miner 配置调好。',
+      'burn-cost 突然涨:从你查 `burn-cost` 到 `register` 之间费用翻倍了。注册前几秒内重新查一次,并多留 TAO buffer。',
+      'network 标志不一致:miner 代码连的是 `finney`,而钱包注册在 `test`。注册和启动 miner 时都一致地传 `--subtensor.network`。',
+      '依赖冲突:旧的 `bittensor` SDK 和 `bittensor-cli` 装在一起导致版本打架。办法:固定用 venv,`pip uninstall bittensor bittensor-cli bittensor-wallet` 后只重装 `bittensor-cli`。',
+      'coldkey/hotkey 搞混:TAO 发到了 hotkey 的 ss58(丢了),或者想注册一个已经在这个 subnet 上的 hotkey(每个 hotkey 在一个 subnet 只能占一个 UID)。永远从 `btcli wallet list` 复制地址。',
+    ],
+  },
+];
+---
+<BaseLayout
+  title="通用配置 — 开始挖矿 — OpenTAO"
+  description="配一次,挖很多。每份 subnet playbook 都默认你做完了这八步——Python、btcli、钱包、TAO、注册、验证。"
+  section="mine"
+>
+  <SubNav items={subnav} active="/mine/general-setup" rightMeta="共约 30 分钟 · 区分系统" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-12 pb-10">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/mine/playbooks', label: '开始挖矿' },
+        { label: '通用配置' },
+      ]} />
+      <div class="flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <h1 class="text-[44px] leading-[1.05] tracking-[-0.025em] font-semibold">配一次,挖很多。</h1>
+          <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[600px]">每份 subnet playbook 都默认你做完了这八件事。做一次、存好钱包,之后直接跳到你想挖的那个 subnet。</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="os-tabs" id="os-tabs">
+            <button class="active" data-os="macos">macOS</button>
+            <button data-os="linux">Linux</button>
+            <button data-os="wsl">WSL</button>
+          </div>
+          <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">约 30 分钟 · 全新安装</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[900px] mx-auto px-6 py-16 space-y-6" id="setup-steps" data-os="macos">
+      {steps.map((s) => (
+        <div class="step" id={s.id}>
+          <div class={`flex items-center justify-between ${s.bullets || s.code || s.codeByOs || s.callout ? 'mb-5' : 'mb-1'}`}>
+            <div class="flex items-baseline gap-3">
+              <span class="step-num">{s.n}</span>
+              <h3 class="text-xl font-semibold">{s.title}</h3>
+            </div>
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">{s.time}</span>
+          </div>
+          <p class={`text-[color:var(--color-fg-muted)] text-sm ${s.bullets || s.code || s.codeByOs ? 'mb-5' : 'mt-3'}`}>{s.body}</p>
+          {s.bullets && (
+            <ul class="text-sm text-[color:var(--color-fg-muted)] space-y-1.5 ml-4 list-disc marker:text-[color:var(--color-fg-dim)]">
+              {s.bullets.map((b) => <li>{b}</li>)}
+            </ul>
+          )}
+          {s.code && (
+            <div class="code-block p-4 mb-3 relative">
+              <div class="absolute top-3 right-3 copy-btn">复制</div>
+              {s.code.lines.map((l) => {
+                if (l.kind === 'spacer') return <div class="mt-2"></div>;
+                if (l.kind === 'comment') return <div><span class="comment">{l.text}</span></div>;
+                if (l.kind === 'ok') return <div><span class="ok">{l.text}</span></div>;
+                return <div><span class="prompt">$</span> {l.text}</div>;
+              })}
+            </div>
+          )}
+          {s.codeByOs && (Object.entries(s.codeByOs) as [keyof typeof s.codeByOs, CodeBlock][]).map(([os, block]) => (
+            <div class="code-block p-4 mb-3 relative" data-os-variant={os}>
+              <div class="absolute top-3 right-3 copy-btn">复制</div>
+              {block.lines.map((l) => {
+                if (l.kind === 'spacer') return <div class="mt-2"></div>;
+                if (l.kind === 'comment') return <div><span class="comment">{l.text}</span></div>;
+                if (l.kind === 'ok') return <div><span class="ok">{l.text}</span></div>;
+                return <div><span class="prompt">$</span> {l.text}</div>;
+              })}
+            </div>
+          ))}
+          {s.callout && (
+            <div class="callout text-sm text-[color:var(--color-fg-muted)]">
+              <span class="font-mono text-xs uppercase tracking-wider" style="color: #b8470b;">{s.callout.tip}</span>
+              <span set:html={s.callout.html}></span>
+            </div>
+          )}
+          {s.seeAlso && s.seeAlso.length > 0 && (
+            <div class="see-also">
+              <div class="see-also-label">另见 · 资源页</div>
+              <div class="see-also-grid">
+                {s.seeAlso.map((r) => (
+                  <a href={r.href} class="see-also-card">
+                    <span class="sa-label">{r.label}</span>
+                    {r.meta && <span class="sa-meta">{r.meta}</span>}
+                    <span class="sa-arrow">→</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <div class="max-w-[900px] mx-auto px-6 pb-16">
+      <div class="flex items-center justify-between border-t hairline pt-6 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <span>最近验证 2026·05·30,对应 btcli 9.22.x</span>
+        <a href="/zh/mine/playbooks" class="hover:text-[color:var(--color-accent)] text-sm">配置完 → 挑个 subnet 开挖 →</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const stepsEl = document.getElementById('setup-steps');
+    const tabsEl = document.getElementById('os-tabs');
+    if (stepsEl && tabsEl) {
+      tabsEl.querySelectorAll<HTMLButtonElement>('button[data-os]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const os = btn.dataset.os || 'macos';
+          stepsEl.dataset.os = os;
+          tabsEl.querySelectorAll('button[data-os]').forEach((b) => b.classList.toggle('active', b === btn));
+        });
+      });
+    }
+
+    document.querySelectorAll<HTMLDivElement>('.code-block .copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const block = btn.parentElement;
+        if (!block) return;
+        const text = Array.from(block.querySelectorAll<HTMLDivElement>(':scope > div'))
+          .filter((d) => !d.classList.contains('copy-btn'))
+          .map((d) => {
+            const prompt = d.querySelector('.prompt');
+            return prompt ? d.textContent?.replace(/^\$\s*/, '').trim() : '';
+          })
+          .filter(Boolean)
+          .join('\n');
+        try {
+          await navigator.clipboard.writeText(text);
+          const orig = btn.textContent;
+          btn.textContent = '已复制 ✓';
+          setTimeout(() => { btn.textContent = orig; }, 1200);
+        } catch { btn.textContent = '失败'; }
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .step { background: #ffffff; border: 1px solid rgba(15, 15, 18, 0.08); border-radius: 8px; padding: 28px; transition: border-color 0.15s; }
+  .step:hover { border-color: rgba(15, 15, 18, 0.22); }
+  .step-num { font-family: var(--font-mono); font-size: 13px; color: #767680; }
+  .step-num.done { color: #15803d; }
+  .step-num.current { color: #b8470b; }
+  .code-block { background: #faf8f4; color: #0c0c10; border: 1px solid rgba(15, 15, 18, 0.1); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; border-radius: 5px; }
+  .code-block .prompt { color: #b8470b; }
+  .code-block .comment { color: #767680; }
+  .code-block .ok { color: #15803d; }
+  #setup-steps[data-os="macos"] .code-block[data-os-variant]:not([data-os-variant="macos"]) { display: none; }
+  #setup-steps[data-os="linux"] .code-block[data-os-variant]:not([data-os-variant="linux"]) { display: none; }
+  #setup-steps[data-os="wsl"]   .code-block[data-os-variant]:not([data-os-variant="wsl"])   { display: none; }
+  .os-tabs { display: inline-flex; border: 1px solid rgba(15, 15, 18, 0.14); border-radius: 5px; padding: 2px; font-family: var(--font-mono); font-size: 11px; }
+  .os-tabs button { padding: 4px 10px; border-radius: 3px; color: #4a4a52; background: transparent; border: 0; font: inherit; cursor: pointer; }
+  .os-tabs button.active { background: rgba(184, 71, 11, 0.1); color: #b8470b; }
+  .callout { background: rgba(184, 71, 11, 0.05); border-left: 3px solid #b8470b; padding: 14px 18px; border-radius: 4px; }
+  .see-also { margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(15, 15, 18, 0.1); }
+  .see-also-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 8px; }
+  .see-also-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; }
+  .see-also-card { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 10px; padding: 10px 14px; border: 1px solid rgba(15, 15, 18, 0.08); border-radius: 5px; background: #fafaf9; transition: all 0.12s; }
+  .see-also-card:hover { border-color: rgba(184, 71, 11, 0.35); background: #ffffff; }
+  .see-also-card .sa-label { font-size: 13px; color: #0c0c10; }
+  .see-also-card .sa-meta { font-family: var(--font-mono); font-size: 10px; color: #767680; }
+  .see-also-card .sa-arrow { color: #b8470b; font-family: var(--font-mono); }
+  .copy-btn { color: #767680; font-family: var(--font-mono); font-size: 11px; cursor: pointer; }
+  .copy-btn:hover { color: #0c0c10; }
+</style>
