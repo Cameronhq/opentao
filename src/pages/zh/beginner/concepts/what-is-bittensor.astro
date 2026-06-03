@@ -1,0 +1,213 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getAdjacent } from '../../../../data/concepts';
+import { localizePath, hasZh } from '../../../../i18n/utils';
+
+const slug = 'what-is-bittensor';
+const { next } = getAdjacent(slug);
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+---
+<BaseLayout
+  title="什么是 Bittensor — Wiki — OpenTAO"
+  description="一个开放的机器智能网络长什么样——800 字讲清。"
+  section="beginner"
+>
+  <header class="border-b hairline">
+    <div class="article px-6 pt-16 pb-12">
+      <div class="flex items-baseline gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-8 flex-wrap">
+        <a href="/zh/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
+        <a href={L('/beginner/wiki')} class="hover:text-[color:var(--color-fg)]">Wiki</a><span>/</span>
+        <span>网络基础</span><span>/</span>
+        <span class="text-[color:var(--color-fg)]">什么是 Bittensor</span>
+      </div>
+      <div class="section-label mb-4">Cluster I · 网络基础 · 概念 01</div>
+      <h1 class="font-serif font-medium text-[56px] md:text-[64px] leading-[1.02] tracking-[-0.025em]">
+        什么是 <span class="italic">Bittensor</span>?
+      </h1>
+      <p class="font-serif italic font-normal text-2xl text-[color:var(--color-fg-muted)] mt-6 leading-[1.4]">
+        一个开放的机器智能网络长什么样——800 字讲清。
+      </p>
+      <div class="mt-10 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)]">
+          <span><span class="text-[color:var(--color-fg)]" id="depth-read-time">25</span> 分钟读完</span>
+          <span class="opacity-30">·</span>
+          <span>最近验证 2026·05·27 by @editorial</span>
+          <span class="opacity-30">·</span>
+          <span>3 位贡献者</span>
+        </div>
+        <div class="depth-toggle" id="depth-toggle">
+          <button data-depth="short">5 分钟</button>
+          <button data-depth="long" class="active">25 分钟</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="border-b hairline">
+    <article class="article px-6 py-16" data-depth="long" id="depth-article">
+      <p class="lead">
+        多数网络只奖励一种工作。比特币奖励算力,Filecoin 奖励存储。Bittensor 一开始就为"很多种工作同时存在"而设计——而且这些种类不是预先定死的。任何人,只要对"什么算有用的智能"有想法,都可以为它开一个市场。
+      </p>
+      <p>
+        整件事的形状就是这样:底下一条链,上面跑着几十个互相竞争的智能市场。今天有 <strong>128 个</strong>在线;明天可能更多。
+      </p>
+
+      <h2 id="why-it-matters"><span class="index">I.</span>为什么重要</h2>
+      <p class="long-only">
+        今天的 AI 大多集中在少数几家公司手里。模型只能通过 API 访问,训练数据是私有的,价值流向拥有平台的人。
+      </p>
+      <p class="long-only">
+        Bittensor 把这件事反过来。任何人都能作为 <a class="inline" href={L('/beginner/concepts/miner')}>miner</a> 加入一个 subnet 贡献工作;任何人都能作为 <a class="inline" href={L('/beginner/concepts/validator')}>validator</a> 加入去给这些工作打分;任何人都能为一种新的智能开一个新 subnet。<span class="term" title="Bittensor 的原生代币">TAO</span> 流向产出价值的人——而不是拥有平台的人。
+      </p>
+      <p class="short-only">
+        今天的 AI 集中在少数公司——闭源模型、私有数据、价值流向平台所有者。Bittensor 反过来:任何人都能挖矿、都能验证、都能开一个新市场。<span class="term" title="Bittensor 的原生代币">TAO</span> 跟着工作走。
+      </p>
+      <p class="pullquote">
+        这套系统是不是真的更好,取决于激励的数学。但至少它的形状,是 Bittensor 有意思的地方。
+      </p>
+
+      <h2 id="how-it-works"><span class="index">II.</span>怎么运转</h2>
+      <p>三块,按顺序。</p>
+
+      <p class="short-only">
+        <strong>Subtensor</strong> 是一条 Substrate 链,记账,每 ~72 分钟发一次 emission。<strong>Subnet</strong> 是跑在上面的市场——每个 subnet 定义 miner 提交什么、validator 怎么打分。<strong>Yuma 共识</strong> 把每个 validator 的权重乘上质押,产出最终的奖励分配。一天大约二十轮。
+      </p>
+
+      <div class="long-only">
+        <h3><span class="step-num">i.</span>Subtensor,那条链</h3>
+        <p>
+          最底下是 <code>subtensor</code>,一条基于 Substrate 的区块链。它记账:谁有 TAO、谁注册在哪、validator 对哪些 miner 怎么评价。每个 <code>block</code>(~12 秒)、每个 <code>tempo</code>(~360 block ≈ 72 分钟)结算一次、发一次 emission。
+        </p>
+
+        <h3><span class="step-num">ii.</span>Subnet,那些市场</h3>
+        <p>
+          链上面跑着各个 subnet。每个 subnet 本质上是一种智能的市场:文本生成、图像生成、推理过程、机械臂的运动控制。每个都有自己的规则:miner 提交什么、validator 怎么打分。从链的视角看,所有 subnet 长得都一样——它们每个 tempo 都只是产出一组权重向量。
+        </p>
+
+        <h3><span class="step-num">iii.</span>Yuma 共识,那道结算</h3>
+        <p>
+          每个 tempo,每个 validator 都给每个 miner 提交权重。<a class="inline" href={L('/beginner/concepts/yuma-consensus')}>Yuma</a> 把这些权重按各 validator 的质押加权,聚合成最终的奖励分配。miner 拿钱、validator 拿钱、subnet owner 抽成。循环往复——一天约二十次,天天如此。
+        </p>
+
+        <div class="figure">[图] 链 → 128 个 subnet → 每 tempo 的权重 → Yuma 聚合 → emission</div>
+      </div>
+
+      <h2 id="in-practice"><span class="index">III.</span>实际怎么参与</h2>
+      <p>想参与的话,你会从三个角色里挑一个:</p>
+      <ul>
+        <li><strong>Miner</strong>——你有 GPU,想产出工作。去读你关心的那个 subnet 的 <a class="inline" href={L('/mine/playbooks')}>mining playbook</a>。</li>
+        <li><strong>Validator</strong>——你有(或能吸引到)足够的 TAO 质押,想做打分。validator 配起来更费劲,但能从 delegation 里赚。</li>
+        <li><strong>Subnet owner</strong>——你有一种想激励的新智能。看 <a class="inline" href={L('/build/hackathon')}>做一个 subnet</a>。</li>
+      </ul>
+      <p class="long-only">
+        多数新人是读完这三个角色才决定要做哪个。没关系——往下读,等你想清楚了再回这一页。
+      </p>
+
+      <h2 id="going-deeper" class="long-only"><span class="index">IV.</span>再深一层</h2>
+      <div class="going-deeper-list mt-4 long-only">
+        <a href="#"><div><div class="text-[color:var(--color-fg)] font-medium">Bittensor 白皮书</div><div class="meta">PDF · 2021 · 数学多但短</div></div><span class="arrow">↗</span></a>
+        <a href={L('/community/insights')}><div><div class="text-[color:var(--color-fg)] font-medium">Yuma 共识,慢慢讲</div><div class="meta">长文 · 22 分钟 · 手把手走一个 block</div></div><span class="arrow">→</span></a>
+        <a href={L('/community/insights')}><div><div class="text-[color:var(--color-fg)] font-medium">为什么 dTAO 改变了一切</div><div class="meta">长文 · 14 分钟 · 回看 2024 的经济升级</div></div><span class="arrow">→</span></a>
+        <a href="#"><div><div class="text-[color:var(--color-fg)] font-medium">GitHub 上的 subtensor 源码</div><div class="meta">代码 · 链本身</div></div><span class="arrow">↗</span></a>
+      </div>
+
+      <h2 id="related"><span class="index">V.</span>相关概念</h2>
+      <div class="grid sm:grid-cols-2 gap-3 mt-6">
+        <a href={L('/beginner/concepts/subtensor')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">04</span><span class="section-label">网络基础</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Subtensor,那条链</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">一条基于 Substrate 的链,替所有人记账。</div>
+        </a>
+        <a href={L('/beginner/concepts/miner')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">08</span><span class="section-label">角色</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Miner</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">贡献者角色。提交工作;按排名赚。</div>
+        </a>
+        <a href={L('/beginner/concepts/validator')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">09</span><span class="section-label">角色</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Validator</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">打分者角色。提交权重;按质押赚。</div>
+        </a>
+        <a href={L('/beginner/concepts/yuma-consensus')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">17</span><span class="section-label">共识</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Yuma 共识</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">聚合规则。validator 权重 × 质押 → 奖励。</div>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <section class="border-b hairline">
+    <div class="article px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <div class="flex items-center gap-5">
+          <a href="#" class="hover:text-[color:var(--color-fg)]">在 GitHub 上编辑</a>
+          <a href="#" class="hover:text-[color:var(--color-fg)]">提个修改建议</a>
+        </div>
+        <span>对照 chain v2.1.4 验证</span>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3 mt-8">
+        <div class="border hairline rounded-md p-4 opacity-50">
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1">← 上一篇</div>
+          <div class="text-[color:var(--color-fg-muted)] text-sm">(第一个概念)</div>
+        </div>
+        {next && (
+          <a href={L(`/beginner/concepts/${next.slug}`)} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1 text-right">下一篇 →</div>
+            <div class="text-[color:var(--color-fg)] text-sm text-right font-medium">{next.title}</div>
+          </a>
+        )}
+      </div>
+      <div class="mt-8 text-center">
+        <a href={L('/beginner/wiki')} class="text-sm hover:text-[color:var(--color-accent)] text-[color:var(--color-fg-muted)]">← 全部 26 个概念</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const article = document.getElementById('depth-article');
+    const readTime = document.getElementById('depth-read-time');
+    document.querySelectorAll<HTMLButtonElement>('#depth-toggle button[data-depth]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const depth = btn.dataset.depth || 'long';
+        if (article) article.dataset.depth = depth;
+        if (readTime) readTime.textContent = depth === 'short' ? '5' : '25';
+        document.querySelectorAll('#depth-toggle button[data-depth]').forEach((b) => b.classList.toggle('active', b === btn));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .article { max-width: 680px; margin: 0 auto; }
+  .article p { color: #1c1c22; line-height: 1.75; margin: 22px 0; font-size: 18px; }
+  .article p.lead { font-family: var(--font-serif); font-weight: 400; font-size: 24px; line-height: 1.55; color: #0c0c10; margin: 32px 0 40px; letter-spacing: -0.005em; }
+  .article p.lead::first-letter { font-size: 56px; line-height: 0.95; float: left; padding: 6px 12px 0 0; font-weight: 500; color: #b8470b; }
+  .article p.pullquote { font-family: var(--font-serif); font-style: italic; font-size: 22px; line-height: 1.5; color: #0c0c10; border-left: 3px solid #b8470b; padding-left: 22px; margin: 36px 0; }
+  .article h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.015em; margin: 64px 0 16px; color: #0c0c10; }
+  .article h2 .index { font-family: var(--font-mono); font-size: 13px; color: #b8b8be; letter-spacing: 0.06em; vertical-align: middle; margin-right: 14px; font-weight: 400; }
+  .article h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; margin: 36px 0 8px; color: #0c0c10; }
+  .article h3 .step-num { font-family: var(--font-mono); font-size: 12px; color: #b8b8be; letter-spacing: 0.06em; margin-right: 12px; }
+  .article ul { margin: 18px 0; padding-left: 24px; }
+  .article li { color: #1c1c22; line-height: 1.75; margin: 8px 0; padding-left: 6px; font-size: 17px; }
+  .article li::marker { color: #b8b8be; }
+  .article a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .article a.inline:hover { text-decoration-color: #b8470b; }
+  .article code { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); border-radius: 3px; padding: 1px 6px; font-family: var(--font-mono); font-size: 14px; }
+  .article strong { font-weight: 600; }
+  .figure { background: #faf8f4; border: 1px dashed rgba(15,15,18,0.18); padding: 32px; text-align: center; font-family: var(--font-mono); font-size: 13px; color: #767680; border-radius: 6px; margin: 30px 0; }
+  .depth-toggle { display: inline-flex; border: 1px solid rgba(15,15,18,0.14); border-radius: 6px; padding: 2px; }
+  .depth-toggle button { padding: 4px 12px; font-size: 12px; color: #4a4a52; border-radius: 4px; font-family: var(--font-mono); cursor: pointer; background: transparent; border: 0; }
+  .depth-toggle button.active { background: rgba(184,71,11,0.1); color: #b8470b; }
+  .article[data-depth="long"] .short-only { display: none; }
+  .article[data-depth="short"] .long-only { display: none; }
+  .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); padding: 18px 20px; border-radius: 6px; transition: all .15s; display: block; }
+  .related-card:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; }
+  .related-card .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; }
+  .going-deeper-list a { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(15,15,18,0.06); transition: color .15s; }
+  .going-deeper-list a:hover { color: #b8470b; }
+  .going-deeper-list a .meta { color: #767680; font-family: var(--font-mono); font-size: 11px; }
+  .going-deeper-list a .arrow { margin-left: auto; color: #b8b8be; }
+  .term { border-bottom: 1px dashed rgba(184,71,11,0.5); cursor: help; color: #0c0c10; }
+</style>

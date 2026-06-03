@@ -1,0 +1,207 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getAdjacent } from '../../../../data/concepts';
+import { localizePath, hasZh } from '../../../../i18n/utils';
+
+const { prev, next } = getAdjacent('miners-and-validators');
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+---
+<BaseLayout
+  title="Miner 与 validator — Wiki — OpenTAO"
+  description="一边提交工作,一边给工作打分。Bittensor 里几乎所有别的东西都从这两个角色推导出来。"
+  section="beginner"
+>
+  <header class="border-b hairline">
+    <div class="article px-6 pt-16 pb-12">
+      <div class="flex items-baseline gap-2 text-xs font-mono text-[color:var(--color-fg-dim)] mb-8 flex-wrap">
+        <a href="/zh/" class="hover:text-[color:var(--color-fg)]">OpenTAO</a><span>/</span>
+        <a href={L('/beginner/wiki')} class="hover:text-[color:var(--color-fg)]">Wiki</a><span>/</span>
+        <span>角色</span><span>/</span>
+        <span class="text-[color:var(--color-fg)]">Miner 与 Validator</span>
+      </div>
+      <div class="section-label mb-4">Cluster II · 角色 · 概念 02(精选)</div>
+      <h1 class="font-serif font-medium text-[56px] md:text-[64px] leading-[1.02] tracking-[-0.025em]">
+        Miner <span class="italic text-[color:var(--color-fg-muted)] font-normal">与</span> validator。
+      </h1>
+      <p class="font-serif italic font-normal text-2xl text-[color:var(--color-fg-muted)] mt-6 leading-[1.4]">
+        一边提交工作,一边打分。Bittensor 里几乎所有别的东西,都从这两个角色推导出来。
+      </p>
+      <div class="mt-10 flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-5 text-xs font-mono text-[color:var(--color-fg-dim)]">
+          <span><span class="text-[color:var(--color-fg)]">12</span> 分钟读完</span>
+          <span class="opacity-30">·</span>
+          <span>最近验证 2026·05·27 by @editorial</span>
+          <span class="opacity-30">·</span>
+          <span>2 位贡献者</span>
+        </div>
+        <div class="depth-toggle">
+          <button>5 分钟</button>
+          <button class="active">12 分钟</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="border-b hairline">
+    <article class="article px-6 py-16">
+      <p class="lead">
+        Bittensor 是一个双边市场,两边就是 miner 和 validator。miner 干活;validator 给活打分。妙的地方在于:两边都拿 <span class="term" title="原生代币">TAO</span>,但走的是不同的曲线——而这个差别,正是网络的激励所在。
+      </p>
+
+      <h2 id="miner"><span class="index">I.</span>Miner</h2>
+      <p>
+        miner 就是任何在一个 subnet 上注册了 hotkey、并在提交工作的人。具体干什么取决于 subnet:文本生成、图像生成、推理过程、机器人策略。有的 subnet 每个 tempo 收一次提交;有的是连续的流。
+      </p>
+      <p>
+        miner 按 validator 给的排名拿钱。排得好,赚得多;排得差,赚得少;排不上,等有更新的人进来时就被 deregister。
+      </p>
+
+      <h2 id="validator"><span class="index">II.</span>Validator</h2>
+      <p>
+        validator 是任何质押了足够 TAO、能占到一个 subnet 上 top-N validator 槽位(通常 N=64)的人。他们不产出工作——他们打分。每个 tempo,他们提交一组权重向量,表示自己认为谁干得好。
+      </p>
+      <p>
+        validator 的收入按<em>两件</em>事成比例:他们(和他们的 delegator)质押了多少 TAO,<strong>外加</strong>他们的权重和共识有多一致。乱唱反调要付代价;偷懒地随大流(照抄中位数)最终也要付代价。
+      </p>
+
+      <h2 id="compare"><span class="index">III.</span>对着看</h2>
+      <div class="compare-grid">
+        <div class="compare-cell miner">
+          <div class="role-label">Miner</div>
+          <h4>贡献者</h4>
+          <ul>
+            <li><strong>启动成本:</strong>一张 GPU + 注册费(<code>~0.4 τ</code>)</li>
+            <li><strong>你要做:</strong>跑模型,每个 tempo 提交工作</li>
+            <li><strong>收入来自:</strong>被 validator 排到高位</li>
+            <li><strong>风险:</strong>更新的 hotkey 表现超过你时被 deregister</li>
+            <li><strong>首次 emission:</strong>约 2 个 tempo(约 2.5 小时)</li>
+          </ul>
+        </div>
+        <div class="compare-cell validator">
+          <div class="role-label">Validator</div>
+          <h4>打分者</h4>
+          <ul>
+            <li><strong>启动成本:</strong>够进 top-64 的 TAO 质押</li>
+            <li><strong>你要做:</strong>给 miner 打分,每个 tempo 提交权重</li>
+            <li><strong>收入来自:</strong>质押 × 与共识的一致度</li>
+            <li><strong>风险:</strong>和中位数分歧过大会被惩罚</li>
+            <li><strong>首次 emission:</strong>立即,但随 bonding 慢慢爬</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 id="why"><span class="index">IV.</span>为什么(理论上)行得通</h2>
+      <p>
+        miner 这边很直白:干得好,拿钱。validator 这边更微妙。如果 validator 只按质押拿钱,他们随便乱投也照样赚;如果只按准确度拿钱,任何人用便宜的质押投对就能薅羊毛、不用投入资本。
+      </p>
+      <p>
+        Bittensor 把两者结合。<a class="inline" href={L('/beginner/concepts/yuma-consensus')}>Yuma 共识</a> 既奖励 validator 贴近"质押加权的中位数",<em>也</em>奖励他们更早跟上正确的变化。结果(理论上)是:validator 有真实的动机去认真打分——既不作弊、也不躺平。
+      </p>
+
+      <h2 id="practice"><span class="index">V.</span>实际上</h2>
+      <p>
+        多数新人选 miner 这边。一个能跑的 miner 是周末项目;一个能跑的 validator 更像一门小生意。两边都能赚得不错,但运营形态不同——miner 更接近"把模型跑在生产环境",validator 更接近"运营一个预言机服务"。
+      </p>
+      <p>
+        拿不准自己适合哪边,就读一个完整的 subnet 页——<a class="inline" href={L('/beginner/subnets/18-zeus')}>SN18 Zeus</a> 把整个形状摊开了:miner 产出什么、validator 怎么打分、Bittensor 之外的客户在买什么。
+      </p>
+
+      <h2 id="going-deeper"><span class="index">VI.</span>再深一层</h2>
+      <div class="going-deeper-list mt-4">
+        <a href={L('/beginner/concepts/yuma-consensus')}><div><div class="text-[color:var(--color-fg)] font-medium">Yuma 共识</div><div class="meta">概念 · 25 分钟 · 聚合规则</div></div><span class="arrow">→</span></a>
+        <a href={L('/beginner/concepts/validator')}><div><div class="text-[color:var(--color-fg)] font-medium">Validator(单独概念)</div><div class="meta">概念 · 8 分钟 · 更深讲打分者</div></div><span class="arrow">→</span></a>
+        <a href={L('/beginner/concepts/miner')}><div><div class="text-[color:var(--color-fg)] font-medium">Miner(单独概念)</div><div class="meta">概念 · 8 分钟 · 更深讲贡献者</div></div><span class="arrow">→</span></a>
+        <a href={L('/mine/playbooks')}><div><div class="text-[color:var(--color-fg)] font-medium">Subnet 挖矿 playbook</div><div class="meta">128 个 subnet,每个一份 playbook</div></div><span class="arrow">→</span></a>
+      </div>
+
+      <h2 id="related"><span class="index">VII.</span>相关概念</h2>
+      <div class="grid sm:grid-cols-2 gap-3 mt-6">
+        <a href={L('/beginner/concepts/yuma-consensus')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">17</span><span class="section-label">共识</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Yuma 共识</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">validator 权重怎么聚合成奖励。</div>
+        </a>
+        <a href={L('/beginner/concepts/staking-nomination')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">15</span><span class="section-label">经济</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">质押与提名</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">把 TAO 锁在一个 validator 后面。</div>
+        </a>
+        <a href={L('/beginner/concepts/bonding-ema')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">19</span><span class="section-label">共识</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Bonding 与 EMA</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">为什么"过去投对过"现在仍然算数。</div>
+        </a>
+        <a href={L('/beginner/concepts/validator-trust')} class="related-card">
+          <div class="flex items-baseline justify-between mb-2"><span class="num text-2xl">20</span><span class="section-label">共识</span></div>
+          <div class="text-[color:var(--color-fg)] font-medium mb-1">Validator trust</div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">为什么唱反调很贵。</div>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <section class="border-b hairline">
+    <div class="article px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <div class="flex items-center gap-5">
+          <a href="#" class="hover:text-[color:var(--color-fg)]">在 GitHub 上编辑</a>
+          <a href="#" class="hover:text-[color:var(--color-fg)]">提个修改建议</a>
+        </div>
+        <span>对照 chain v2.1.4 验证</span>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3 mt-8">
+        {prev && (
+          <a href={L(`/beginner/concepts/${prev.slug}`)} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1">← 上一篇</div>
+            <div class="text-[color:var(--color-fg)] text-sm font-medium">{prev.title}</div>
+          </a>
+        )}
+        {next && (
+          <a href={L(`/beginner/concepts/${next.slug}`)} class="border hairline rounded-md p-4 hover:border-[color:var(--color-fg-muted)] transition block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-1 text-right">下一篇 →</div>
+            <div class="text-[color:var(--color-fg)] text-sm text-right font-medium">{next.title}</div>
+          </a>
+        )}
+      </div>
+      <div class="mt-8 text-center">
+        <a href={L('/beginner/wiki')} class="text-sm hover:text-[color:var(--color-accent)] inline-flex items-center gap-2 text-[color:var(--color-fg-muted)]">← 全部 26 个概念</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .article { max-width: 680px; margin: 0 auto; }
+  .article p { color: #1c1c22; line-height: 1.75; margin: 22px 0; font-size: 18px; }
+  .article p.lead { font-family: var(--font-serif); font-weight: 400; font-size: 24px; line-height: 1.55; color: #0c0c10; margin: 32px 0 40px; letter-spacing: -0.005em; }
+  .article p.lead::first-letter { font-size: 56px; line-height: 0.95; float: left; padding: 6px 12px 0 0; font-weight: 500; color: #b8470b; }
+  .article h2 { font-family: var(--font-serif); font-weight: 500; font-size: 30px; letter-spacing: -0.015em; margin: 64px 0 16px; color: #0c0c10; }
+  .article h2 .index { font-family: var(--font-mono); font-size: 13px; color: #b8b8be; letter-spacing: 0.06em; vertical-align: middle; margin-right: 14px; font-weight: 400; }
+  .article ul { margin: 18px 0; padding-left: 24px; }
+  .article li { color: #1c1c22; line-height: 1.75; margin: 8px 0; padding-left: 6px; font-size: 17px; }
+  .article li::marker { color: #b8b8be; }
+  .article a.inline { color: #0c0c10; text-decoration: underline; text-decoration-color: rgba(184,71,11,0.45); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .article a.inline:hover { text-decoration-color: #b8470b; }
+  .article code { background: #faf8f4; border: 1px solid rgba(15,15,18,0.09); border-radius: 3px; padding: 1px 6px; font-family: var(--font-mono); font-size: 14px; }
+  .article strong { font-weight: 600; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+  .compare-cell { border: 1px solid rgba(15,15,18,0.1); border-radius: 8px; padding: 22px; background: #fafaf9; }
+  .compare-cell.miner { border-left: 3px solid #b8470b; }
+  .compare-cell.validator { border-left: 3px solid #1c6ea4; }
+  .compare-cell .role-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #767680; margin-bottom: 8px; }
+  .compare-cell h4 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; color: #0c0c10; margin: 0 0 14px; }
+  .compare-cell ul { padding-left: 18px; margin: 0; }
+  .compare-cell li { font-size: 14px; line-height: 1.55; margin: 6px 0; color: #1c1c22; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .depth-toggle { display: inline-flex; border: 1px solid rgba(15,15,18,0.14); border-radius: 6px; padding: 2px; }
+  .depth-toggle button { padding: 4px 12px; font-size: 12px; color: #4a4a52; border-radius: 4px; font-family: var(--font-mono); }
+  .depth-toggle button.active { background: rgba(184,71,11,0.1); color: #b8470b; }
+  .related-card { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); padding: 18px 20px; border-radius: 6px; transition: all .15s; display: block; }
+  .related-card:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; }
+  .related-card .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; }
+  .going-deeper-list a { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(15,15,18,0.06); transition: color .15s; }
+  .going-deeper-list a:hover { color: #b8470b; }
+  .going-deeper-list a .meta { color: #767680; font-family: var(--font-mono); font-size: 11px; }
+  .going-deeper-list a .arrow { margin-left: auto; color: #b8b8be; }
+  .term { border-bottom: 1px dashed rgba(184,71,11,0.5); cursor: help; color: #0c0c10; }
+</style>
