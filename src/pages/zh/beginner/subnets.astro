@@ -1,0 +1,283 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { subnets as allSubnets } from '../../../data/subnets';
+
+interface Row {
+  netuid: number; slug: string; name: string; owner: string;
+  cat: string; catLabel: string; emission: string; mcap: string; price: string;
+  delta7d: string; delta7dSign: 'pos' | 'neg';
+  miners: string; minerSlots: string; minersEarning: string; validators: string;
+  pb: string; pbClass: 'pb-yes' | 'pb-no' | 'pb-stale'; dot: 'dot-active' | 'dot-new' | 'dot-stale'; newTag?: boolean;
+}
+
+const parseSI = (raw: string | undefined): number => {
+  const m = (raw || '').match(/([\d.]+)\s*([KMB]?)/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]); const u = m[2].toUpperCase();
+  return n * (u === 'B' ? 1e9 : u === 'M' ? 1e6 : u === 'K' ? 1e3 : 1);
+};
+const parseDelta = (raw: string | undefined, sign: 'pos' | 'neg'): number => {
+  const n = parseFloat((raw || '').replace(/[^0-9.]/g, '') || '0');
+  return sign === 'neg' ? -n : n;
+};
+
+const rows: Row[] = [...allSubnets]
+  .sort((a, b) => parseSI(b.emission) - parseSI(a.emission))
+  .map((s) => ({
+    netuid: s.netuid, slug: s.slug, name: s.name, owner: s.owner,
+    cat: s.cat, catLabel: s.catLabel, emission: s.emission, mcap: s.mcap, price: s.price,
+    delta7d: s.delta7d, delta7dSign: s.delta7dSign,
+    miners: s.miners, minerSlots: s.minerSlots, minersEarning: s.minersEarning, validators: s.validators,
+    pb: '— 缺失', pbClass: 'pb-no' as const, dot: 'dot-active' as const,
+  }));
+---
+<BaseLayout
+  title="Subnet 目录 — OpenTAO"
+  description="128 个在线的智能市场。点开任一个,看它做什么、谁在挖、怎么加入。"
+  section="beginner"
+>
+  <section class="border-b hairline">
+    <div class="max-w-[1500px] mx-auto px-6 pt-10 pb-6">
+      <div class="flex items-end justify-between flex-wrap gap-6 mb-8">
+        <div>
+          <Breadcrumb crumbs={[
+            { href: '/zh/', label: 'OpenTAO' },
+            { label: 'Subnet 目录' },
+          ]} />
+          <h1 class="text-[40px] leading-[1.05] tracking-[-0.025em] font-semibold">Subnet</h1>
+          <p class="text-[color:var(--color-fg-muted)] mt-2 max-w-[540px] text-sm">128 个在线的智能市场。点开任一个,看它做什么、谁在挖、怎么加入。</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-7 border hairline rounded-md overflow-hidden bg-[color:var(--color-surface)]">
+        <div class="stat-cell"><div class="section-label">TAO 价格</div><div class="stat-num mt-1 tabular">$284.51 <span class="pos text-xs font-mono">+2.31%</span></div></div>
+        <div class="stat-cell"><div class="section-label">市值</div><div class="stat-num mt-1 tabular">$2.41B</div></div>
+        <div class="stat-cell"><div class="section-label">总 emission · 24h</div><div class="stat-num mt-1 tabular">7,200 τ</div></div>
+        <div class="stat-cell"><div class="section-label">活跃 subnet</div><div class="stat-num mt-1 tabular">128</div></div>
+        <div class="stat-cell"><div class="section-label">活跃 miner</div><div class="stat-num mt-1 tabular">52,184</div></div>
+        <div class="stat-cell"><div class="section-label">Validator</div><div class="stat-num mt-1 tabular">1,248</div></div>
+        <div class="stat-cell"><div class="section-label">Block</div><div class="stat-num mt-1 tabular">#4,920,118</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline sticky top-[57px] z-40 nav-blur">
+    <div class="max-w-[1500px] mx-auto px-6 py-3 flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2 px-3 py-2 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] w-full sm:w-64">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="subnet-search" type="text" placeholder="按名字、netuid、owner 搜…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+      </div>
+      <div class="flex items-center gap-2 overflow-x-auto">
+        <button class="pill active" data-filter-cat="all">全部</button>
+        <button class="pill" data-filter-cat="llm">LLM</button>
+        <button class="pill" data-filter-cat="vision">Vision</button>
+        <button class="pill" data-filter-cat="audio">Audio</button>
+        <button class="pill" data-filter-cat="robotics">Robotics</button>
+        <button class="pill" data-filter-cat="data">Data</button>
+        <button class="pill" data-filter-cat="reason">Reasoning</button>
+        <button class="pill" data-filter-cat="compute">Compute</button>
+        <button class="pill" data-filter-cat="storage">Storage</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="max-w-[1500px] mx-auto px-6 py-8">
+      <div class="overflow-x-auto">
+        <table class="subnet-table tabular">
+          <thead>
+            <tr>
+              <th class="left sortable" data-sort="netuid"      data-sort-default="asc"><span class="lbl">#</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="netuid"      data-sort-default="asc"><span class="lbl">Subnet</span><span class="sort">↕</span></th>
+              <th class="left sortable" data-sort="cat"         data-sort-default="asc"><span class="lbl">类别</span><span class="sort">↕</span></th>
+              <th class="sortable sorted" data-sort="emission"  data-sort-default="desc" data-sort-active="desc"><span class="lbl">Emission · 24h</span><span class="sort">↓</span></th>
+              <th class="sortable" data-sort="mcap"             data-sort-default="desc"><span class="lbl">市值</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="price"            data-sort-default="desc"><span class="lbl">价格 (τ)</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="delta7d"          data-sort-default="desc"><span class="lbl">7d</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="miners"           data-sort-default="desc"><span class="lbl">矿工</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="validators"       data-sort-default="desc"><span class="lbl">Validator</span><span class="sort">↕</span></th>
+              <th class="sortable" data-sort="playbook"         data-sort-default="desc"><span class="lbl">Playbook</span><span class="sort">↕</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                data-href={`/beginner/subnets/${r.slug}`}
+                data-cat={r.cat}
+                data-playbook={r.pbClass === 'pb-yes' ? '1' : '0'}
+                data-netuid={String(r.netuid).padStart(4, '0')}
+                data-emission-n={String(parseSI(r.emission))}
+                data-mcap-n={String(parseSI(r.mcap))}
+                data-price-n={String(parseFloat(r.price) || 0)}
+                data-delta7d-n={String(parseDelta(r.delta7d, r.delta7dSign))}
+                data-miners-n={String(parseSI(r.miners))}
+                data-validators-n={String(parseSI(r.validators))}
+                data-name={r.name.toLowerCase()}
+                data-search={`${r.name} ${r.owner} ${r.netuid} ${r.catLabel}`.toLowerCase()}
+              >
+                <td class="left"><span class="netuid">{r.netuid}</span></td>
+                <td class="left">
+                  <div class="name">
+                    {/^[\d⚒]+$/.test(r.name) ? <span class="text-[color:var(--color-fg-dim)] italic">(未命名)</span> : r.name}
+                    {r.newTag && <span class="text-[9px] text-[color:var(--color-accent)] font-mono ml-1">NEW</span>}
+                  </div>
+                </td>
+                <td class="left"><span class={`cat cat-${r.cat}`}>{r.catLabel}</span></td>
+                <td><span class="text-[color:var(--color-fg)]">{r.emission}</span> <span class="text-[color:var(--color-fg-dim)] text-xs">τ</span></td>
+                <td>{r.mcap}</td>
+                <td>{r.price}</td>
+                <td class={r.delta7dSign}>{r.delta7d}</td>
+                <td>
+                  <span class="text-[color:var(--color-fg)]">{r.miners}</span>
+                  <span class="text-[color:var(--color-fg-dim)] text-xs"> / {r.minerSlots}</span>
+                  <span class="text-[color:var(--color-fg-dim)] text-xs"> · {r.minersEarning} earning</span>
+                </td>
+                <td>{r.validators}</td>
+                <td><span class={r.pbClass}>{r.pb}</span></td>
+                <td><span class={r.dot}></span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t hairline pt-5">
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]" id="subnet-count">显示 <span class="text-[color:var(--color-fg)]" data-visible>{rows.length}</span> / <span class="text-[color:var(--color-fg)]">{rows.length}</span> 个 subnet</div>
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]"><a href="/subnets.csv" download class="hover:text-[color:var(--color-fg)] underline underline-offset-2">CSV ↓</a> · <a href="/zh/beginner/concepts/yuma-consensus" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">方法论</a></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.querySelectorAll<HTMLTableRowElement>('tr[data-href]').forEach((tr) => {
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', () => {
+        const href = tr.getAttribute('data-href');
+        if (href) window.location.href = href;
+      });
+    });
+
+    let cat = 'all';
+    let query = '';
+    let sortKey: string = 'emission';
+    let sortDir: 'asc' | 'desc' = 'desc';
+
+    const tbody = document.querySelector<HTMLTableSectionElement>('.subnet-table tbody');
+    const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('tbody tr[data-href]'));
+    const visibleCount = document.querySelector<HTMLSpanElement>('[data-visible]');
+    const headers = Array.from(document.querySelectorAll<HTMLTableCellElement>('th.sortable'));
+
+    const COMPARE: Record<string, { attr: string; kind: 'number' | 'string' }> = {
+      netuid:     { attr: 'netuid',      kind: 'string' },
+      name:       { attr: 'name',        kind: 'string' },
+      cat:        { attr: 'cat',         kind: 'string' },
+      emission:   { attr: 'emissionN',   kind: 'number' },
+      mcap:       { attr: 'mcapN',       kind: 'number' },
+      price:      { attr: 'priceN',      kind: 'number' },
+      delta7d:    { attr: 'delta7dN',    kind: 'number' },
+      miners:     { attr: 'minersN',     kind: 'number' },
+      validators: { attr: 'validatorsN', kind: 'number' },
+      playbook:   { attr: 'playbook',    kind: 'number' },
+    };
+
+    function apply() {
+      let shown = 0;
+      const visible: HTMLTableRowElement[] = [];
+      for (const r of rows) {
+        const rCat = r.dataset.cat || '';
+        const rSearch = r.dataset.search || '';
+        const matchCat = cat === 'all' || rCat === cat;
+        const matchSearch = !query || rSearch.includes(query);
+        const show = matchCat && matchSearch;
+        r.style.display = show ? '' : 'none';
+        if (show) { shown++; visible.push(r); }
+      }
+      const spec = COMPARE[sortKey] || COMPARE.emission;
+      const flip = sortDir === 'asc' ? 1 : -1;
+      const sorted = [...visible].sort((a, b) => {
+        const av = a.dataset[spec.attr] || '';
+        const bv = b.dataset[spec.attr] || '';
+        if (spec.kind === 'number') return (Number(av) - Number(bv)) * flip;
+        return av.localeCompare(bv) * flip;
+      });
+      if (tbody) for (const r of sorted) tbody.appendChild(r);
+      if (visibleCount) visibleCount.textContent = String(shown);
+      for (const th of headers) {
+        const key = th.dataset.sort;
+        const isActive = key === sortKey;
+        th.classList.toggle('sorted', isActive);
+        const arrow = th.querySelector<HTMLSpanElement>('.sort');
+        if (arrow) arrow.textContent = isActive ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-cat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        cat = btn.dataset.filterCat || 'all';
+        document.querySelectorAll('[data-filter-cat]').forEach((b) => b.classList.toggle('active', b === btn));
+        apply();
+      });
+    });
+
+    const search = document.getElementById('subnet-search') as HTMLInputElement | null;
+    if (search) {
+      search.addEventListener('input', () => { query = search.value.trim().toLowerCase(); apply(); });
+    }
+
+    for (const th of headers) {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (!key) return;
+        if (sortKey === key) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+        else { sortKey = key; sortDir = (th.dataset.sortDefault as 'asc' | 'desc') || 'desc'; }
+        apply();
+      });
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .stat-cell { padding: 14px 18px; border-right: 1px solid rgba(15,15,18,0.07); }
+  .stat-cell:last-child { border-right: 0; }
+  .stat-num { font-weight: 600; letter-spacing: -0.01em; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; background: transparent; white-space: nowrap; }
+  .pill:hover { border-color: rgba(15,15,18,0.28); color: #0c0c10; }
+  .pill.active { color: #b8470b; border-color: rgba(184,71,11,0.4); background: rgba(184,71,11,0.06); }
+  table.subnet-table { width: 100%; border-collapse: collapse; }
+  .subnet-table thead th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #767680; font-weight: 400; padding: 14px 12px; text-align: right; border-bottom: 1px solid rgba(15,15,18,0.12); white-space: nowrap; background: #ffffff; user-select: none; }
+  .subnet-table thead th.left { text-align: left; }
+  .subnet-table thead th.sortable { cursor: pointer; transition: color .12s; }
+  .subnet-table thead th.sortable:hover { color: #0c0c10; }
+  .subnet-table thead th.sortable:hover .sort { opacity: 0.85; }
+  .subnet-table thead th .sort { opacity: 0.35; margin-left: 4px; transition: opacity .12s, color .12s; }
+  .subnet-table thead th.sorted .sort { opacity: 1; color: #b8470b; }
+  .subnet-table thead th.sorted { color: #0c0c10; }
+  .subnet-table tbody td { padding: 14px 12px; border-bottom: 1px solid rgba(15,15,18,0.05); font-size: 13px; text-align: right; vertical-align: middle; }
+  .subnet-table tbody td.left { text-align: left; }
+  .subnet-table tbody tr { transition: background .12s; }
+  .subnet-table tbody tr:hover { background: #fafaf9; }
+  .subnet-table tbody tr:hover .netuid { color: #b8470b; }
+  .netuid { font-family: var(--font-mono); font-weight: 500; transition: color .15s; color: #0c0c10; }
+  .name { font-weight: 500; color: #0c0c10; }
+  .owner { font-family: var(--font-mono); font-size: 11px; color: #767680; }
+  .cat { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid; display: inline-block; }
+  .cat-llm      { color: #6741d9; border-color: rgba(103,65,217,0.3); background: rgba(103,65,217,0.06); }
+  .cat-vision   { color: #1c6ea4; border-color: rgba(28,110,164,0.3); background: rgba(28,110,164,0.06); }
+  .cat-audio    { color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06); }
+  .cat-robotics { color: #c2410c; border-color: rgba(194,65,12,0.35); background: rgba(194,65,12,0.06); }
+  .cat-data     { color: #15803d; border-color: rgba(21,128,61,0.3); background: rgba(21,128,61,0.06); }
+  .cat-reason   { color: #a16207; border-color: rgba(161,98,7,0.3); background: rgba(161,98,7,0.06); }
+  .cat-compute  { color: #475569; border-color: rgba(71,85,105,0.3); background: rgba(71,85,105,0.06); }
+  .cat-storage  { color: #854d0e; border-color: rgba(133,77,14,0.3); background: rgba(133,77,14,0.06); }
+  .dot-active { width: 6px; height: 6px; border-radius: 999px; background: #16a34a; box-shadow: 0 0 6px rgba(22,163,74,0.4); display: inline-block; }
+  .dot-new    { width: 6px; height: 6px; border-radius: 999px; background: #b8470b; box-shadow: 0 0 6px rgba(184,71,11,0.4); display: inline-block; }
+  .dot-stale  { width: 6px; height: 6px; border-radius: 999px; background: #b8b8be; display: inline-block; }
+  .pos { color: #15803d; }
+  .neg { color: #b91c1c; }
+  .pb-yes { color: #15803d; font-family: var(--font-mono); font-size: 10px; }
+  .pb-no  { color: #767680; font-family: var(--font-mono); font-size: 10px; }
+  .pb-stale  { color: #b8470b; font-family: var(--font-mono); font-size: 10px; }
+  .tabular { font-variant-numeric: tabular-nums; }
+</style>
