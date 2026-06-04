@@ -18,6 +18,9 @@ export const ZH_ROUTES = new Set<string>([
   '/build/hackathon',
   '/build/incubator',
   '/build/idea-bank',
+  '/community/events',
+  '/community/chapters',
+  '/community/insights',
 ]);
 
 /** Detect the active locale from the URL pathname. */

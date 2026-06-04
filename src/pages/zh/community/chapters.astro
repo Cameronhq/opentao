@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/community/events'), label: '活动' },
+  { href: L('/community/chapters'), label: '城市分会' },
+  { href: L('/community/insights'), label: '长文' },
+];
+
+const pins = [
+  { city: '旧金山', top: '38%', left: '18%' },
+  { city: '纽约', top: '36%', left: '27%' },
+  { city: '圣保罗', top: '70%', left: '32%' },
+  { city: '伦敦', top: '28%', left: '48%' },
+  { city: '柏林', top: '30%', left: '52%' },
+  { city: '拉各斯', top: '55%', left: '51%' },
+  { city: '班加罗尔', top: '50%', left: '68%' },
+  { city: '新加坡', top: '60%', left: '75%' },
+  { city: '深圳', top: '45%', left: '80%' },
+  { city: '首尔', top: '39%', left: '82%' },
+  { city: '东京', top: '42%', left: '85%' },
+  { city: '悉尼', top: '80%', left: '86%' },
+];
+
+const chapters = [
+  { href: L('/community/chapters/tokyo'), city: '东京', flag: '🇯🇵', hosts: '@yuki + @takahiro · 自 2025-09', events: '办过 12 场', members: '412' },
+  { href: '/community/chapters/san-francisco', city: '旧金山', flag: '🇺🇸', hosts: '@ke.ng + 还有 2 人 · 自 2025-06', events: '办过 18 场', members: '1,108' },
+  { href: '/community/chapters/berlin', city: '柏林', flag: '🇩🇪', hosts: '@carlos · 自 2025-11', events: '办过 6 场', members: '526' },
+  { href: '/community/chapters/singapore', city: '新加坡', flag: '🇸🇬', hosts: '@wei · 自 2025-10', events: '办过 5 场', members: '308' },
+  { href: '/community/chapters/shenzhen', city: '深圳', flag: '🇨🇳', hosts: '@chen · 自 2026-01 · 中文', events: '办过 3 场', members: '144' },
+  { href: '/community/chapters/new-york', city: '纽约', flag: '🇺🇸', hosts: '@maya · 自 2026-02', events: '办过 4 场', members: '288' },
+  { href: '/community/chapters/london', city: '伦敦', flag: '🇬🇧', hosts: '@sasha · 自 2025-12', events: '办过 5 场', members: '331' },
+  { href: '/community/chapters/bangalore', city: '班加罗尔', flag: '🇮🇳', hosts: '@arjun · 自 2026-01', events: '办过 3 场', members: '204' },
+];
+---
+<BaseLayout
+  title="城市分会 — 社区 — OpenTAO"
+  description="全球十二个本地 Bittensor 分会。各自办 meetup,用各自的语言。"
+  section="community"
+>
+  <SubNav items={subnav} active="/community/chapters" rightMeta="12 个活跃 · 3 个筹建" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-20 pb-14">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/community/events', label: '社区' },
+        { label: '城市分会' },
+      ]} />
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">十二个 </span>本地社群<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">每个分会自己办 meetup,按自己的节奏、用自己的语言。我们给你品牌物料和报销,你给这座城市一个聚起来的地方。</p>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-10">
+      <div class="section-label mb-4">我们在哪</div>
+      <div class="map">
+        <svg width="100%" height="100%" viewBox="0 0 1000 420" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 opacity-60">
+          <defs><pattern id="dots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="rgba(15,15,18,0.15)"/></pattern></defs>
+          <rect width="1000" height="420" fill="url(#dots)" />
+          <ellipse cx="220" cy="160" rx="100" ry="60" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="500" cy="140" rx="120" ry="55" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="780" cy="170" rx="110" ry="60" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="280" cy="290" rx="60" ry="60" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="560" cy="260" rx="80" ry="50" fill="rgba(184,71,11,0.05)"/>
+          <ellipse cx="820" cy="320" rx="50" ry="40" fill="rgba(184,71,11,0.05)"/>
+        </svg>
+        {pins.map((p) => (
+          <div class="pin" data-city={p.city} style={`top: ${p.top}; left: ${p.left};`}></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">所有分会</div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {chapters.map((c) => (
+          <a href={c.href} class="card ch-card rounded-md block">
+            <div class="flex items-baseline justify-between mb-2"><div class="city">{c.city}</div><span class="flag">{c.flag}</span></div>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-4">{c.hosts}</div>
+            <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+              <div><div class="text-[color:var(--color-fg-dim)]">活动</div><div class="text-[color:var(--color-fg)]">{c.events}</div></div>
+              <div><div class="text-[color:var(--color-fg-dim)]">成员</div><div class="text-[color:var(--color-fg)]">{c.members}</div></div>
+            </div>
+          </a>
+        ))}
+        <a href={L('/community/become-a-host')} class="card ch-card rounded-md block opacity-70" style="border-style: dashed;">
+          <div class="flex items-baseline justify-between mb-2"><div class="city">圣保罗</div><span class="flag">🇧🇷</span></div>
+          <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-4">筹建中 · 正在收主理人申请</div>
+          <div class="text-xs text-[color:var(--color-fg-muted)]">来当第一个主理人 →</div>
+        </a>
+        <a href={L('/community/become-a-host')} class="card ch-card rounded-md block" style="border-style: dashed; background: transparent;">
+          <div class="flex items-baseline justify-between mb-2"><div class="city text-[color:var(--color-fg-muted)]">你的城市?</div></div>
+          <div class="text-sm text-[color:var(--color-fg-muted)] mt-2">你那儿还没有,就开一个。申请就一段话。</div>
+          <div class="mt-3 text-xs font-mono text-[color:var(--color-accent)]">申请当主理人 →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-[1.3fr_1fr] gap-10 items-end">
+        <div>
+          <div class="section-label mb-3">来当主理人</div>
+          <h2 class="text-3xl md:text-4xl font-serif italic font-medium leading-tight max-w-[580px]">一段话。不要 deck。一周内回你。</h2>
+          <p class="text-[color:var(--color-fg-muted)] mt-5 max-w-[560px] leading-relaxed">告诉我们你在哪、为什么想办、第一场打算办成什么样。就这些。我们约个 30 分钟视频,一起拍板。</p>
+          <a href={L('/community/become-a-host')} class="mt-7 inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md btn-primary">申请当主理人<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="card rounded-md p-6">
+          <div class="section-label mb-4">我们提供什么</div>
+          <ul class="space-y-3 text-sm text-[color:var(--color-fg-muted)]">
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> Logo / 海报 / 幻灯模板</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> 主理人 playbook(怎么办第一场)</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> 每场 $500 餐饮 & 场地报销</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> 每季度贴纸 + T 恤</li>
+            <li class="flex items-start gap-3"><span class="text-[color:var(--color-fg-dim)] mt-0.5">·</span> 和其他主理人的直连(Discord 频道)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ch-card { position: relative; padding: 24px 20px; }
+  .ch-card .city { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 22px; letter-spacing: -0.01em; }
+  .flag { font-size: 16px; }
+  .map { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 8px; height: 420px; position: relative; overflow: hidden; }
+  .pin { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #b8470b; box-shadow: 0 0 12px rgba(184,71,11,0.5); cursor: pointer; }
+  .pin::after { content: attr(data-city); position: absolute; top: -28px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #ffffff; background: #0c0c10; padding: 3px 8px; border-radius: 3px; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+  .pin:hover::after { opacity: 1; }
+</style>

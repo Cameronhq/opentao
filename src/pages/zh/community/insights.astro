@@ -1,0 +1,158 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { insights } from '../../../data/insights';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/community/events'), label: '活动' },
+  { href: L('/community/chapters'), label: '城市分会' },
+  { href: L('/community/insights'), label: '长文' },
+];
+
+const featured = insights.find((i) => i.featured) ?? insights[0];
+const latest = insights
+  .filter((i) => i.slug !== featured.slug)
+  .map((i) => ({
+    href: `/community/insights/${i.slug}`,
+    cover: i.cover,
+    coverText: i.coverText,
+    type: `${i.type} · ${i.readTime}`,
+    title: i.title,
+    body: i.lead,
+    meta: `by ${i.authorHandle ?? i.author} · ${i.date}`,
+  }));
+const types = [...new Set(insights.map((i) => i.type))];
+---
+<BaseLayout
+  title="长文 — 社区 — OpenTAO"
+  description="一线建设者写的深度、复盘和访谈。"
+  section="community"
+>
+  <SubNav items={subnav} active="/community/insights" rightMeta={`${insights.length} 篇`} />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-20 pb-14">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/community/events', label: '社区' },
+        { label: '长文' },
+      ]} />
+      <div class="grid lg:grid-cols-[1.4fr_1fr] gap-12 items-end">
+        <div>
+          <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold">
+            <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">长 </span>文<span class="text-[color:var(--color-accent)]">.</span>
+          </h1>
+          <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[580px] leading-relaxed">深度、复盘、访谈——写给已经懂基础、想再往里走一层的人。</p>
+        </div>
+        <div class="card rounded-md p-5">
+          <div class="section-label mb-2 flex items-center gap-3">
+            <span>订阅</span>
+            <span class="coming-soon">即将</span>
+          </div>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">每两周一封邮件。新文章,绝不发垃圾。</p>
+          <div class="flex gap-2 opacity-60 pointer-events-none">
+            <input class="flex-1 px-3 py-2 bg-[color:var(--color-surface)] border hairline rounded text-sm text-[color:var(--color-fg)] outline-none focus:border-[color:var(--color-fg-muted)]" placeholder="you@example.com" disabled />
+            <button class="btn-primary px-4 py-2 text-sm font-medium rounded" disabled>订阅</button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-12 flex flex-wrap items-center gap-2">
+        <button class="pill active" data-filter-type="all">全部</button>
+        {types.map((t) => (
+          <button class="pill" data-filter-type={t}>{t}</button>
+        ))}
+        <a href="/feed.xml" class="pill ml-auto">RSS</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">精选</div>
+      <a id="featured-card" href={`/community/insights/${featured.slug}`} class="grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center group" data-type={featured.type}>
+        <div class={`cover ${featured.cover} rounded-md`}>{featured.coverText}</div>
+        <div>
+          <div class="flex items-center gap-3 mb-4"><span class="type-tag" style="color: #b8470b;">{featured.type} · {featured.readTime}</span><span class="text-[color:var(--color-fg-dim)] font-mono text-xs">{featured.date}</span></div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight leading-[1.1] mb-4">{featured.title}</h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6 max-w-[520px]">{featured.lead}</p>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #6741d9, #1c6ea4);"></div>
+            <div><div class="text-sm text-[color:var(--color-fg)]">{featured.author}</div>{featured.authorHandle && <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">{featured.authorHandle}</div>}</div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-6">最新</div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="insights-grid">
+        {latest.map((p) => (
+          <a href={p.href} class="block" data-type={p.type.split('·')[0].trim()}>
+            <div class={`cover ${p.cover} rounded-md mb-4`}>{p.coverText}</div>
+            <div class="flex items-center gap-3 mb-2"><span class="type-tag">{p.type}</span></div>
+            <h3 class="text-xl font-serif italic font-medium tracking-tight leading-snug mb-2">{p.title}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">{p.body}</p>
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">{p.meta}</div>
+          </a>
+        ))}
+      </div>
+      <div class="mt-10 flex flex-col items-center gap-2">
+        <div class="text-sm text-[color:var(--color-fg-muted)]">目前发布的就这些。</div>
+        <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">新文章每两周更新 — <a href="/feed.xml" class="hover:text-[color:var(--color-fg)] underline underline-offset-2">用 RSS 订阅</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-[1.3fr_1fr] gap-10 items-center">
+        <div>
+          <div class="section-label mb-3">来投一篇</div>
+          <h2 class="text-3xl font-serif italic font-medium leading-snug max-w-[520px]">有长篇观点?先发提纲,我们感兴趣再要全文。</h2>
+        </div>
+        <div class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+          <p>采用的文章我们付稿费。明码标价,不玩砍价。轻度编辑,绝不动你的语气。</p>
+          <a href={L('/community/insights/contribute')} class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-md border hairline-strong text-sm hover:border-[color:var(--color-fg-muted)]">投个提纲 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const grid = document.getElementById('insights-grid');
+    const featured = document.getElementById('featured-card') as HTMLAnchorElement | null;
+    const cards = grid ? Array.from(grid.querySelectorAll<HTMLAnchorElement>('a[data-type]')) : [];
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-type]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filterType || 'all';
+        document.querySelectorAll('[data-filter-type]').forEach((b) => b.classList.toggle('active', b === btn));
+        for (const c of cards) {
+          c.style.display = f === 'all' || c.dataset.type === f ? '' : 'none';
+        }
+        if (featured) {
+          featured.style.display = f === 'all' || featured.dataset.type === f ? '' : 'none';
+        }
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; font-size: 13px; color: #4a4a52; }
+  .pill:hover { color: #0c0c10; border-color: rgba(15,15,18,0.28); }
+  .pill.active { color: #b8470b; border-color: rgba(184,71,11,0.4); background: rgba(184,71,11,0.06); }
+  .type-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #4a4a52; }
+  .cover { background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; color: #767680; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .cover-1 { background: linear-gradient(135deg, #fdf3e3, #f5e8d2); color: #b8470b; }
+  .cover-2 { background: linear-gradient(135deg, #e8f1f7, #d4e4f0); color: #1c6ea4; }
+  .cover-3 { background: linear-gradient(135deg, #f0eafa, #e0d6f0); color: #6741d9; }
+  .cover-4 { background: linear-gradient(135deg, #e6f4ea, #d2ead8); color: #15803d; }
+  .cover-5 { background: linear-gradient(135deg, #fceae3, #f6d6cd); color: #c2410c; }
+  .cover-6 { background: linear-gradient(135deg, #faf0d6, #f0e2bd); color: #a16207; }
+</style>
