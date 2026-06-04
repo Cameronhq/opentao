@@ -3,6 +3,14 @@
 > 每次实际改动后在顶部加一条。格式:`## 日期`,下列 `- 改了什么 — 涉及文件`。
 > 决策性的"为什么"记在 `PRD.md`,这里只记"改了什么"。
 
+## 2026-06-05
+
+- **中文全量上线:21 个手写页全部翻完** [PRD I18N-1/4] — 首页 + Mine(agent/general-setup/playbooks/resources)+ Beginner(wiki/subnets/3 concept)+ Build(hackathon/incubator/idea-bank)+ Community(events/chapters/insights/become-a-host/contribute/东京活动/东京分会)+ 404(双语)。
+  - 每个 `/zh` 页是 EN 页的完整副本,按"达意"重写,术语保留英文;表单逻辑、表格筛选、排序脚本原样保留。
+  - section 子导航用 `hasZh()` 智能深链(已翻译去 /zh,未翻译回退英文);所有路由登记进 `ZH_ROUTES`。
+  - 修了个全站 switcher bug:`toBaseRoute` 现在去掉尾斜杠,子页深链才正确。
+  - 数据驱动的 `[slug]` 详情页(子网/playbook/concept)仍回退英文,待 Phase 3。
+
 ## 2026-06-02 (下午)
 
 - **首页露出 MCP** [audit 8] — 首页(EN + /zh)hero 下加 agent/MCP strip:一行接入命令 + 示例问答 + CTA 到 /mine/agent。

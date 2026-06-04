@@ -138,7 +138,9 @@ Both read one source — `/mining-data.json` (built from `subnets.ts` + `playboo
 
 - Switcher (EN · 中) is live in the nav on every page; `<html lang>` is dynamic.
 - Chrome (nav/footer) is bilingual via `src/i18n/ui.ts` (zh falls back to en).
-- Translated so far: `/zh/` homepage. Untranslated routes fall back to English.
+- Translated: **all 21 hand-written pages** (`/zh/` homepage + full Mine /
+  Beginner / Build / Community sections + bilingual 404). Data-driven `[slug]`
+  detail pages (subnet / playbook / concept) still fall back to English.
   Add a page: create `src/pages/zh/<path>.astro` + add its base route to
   `ZH_ROUTES` in `src/i18n/utils.ts`.
 
