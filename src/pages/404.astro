@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+// Single static 404 for the whole site. It renders English; a tiny script
+// swaps to Chinese (and /zh links) when the visited path is under /zh.
 ---
 <BaseLayout
   title="404 — Page not found — OpenTAO"
@@ -10,15 +12,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="flex items-center gap-3 mb-6">
         <span class="section-label section-index">[ 404 ]</span>
         <span class="accent-dot"></span>
-        <span class="section-label">page not found</span>
+        <span class="section-label" data-zh="页面没找到">page not found</span>
       </div>
 
       <h1 class="text-[64px] md:text-[88px] leading-[1.02] tracking-[-0.03em] font-semibold">
-        That page<br>
-        <span class="text-[color:var(--color-fg-muted)] font-serif italic">doesn't exist yet.</span>
+        <span data-zh="这个页面">That page</span><br>
+        <span class="text-[color:var(--color-fg-muted)] font-serif italic" data-zh="还不存在。">doesn't exist yet.</span>
       </h1>
 
-      <p class="mt-8 text-lg text-[color:var(--color-fg-muted)] max-w-[560px] leading-relaxed">
+      <p class="mt-8 text-lg text-[color:var(--color-fg-muted)] max-w-[560px] leading-relaxed" data-zh="OpenTAO 正在建设中——有些链接会落到这里,因为内容还在写。找到你要的东西最快的方式:">
         OpenTAO is in active construction — some links land here while content
         is still being written. The fastest way to find what you need:
       </p>
@@ -28,46 +30,61 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           onclick="window.dispatchEvent(new KeyboardEvent('keydown',{key:'k',metaKey:true,ctrlKey:true}))"
           class="btn-primary inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md cursor-pointer"
         >
-          Search the site
+          <span data-zh="搜索全站">Search the site</span>
           <kbd class="font-mono text-[10px] text-white/70 border border-white/30 rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
-        <a href="/" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md">
+        <a href="/" data-zh-href="/zh/" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-md" data-zh="回首页">
           Back to home
         </a>
       </div>
 
       <div class="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <a href="/beginner/wiki" class="card rounded-md p-5 block">
-          <div class="section-label mb-2">Beginner</div>
-          <div class="font-medium mb-1">Wiki & concepts</div>
-          <p class="text-xs text-[color:var(--color-fg-muted)]">25 concept pages, by-cluster.</p>
+        <a href="/beginner/wiki" data-zh-href="/zh/beginner/wiki" class="card rounded-md p-5 block">
+          <div class="section-label mb-2" data-zh="入门">Beginner</div>
+          <div class="font-medium mb-1" data-zh="Wiki 与概念">Wiki & concepts</div>
+          <p class="text-xs text-[color:var(--color-fg-muted)]" data-zh="26 个概念页,按簇分。">25 concept pages, by-cluster.</p>
         </a>
         <a href="/build/idea-bank" class="card rounded-md p-5 block">
-          <div class="section-label mb-2">Build a subnet</div>
-          <div class="font-medium mb-1">Idea bank</div>
-          <p class="text-xs text-[color:var(--color-fg-muted)]">12 vetted directions to steal.</p>
+          <div class="section-label mb-2" data-zh="做 subnet">Build a subnet</div>
+          <div class="font-medium mb-1" data-zh="Idea 库">Idea bank</div>
+          <p class="text-xs text-[color:var(--color-fg-muted)]" data-zh="12 个经筛选、可直接拿走的方向。">12 vetted directions to steal.</p>
         </a>
-        <a href="/mine/playbooks" class="card rounded-md p-5 block">
-          <div class="section-label mb-2">Start mining</div>
-          <div class="font-medium mb-1">128 playbooks</div>
-          <p class="text-xs text-[color:var(--color-fg-muted)]">One per subnet, status-tagged.</p>
+        <a href="/mine/playbooks" data-zh-href="/zh/mine/playbooks" class="card rounded-md p-5 block">
+          <div class="section-label mb-2" data-zh="开始挖矿">Start mining</div>
+          <div class="font-medium mb-1" data-zh="128 份 playbook">128 playbooks</div>
+          <p class="text-xs text-[color:var(--color-fg-muted)]" data-zh="每个 subnet 一份,带状态标记。">One per subnet, status-tagged.</p>
         </a>
         <a href="/community/events" class="card rounded-md p-5 block">
-          <div class="section-label mb-2">Community</div>
-          <div class="font-medium mb-1">Events</div>
-          <p class="text-xs text-[color:var(--color-fg-muted)]">Meetups, AMAs, demo days.</p>
+          <div class="section-label mb-2" data-zh="社区">Community</div>
+          <div class="font-medium mb-1" data-zh="活动">Events</div>
+          <p class="text-xs text-[color:var(--color-fg-muted)]" data-zh="Meetup、AMA、demo day。">Meetups, AMAs, demo days.</p>
         </a>
       </div>
 
       <div class="mt-12 text-xs font-mono text-[color:var(--color-fg-dim)]">
-        Spotted a broken link from outside?
+        <span data-zh="从外部点进来发现死链?">Spotted a broken link from outside?</span>
         <a
           href="https://github.com/Cameronhq/opentao/issues/new?title=broken+link"
           target="_blank"
           rel="noopener"
           class="hover:text-[color:var(--color-fg)] underline underline-offset-2"
+          data-zh="去 GitHub 反馈 →"
         >Report it on GitHub →</a>
       </div>
     </div>
   </section>
+
+  <script>
+    if (location.pathname.startsWith('/zh')) {
+      document.documentElement.lang = 'zh-CN';
+      document.querySelectorAll<HTMLElement>('[data-zh]').forEach((el) => {
+        const t = el.getAttribute('data-zh');
+        if (t) el.textContent = t;
+      });
+      document.querySelectorAll<HTMLAnchorElement>('a[data-zh-href]').forEach((a) => {
+        const h = a.getAttribute('data-zh-href');
+        if (h) a.setAttribute('href', h);
+      });
+    }
+  </script>
 </BaseLayout>
