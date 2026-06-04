@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/build/hackathon'), label: '黑客松' },
+  { href: L('/build/incubator'), label: '孵化器' },
+  { href: L('/build/idea-bank'), label: 'Idea 库' },
+];
+
+const countdown = [
+  { label: '开放', date: '2026·05·12', meta: '✓ 完成', done: true },
+  { label: 'Kickoff', date: '2026·05·14', meta: '✓ 完成', done: true },
+  { label: '中期检查', date: '2026·06·14', meta: '还有 18 天' },
+  { label: '截止', date: '2026·07·14', meta: '还有 48 天', highlight: true },
+  { label: 'Demo day', date: '2026·07·22', meta: '还有 56 天' },
+];
+
+const funnel = [
+  { n: '01', title: '提交一个 idea', body: '一页纸、一段 3 分钟视频、一个 GitHub repo。不要 30 页 deck。', meta: '每季 ~500' },
+  { n: '02', title: '进 Top 30', body: '三位独立评委初筛,前 30 进 demo day。', meta: '每季 ~30', highlight: true },
+  { n: '03', title: '拿下一个赛道', body: '现场 demo,评委选。每赛道前三。冠军拿奖金 + 孵化器直通。', meta: '每季 ~10' },
+  { n: '04', title: '上线一个 subnet', body: '10 周孵化,然后你的团队注册一个 netuid,在主网上线。', meta: '每季 ~3' },
+];
+
+const tracks = [
+  { name: 'LLM', pool: '$75K', body: '文本生成、代码、翻译、检索、agent 工作流的 subnet。', prizes: ['1st $35K', '2nd $20K', '3rd $10K'] },
+  { name: '机器人与物理 AI', pool: '$75K', body: '和物理世界闭环的 subnet——策略、sim-to-real、运动控制、感知。', prizes: ['1st $35K', '2nd $20K', '3rd $10K'] },
+  { name: '数据与合成', pool: '$50K', body: '产出数据集、标注、合成训练数据的 subnet——按下游模型的提升打分。', prizes: ['1st $25K', '2nd $15K', '3rd $10K'] },
+  { name: '开放', pool: '$50K', body: '其它任何方向。推理、音频、科学计算、新颖的机制设计——惊艳我们。', prizes: ['1st $25K', '2nd $15K', '3rd $10K'] },
+];
+---
+<BaseLayout
+  title="黑客松 — 做 subnet — OpenTAO"
+  description="OpenTAO 黑客松第一季——四个赛道共 25 万美元。最强的团队直通孵化器面试。"
+  section="build"
+>
+  <SubNav items={subnav} active="/build/hackathon" rightMeta="第一季 · 7 月 14 日前开放" />
+
+  <section class="relative overflow-hidden border-b hairline stripe">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-20">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/build/hackathon', label: '做 subnet' },
+        { label: '黑客松' },
+      ]} />
+
+      <div class="flex items-center gap-3 mb-5">
+        <span class="accent-dot"></span>
+        <span class="section-label" style="color: #b8470b">第一季 · 进行中 · 报名开放</span>
+      </div>
+      <h1 class="text-[64px] md:text-[76px] leading-[0.96] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic text-[color:var(--color-fg-muted)] font-normal">OpenTAO </span><br>黑客松<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">四个赛道共 25 万美元。每季最强的项目直接进孵化器面试——以及一条在主网上线为真 subnet 的清晰路径。</p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="#" class="btn-accent inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">提交你的 idea<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="#tracks" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">看四个赛道</a>
+        <span class="ml-2 text-xs text-[color:var(--color-fg-dim)] font-mono">报名 2026·07·14 截止 · demo day 2026·07·22</span>
+      </div>
+
+      <div class="mt-12 grid grid-cols-2 md:grid-cols-5 border hairline rounded-md overflow-hidden bg-[color:var(--color-surface)] max-w-3xl">
+        {countdown.map((c) => (
+          <div class="font-mono px-4 py-3 border-r hairline last:border-r-0" style={c.highlight ? 'background: rgba(184,71,11,0.05);' : ''}>
+            <div class="section-label" style={c.highlight ? 'color: #b8470b' : ''}>{c.label}</div>
+            <div class="text-[color:var(--color-fg)] mt-1 text-sm">{c.date}</div>
+            <div class={`text-[10px] font-mono mt-0.5 ${c.highlight ? 'text-[color:var(--color-accent)]' : c.done ? 'text-[color:var(--color-ok)]' : 'text-[color:var(--color-fg-dim)]'}`}>{c.meta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">从 idea 到主网</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">每一季的路径都一样。</h2>
+      <div class="grid lg:grid-cols-4 gap-3">
+        {funnel.map((f) => (
+          <div class="relative p-6 border rounded-md bg-[color:var(--color-paper)]" style={f.highlight ? 'border-color: rgba(184,71,11,0.25); background: rgba(184,71,11,0.04);' : 'border-color: rgba(15,15,18,0.08);'}>
+            <div class={`font-mono text-xs mb-3 ${f.highlight ? 'text-[color:var(--color-accent)]' : 'text-[color:var(--color-fg-dim)]'}`}>{f.n}</div>
+            <h3 class="font-semibold mb-2">{f.title}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-4">{f.body}</p>
+            <div class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">{f.meta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="tracks" class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">四个赛道</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-3 max-w-[600px]">25 万美元奖金,分四个方向。</h2>
+      <p class="text-[color:var(--color-fg-muted)] max-w-[560px] mb-12">提交时选一个。可以跨赛道参赛(只在一个赛道计分)。</p>
+      <div class="grid md:grid-cols-2 gap-4">
+        {tracks.map((t) => (
+          <div class="card rounded-md p-7">
+            <div class="flex items-baseline justify-between mb-5">
+              <h3 class="text-xl font-semibold tracking-tight">{t.name}</h3>
+              <span class="text-[color:var(--color-fg-muted)] text-sm">{t.pool}</span>
+            </div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] mb-5 leading-relaxed">{t.body}</p>
+            <div class="flex items-center gap-4 text-xs font-mono text-[color:var(--color-fg-dim)] border-t hairline pt-4">
+              {t.prizes.map((p) => {
+                const parts = p.split(' ');
+                return <span>{parts[0]} <span class="text-[color:var(--color-fg)]">{parts[1]}</span></span>;
+              })}
+              <span class="ml-auto">+ 孵化器直通</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">评委与导师</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">在线 subnet 的创始人、核心开发者、运营者。</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #b8470b, #16a34a);"></div><div class="font-medium">Ke Zhang</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">@ke.ng · SN3 创始人</div></div>
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #6741d9, #1c6ea4);"></div><div class="font-medium">Rho Carter</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">@rho.lab · 核心开发</div></div>
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #c2410c, #b8470b);"></div><div class="font-medium">Yuki Tanaka</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">@yuki · SN18 合作方</div></div>
+        <div class="card rounded-md p-5"><div class="w-12 h-12 rounded-full mb-4" style="background: linear-gradient(135deg, #15803d, #1c6ea4);"></div><div class="font-medium">+ 还有 14 位</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">看全部评委 →</div></div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/build/hackathon'), label: '黑客松' },
+  { href: L('/build/incubator'), label: '孵化器' },
+  { href: L('/build/idea-bank'), label: 'Idea 库' },
+];
+
+const benefits = [
+  { value: '$50K', label: '资金', body: '纯 grant,分两笔发。我们不拿回任何东西。' },
+  { value: '$30K', label: '算力额度', body: 'Lambda、RunPod、CoreWeave 的 GPU 额度,让你把原型跑到规模。' },
+  { value: '8h/周', label: '导师时间', body: '每周 2 小时 1:1 + 小组 office hours。导师都是在线 subnet 的运营者。' },
+  { value: '1 个 netuid', label: '主网上线', body: '我们帮你注册、锁仓、并从第一天起在 OpenTAO 上记录你的 subnet。' },
+];
+
+const timeline = [
+  { week: 'W0', title: '选拔', meta: '面试、发 offer', state: 'done' },
+  { week: 'W1', title: 'Kickoff', meta: '集训(SF)', state: 'done' },
+  { week: 'W2-3', title: '架构', meta: '打分设计', state: 'done' },
+  { week: 'W4', title: '测试网 alpha', meta: '跑起 miner', state: 'now' },
+  { week: 'W5-6', title: '调优', meta: 'scoring 与 bonding', state: '' },
+  { week: 'W7', title: '安全审查', meta: '第三方审计', state: '' },
+  { week: 'W8', title: '主网准备', meta: '锁仓', state: '' },
+  { week: 'W9', title: 'Pitch 准备', meta: 'demo 打磨', state: '' },
+  { week: 'W10', title: 'Demo day', meta: 'VC + 社区', state: '' },
+  { week: 'W11+', title: '上线', meta: '你的 netuid 上线', state: '' },
+];
+
+const statusZh: Record<string, string> = { live: '上线', testnet: '测试网', pivoting: '转型中', paused: '暂停' };
+const cohort01 = [
+  { netuid: '82', status: 'live', name: 'Continuum', body: '长文摘要,由 faithfulness 模型打分。' },
+  { netuid: '94', status: 'live', name: 'Aria', body: '音乐合成,按与参考的贴合度打分。' },
+  { netuid: '117', status: 'live', name: 'Mesa', body: '从 prompt 生成带纹理的 3D 网格。' },
+  { netuid: null, status: 'pivoting', name: 'Solstice', body: '原本是预测类 subnet,现在转型做 B2B SaaS。' },
+  { netuid: null, status: 'paused', name: 'Watershed', body: '联邦训练 subnet——创始人重新评估期间暂停。' },
+  { netuid: '122', status: 'testnet', name: 'Caldera', body: '声音克隆 subnet,目前在主网准备中。' },
+];
+
+function statusStyle(status: string) {
+  if (status === 'live') return 'background: rgba(21,128,61,0.1); color: #15803d;';
+  if (status === 'testnet') return 'background: rgba(184,71,11,0.1); color: #b8470b;';
+  return '';
+}
+---
+<BaseLayout
+  title="孵化器 — 做 subnet — OpenTAO"
+  description="OpenTAO 孵化器——10 周从原型到主网。每期八个团队。5 万美元 grant + 算力 + 导师 + netuid 注册。"
+  section="build"
+>
+  <SubNav items={subnav} active="/build/incubator" rightMeta="第 02 期 · 报名开放" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/build/hackathon', label: '做 subnet' },
+        { label: '孵化器' },
+      ]} />
+
+      <div class="flex items-center gap-3 mb-5">
+        <span class="section-label">第 02 期 · 报名截止 6 月 30 日</span>
+      </div>
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold max-w-[840px]">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">10</span> 周,<br>从原型到主网<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">每期八个团队。每个 5 万美元,外加算力、导师时间,以及注册 netuid、上线真 subnet 的直接支持。</p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="#" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">申请第 02 期<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="#cohort" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">看包含什么</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="cohort" class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">你能拿到什么</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">不要股权,不要代币。只给跑道。</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {benefits.map((b) => (
+          <div class="card rounded-md p-6">
+            <div class="text-3xl font-semibold mb-2">{b.value}</div>
+            <div class="section-label mb-3">{b.label}</div>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{b.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">逐周</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">十周。远程为主。一次线下集训。</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-2">
+        {timeline.map((w) => (
+          <div class={`timeline-week ${w.state}`}>
+            <div class={`font-mono text-xs mb-1 ${w.state === 'now' ? '' : 'text-[color:var(--color-fg-dim)]'}`} style={w.state === 'now' ? 'color: #b8470b' : ''}>{w.week}</div>
+            <div class="font-medium text-sm">{w.title}</div>
+            <div class="text-xs text-[color:var(--color-fg-muted)] mt-1">{w.meta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="section-label mb-3">第 01 期 · 2026·02 毕业</div>
+      <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-[600px]">六个团队交付,三个上了主网。</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {cohort01.map((t) => {
+          const dim = t.status === 'pivoting' || t.status === 'paused';
+          return (
+            <a href="#" class={`card rounded-md p-6 block ${dim ? 'opacity-70' : ''}`}>
+              <div class="flex items-baseline justify-between mb-3">
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">
+                  {t.netuid ? <>netuid <span class="text-[color:var(--color-fg)]">{t.netuid}</span></> : '项目'}
+                </div>
+                {dim ? (
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded text-[color:var(--color-fg-dim)] border hairline">{statusZh[t.status]}</span>
+                ) : (
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded" style={statusStyle(t.status)}>{statusZh[t.status]}</span>
+                )}
+              </div>
+              <h3 class="font-semibold mb-1">{t.name}</h3>
+              <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{t.body}</p>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .timeline-week { position: relative; padding: 14px 16px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #ffffff; }
+  .timeline-week.done { opacity: 0.5; }
+  .timeline-week.now { border-color: rgba(184,71,11,0.35); background: rgba(184,71,11,0.04); }
+  .timeline-week.now::before { content: ""; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border: 1px solid rgba(184,71,11,0.18); border-radius: 8px; }
+</style>

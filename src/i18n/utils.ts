@@ -15,6 +15,8 @@ export const ZH_ROUTES = new Set<string>([
   '/beginner/concepts/yuma-consensus',
   '/beginner/wiki',
   '/beginner/subnets',
+  '/build/hackathon',
+  '/build/incubator',
 ]);
 
 /** Detect the active locale from the URL pathname. */
