@@ -1,0 +1,240 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+
+const cluster1 = [
+  { n: '04', slug: 'subtensor', title: 'Subtensor,那条链', body: '一条基于 Substrate 的链,替所有人记账,每个 tempo 发一次 emission。' },
+  { n: '05', slug: 'block-tempo-epoch', title: 'Block · Tempo · Epoch', body: 'Bittensor 的三个时间单位——12 秒、72 分钟、约 1 天——以及各自发生什么。' },
+  { n: '06', slug: 'what-is-a-subnet', title: '什么是 subnet', body: '一种智能的自洽市场——文本、图像、推理、运动控制。' },
+  { n: '07', slug: 'registration-immunity', title: '注册与免疫期', body: '怎么在一个 subnet 里拿到 UID 槽位、要花多少、配置期间什么在保护你。' },
+];
+const cluster2 = [
+  { n: '08', slug: 'miner', title: 'Miner', body: '贡献者角色。提交工作;被 validator 排得高就赚得多。' },
+  { n: '09', slug: 'validator', title: 'Validator', body: '打分者角色。提交权重;收入和质押、以及与共识的一致度成正比。' },
+  { n: '10', slug: 'subnet-owner', title: 'Subnet owner', body: '设计任务、设计打分,并抽成。创始人角色。' },
+  { n: '11', slug: 'delegator', title: 'Delegator', body: '把 TAO 质押在你信任的 validator 后面。被动——付它一份抽成,剩下归你。' },
+];
+const cluster3 = [
+  { n: '12', slug: 'tao', title: 'TAO,那个代币', body: '2100 万上限、减半节奏,一切结算都用的单位。' },
+  { n: '13', slug: 'dtao', title: 'dTAO,2024 的升级', body: '为什么 subnet 级的代币市场改变了 emission 的流向。' },
+  { n: '14', slug: 'emission-curve', title: 'Emission 曲线', body: 'TAO 每个 block 怎么发,减半在实际中意味着什么。' },
+  { n: '15', slug: 'staking-nomination', title: '质押与提名', body: '把 TAO 锁在一个 validator 后面,再把你那份拿回来。' },
+  { n: '16', slug: 'registration-cost', title: '注册成本', body: 'UID 槽位的价格、为什么会浮动、怎么挑时机。' },
+];
+const cluster4 = [
+  { n: '17', slug: 'yuma-consensus', title: 'Yuma 共识', body: '聚合规则。validator 权重按质押加权 → emission。' },
+  { n: '18', slug: 'weights-setting', title: '设权重', body: 'validator 实际提交什么、多久一次、链上是什么。' },
+  { n: '19', slug: 'bonding-ema', title: 'Bonding 与 EMA', body: '记忆和滞后怎么被算进打分里,防止结果抖动。' },
+  { n: '20', slug: 'validator-trust', title: 'Validator trust', body: '为什么和中位数分歧太大很贵。' },
+];
+const cluster5 = [
+  { n: '21', slug: 'registering-new-subnet', title: '注册一个新 subnet', body: '要花多少、你承诺了什么、第一天会发生什么。' },
+  { n: '22', slug: 'subnet-validator-selection', title: 'Subnet validator 选取', body: '为什么只有质押加权 top-N 的 validator 拿钱。' },
+  { n: '23', slug: 'subnet-hyperparameters', title: 'Subnet 超参', body: 'Tempo、rho、kappa——每个 subnet 都有的旋钮,以及它们干嘛的。' },
+];
+const cluster6 = [
+  { n: '24', slug: 'senate', title: 'Senate', body: '质押最高的那些 validator 有一点治理角色。' },
+  { n: '25', slug: 'hyperparameter-votes', title: '超参投票', body: '全链常量是怎么被改的。' },
+  { n: '26', slug: 'network-upgrade-flow', title: '网络升级流程', body: '运行时升级怎么从一个 PR 走到生产。' },
+];
+---
+<BaseLayout
+  title="Wiki — OpenTAO"
+  description="关于 Bittensor 要懂的二十六件事——从底下的网络,到里面的角色,到让它保持诚实的数学。"
+  section="beginner"
+>
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-50"></div>
+    <div class="hero-glow"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { label: 'Wiki' },
+      ]} />
+      <h1 class="text-[64px] md:text-[80px] leading-[0.96] tracking-[-0.03em] font-semibold">
+        <span class="font-serif italic text-[color:var(--color-fg-muted)] font-normal">那些 </span>概念<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-8 text-lg text-[color:var(--color-fg-muted)] max-w-[600px] leading-relaxed">关于 Bittensor 要懂的二十六件事——从底下的网络,到里面的角色,到让它保持诚实的数学。随便什么顺序读都行。</p>
+      <div class="mt-9 flex items-center gap-3 max-w-md">
+        <div class="flex items-center gap-2 px-4 py-2.5 border hairline rounded-md text-sm text-[color:var(--color-fg-muted)] flex-1 bg-[color:var(--color-surface)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="wiki-search" type="text" placeholder="过滤 26 个概念…" class="bg-transparent outline-none text-[color:var(--color-fg)] flex-1 placeholder:text-[color:var(--color-fg-dim)] text-sm" />
+          <span id="wiki-count" class="font-mono text-[10px] text-[color:var(--color-fg-dim)] tabular">26</span>
+        </div>
+      </div>
+      <div id="wiki-empty" class="hidden mt-6 text-sm text-[color:var(--color-fg-muted)]">没有匹配。试试 <button type="button" class="underline" id="wiki-search-global">全站搜索 ⌘K</button>。</div>
+      <div class="mt-12 flex flex-wrap items-center gap-6 text-xs font-mono text-[color:var(--color-fg-dim)]">
+        <span><span class="text-[color:var(--color-fg)]">26</span> 个概念</span><span class="opacity-30">·</span>
+        <span><span class="text-[color:var(--color-fg)]">6</span> 个簇</span><span class="opacity-30">·</span>
+        <span>双语 · EN <span class="opacity-30">/</span> 中</span><span class="opacity-30">·</span>
+        <span>最近审阅 2026·05·27</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="cluster-rule mb-12">
+        <span class="section-label">从这开始</span>
+        <span class="line"></span>
+        <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">三个解锁其余一切的概念</span>
+      </div>
+      <div class="grid lg:grid-cols-3 gap-4">
+        <a href={L('/beginner/concepts/what-is-bittensor')} class="featured rounded-md p-7 block group" data-wiki-card data-wiki-text="什么是 bittensor 网络基础 800 字 一条链 128 市场 tao what is">
+          <div class="flex items-baseline justify-between mb-7">
+            <span class="num text-5xl">01</span>
+            <span class="pill-tag" style="border-color: rgba(184,71,11,0.3); color: #b8470b;">基础</span>
+          </div>
+          <div class="section-label mb-2">网络基础</div>
+          <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">什么是 Bittensor</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">整个网络,800 字讲清。底下一条链,上面 128 个互相竞争的智能市场,用 TAO 结算。</p>
+          <div class="flex items-center text-sm text-[color:var(--color-fg)] gap-2">先读这篇 <span class="arrow">→</span></div>
+        </a>
+        <a href={L('/beginner/concepts/miners-and-validators')} class="ccard rounded-md p-7 block group" data-wiki-card data-wiki-text="miner validator 角色 双边市场 工作 打分">
+          <div class="flex items-baseline justify-between mb-7"><span class="num text-5xl">02</span><span class="pill-tag">角色</span></div>
+          <div class="section-label mb-2">角色</div>
+          <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">Miner 与 validator</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">一边提交工作,一边打分。Bittensor 里几乎所有别的东西,都是这个双边市场怎么接线的结果。</p>
+          <div class="flex items-center text-sm text-[color:var(--color-fg-muted)] gap-2">读 <span class="arrow">→</span></div>
+        </a>
+        <a href={L('/beginner/concepts/yuma-consensus')} class="ccard rounded-md p-7 block group" data-wiki-card data-wiki-text="yuma 共识 聚合 validator 权重 emission">
+          <div class="flex items-baseline justify-between mb-7"><span class="num text-5xl">03</span><span class="pill-tag">共识</span></div>
+          <div class="section-label mb-2">共识</div>
+          <h3 class="text-2xl tracking-tight mb-3 font-serif font-medium">直觉理解 Yuma</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-7">把 validator 的意见变成真实 emission 的聚合规则。读懂这篇,其余 80% 就通了。</p>
+          <div class="flex items-center text-sm text-[color:var(--color-fg-muted)] gap-2">读 <span class="arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {[
+    { roman: 'I.', title: '网络基础', count: '4 个概念 · ~20 分钟', intro: '底下这条链到底怎么运转——block、tempo,以及让一个 subnet 得以存在的注册机制。', items: cluster1, cols: 'md:grid-cols-2' },
+    { roman: 'II.', title: '角色', count: '4 个概念 · ~12 分钟', intro: '四种参与者。多数新人会挑一个一直做下去;理解其它几个,有助于你想清楚网络的行为。', items: cluster2, cols: 'md:grid-cols-2' },
+    { roman: 'III.', title: '经济', count: '5 个概念 · ~25 分钟', intro: 'TAO 从哪来、到哪去,以及 2024 的 dTAO 升级怎么改变了 subnet 争夺它的方式。', items: cluster3, cols: 'md:grid-cols-2 lg:grid-cols-3' },
+    { roman: 'IV.', title: '共识', count: '4 个概念 · ~20 分钟', intro: '把成千上万个意见变成一个奖励向量的数学。只想挖矿可以跳过;想做 validator 或建 subnet 就读一读。', items: cluster4, cols: 'md:grid-cols-2' },
+  ].map((c) => (
+    <section class="border-b hairline">
+      <div class="max-w-[1200px] mx-auto px-6 py-20">
+        <div class="cluster-rule mb-12">
+          <div class="flex items-baseline gap-4"><span class="num text-2xl">{c.roman}</span><h2 class="cluster-title text-2xl text-[color:var(--color-fg)]">{c.title}</h2></div>
+          <span class="line"></span>
+          <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">{c.count}</span>
+        </div>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">{c.intro}</p>
+        <div class={`grid ${c.cols} gap-3`}>
+          {c.items.map((it) => (
+            <a href={L(`/beginner/concepts/${it.slug}`)} class="ccard rounded-md p-5 flex items-start gap-4" data-wiki-card data-wiki-text={(it.title + ' ' + it.body).toLowerCase()}>
+              <span class="num text-3xl shrink-0 w-10">{it.n}</span>
+              <div class="flex-1">
+                <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
+                <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{it.body}</p>
+              </div>
+              <span class="arrow text-[color:var(--color-fg-dim)] mt-1">→</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <div>
+          <div class="cluster-rule mb-10">
+            <div class="flex items-baseline gap-4"><span class="num text-2xl">V.</span><h2 class="cluster-title text-2xl text-[color:var(--color-fg)]">Subnet</h2></div>
+            <span class="line"></span>
+            <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">3 个概念</span>
+          </div>
+          <div class="space-y-3">
+            {cluster5.map((it) => (
+              <a href={L(`/beginner/concepts/${it.slug}`)} class="ccard rounded-md p-5 flex items-start gap-4 block" data-wiki-card data-wiki-text={(it.title + ' ' + it.body).toLowerCase()}>
+                <span class="num text-3xl shrink-0 w-10">{it.n}</span>
+                <div class="flex-1">
+                  <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
+                  <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{it.body}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="cluster-rule mb-10">
+            <div class="flex items-baseline gap-4"><span class="num text-2xl">VI.</span><h2 class="cluster-title text-2xl text-[color:var(--color-fg)]">治理</h2></div>
+            <span class="line"></span>
+            <span class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">3 个概念</span>
+          </div>
+          <div class="space-y-3">
+            {cluster6.map((it) => (
+              <a href={L(`/beginner/concepts/${it.slug}`)} class="ccard rounded-md p-5 flex items-start gap-4 block" data-wiki-card data-wiki-text={(it.title + ' ' + it.body).toLowerCase()}>
+                <span class="num text-3xl shrink-0 w-10">{it.n}</span>
+                <div class="flex-1">
+                  <h4 class="text-base font-medium tracking-tight mb-1" set:html={it.title} />
+                  <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">{it.body}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-[1fr_auto] gap-8 items-center">
+        <div>
+          <div class="section-label mb-3">公共知识</div>
+          <h3 class="text-2xl font-serif italic font-medium leading-snug max-w-[560px]">每个概念页都能改。看到过时或缺失的?提个 PR。</h3>
+        </div>
+        <a href="https://github.com/Cameronhq/opentao/tree/main/src/pages/beginner/concepts" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md border hairline-strong hover:border-[color:var(--color-fg-muted)]">在 GitHub 上编辑 ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const input = document.getElementById('wiki-search');
+    const cards = Array.from(document.querySelectorAll('[data-wiki-card]'));
+    const counter = document.getElementById('wiki-count');
+    const empty = document.getElementById('wiki-empty');
+    const globalBtn = document.getElementById('wiki-search-global');
+
+    function apply() {
+      const q = (input && input.value || '').trim().toLowerCase();
+      let shown = 0;
+      for (const c of cards) {
+        const t = c.getAttribute('data-wiki-text') || '';
+        const match = !q || t.includes(q);
+        c.style.display = match ? '' : 'none';
+        if (match) shown++;
+      }
+      if (counter) counter.textContent = String(shown);
+      if (empty) empty.classList.toggle('hidden', shown !== 0 || q === '');
+    }
+
+    if (input) input.addEventListener('input', apply);
+    if (globalBtn) globalBtn.addEventListener('click', () => {
+      const e = new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true });
+      window.dispatchEvent(e);
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .ccard { background: #ffffff; border: 1px solid rgba(15,15,18,0.08); transition: all .15s; }
+  .ccard:hover { border-color: rgba(15,15,18,0.22); background: #fafaf9; transform: translateY(-1px); }
+  .ccard:hover .num { color: #b8470b; }
+  .num { font-family: var(--font-serif); font-style: italic; color: #b8b8be; transition: color .15s; }
+  .cluster-rule { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; }
+  .cluster-rule .line { height: 1px; background: rgba(15,15,18,0.1); }
+  .cluster-title { font-family: var(--font-serif); font-weight: 500; font-style: italic; letter-spacing: -0.01em; }
+  .featured { background: linear-gradient(180deg, rgba(184,71,11,0.04), rgba(184,71,11,0) 60%), #ffffff; border: 1px solid rgba(184,71,11,0.22); transition: all .15s; }
+  .featured:hover { border-color: rgba(184,71,11,0.4); transform: translateY(-1px); }
+  .pill-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(15,15,18,0.12); color: #767680; }
+  .arrow { transition: transform .15s; }
+  a:hover .arrow { transform: translateX(3px); }
+</style>

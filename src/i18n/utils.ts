@@ -13,6 +13,7 @@ export const ZH_ROUTES = new Set<string>([
   '/beginner/concepts/what-is-bittensor',
   '/beginner/concepts/miners-and-validators',
   '/beginner/concepts/yuma-consensus',
+  '/beginner/wiki',
 ]);
 
 /** Detect the active locale from the URL pathname. */
