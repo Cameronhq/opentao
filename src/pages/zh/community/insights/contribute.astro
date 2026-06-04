@@ -1,0 +1,366 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import SubNav from '../../../../components/SubNav.astro';
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/community/events'), label: '活动' },
+  { href: L('/community/chapters'), label: '城市分会' },
+  { href: L('/community/insights'), label: '长文' },
+];
+
+const formats = [
+  { title: '深度 · 2000–5000 字', body: '一个 subnet、机制或工具——拆开再装回去。最接近学术严谨,但没有学术腔。' },
+  { title: '教程 · 1500–3000 字', body: '超出 playbook 的内容。别处没记录的进阶操作。能带数字最好。' },
+  { title: '复盘 · 2000–4000 字', body: '一次活动、升级或治理时刻——带着事后视角和数据回看。' },
+  { title: '访谈 · 3000–6000 字', body: '一个值得听的 subnet owner、核心开发或低调的 builder。Q&A 格式 + 短引子。' },
+  { title: '随笔 · 800–1500 字', body: '短而锋利。一张图、一个观点、一串观察。门槛更低。' },
+];
+
+const rates = [
+  { format: '深度', words: '2000–5000', rate: '$800', tr: '$400' },
+  { format: '教程', words: '1500–3000', rate: '$500', tr: '$250' },
+  { format: '复盘', words: '2000–4000', rate: '$650', tr: '$325' },
+  { format: '访谈', words: '3000–6000', rate: '$900', tr: '$450' },
+  { format: '随笔', words: '800–1500', rate: '$250', tr: '$125' },
+];
+
+const steps = [
+  { n: '01', title: '提交提纲', body: '标题、一句话、提纲、你的背景。就在下面。', when: '第 0 天' },
+  { n: '02', title: '编辑读 + 回复', body: '三位编辑独立读。一周内给结论。', when: '~ 第 7 天' },
+  { n: '03', title: '通过 — kickoff 通话(可选)', body: '15 分钟对齐范围、截止、我们该给的数据。', when: '第 2 周' },
+  { n: '04', title: '初稿 → 编辑审', body: '你交初稿。我们做 1-2 轮:先结构意见,后逐行。', when: '第 3-5 周' },
+  { n: '05', title: '事实核查 + 交叉链接', body: '所有论断核实、所有引用加链、与 Wiki & Subnet 页交叉链接。', when: '第 5-6 周' },
+];
+---
+<BaseLayout
+  title="投一篇长文 — 长文 — OpenTAO"
+  description="先发提纲。我们感兴趣再要全文。采用的文章付稿费。"
+  section="community"
+>
+  <SubNav items={subnav} active="/community/insights" rightMeta="投稿 → 一周回" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/community/events', label: '社区' },
+        { href: '/community/insights', label: '长文' },
+        { label: '投稿' },
+      ]} />
+      <h1 class="text-[56px] md:text-[68px] leading-[1.02] tracking-[-0.03em] font-semibold max-w-[840px]">
+        <span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">先发 </span>提纲。<br>感兴趣再要全文<span class="text-[color:var(--color-accent)]">.</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[620px] leading-relaxed">
+        我们每月发约 4 篇,大概三分之一来自公开投稿。标准是"一个好奇的 Bittensor builder 会不会转给朋友"——不是"作者有没有名"。给我们一份提纲,一周内回。
+      </p>
+      <div class="mt-9 flex flex-wrap items-center gap-3">
+        <a href="#pitch-form" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">投个提纲<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href={L('/community/insights')} class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">看我们发过什么</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <div class="section-label mb-3">我们收什么</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">五种形式,挑一个。</h2>
+          <div class="space-y-4 text-sm">
+            {formats.map((f) => (
+              <div><div class="font-medium">{f.title}</div><div class="text-[color:var(--color-fg-muted)] leading-relaxed mt-1">{f.body}</div></div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="section-label mb-3">我们不收什么</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-6 leading-snug">我们会礼貌谢绝的。</h2>
+          <ul class="space-y-3 text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">价格预测或投资建议。</strong>我们是开发者站,不是研究台。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">披着分析外衣的项目宣传。</strong>如果唯一结论是"我们 subnet 很棒",那是通稿。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">Medium / Substack 旧文重发。</strong>我们付的是原创,不是转载。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">AI 生成的稿。</strong>用工具辅助编辑没问题,整篇让模型写不行。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">返佣或推荐链接。</strong>我们不放,请也别带。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-1">×</span><span><strong class="text-[color:var(--color-fg)]">读着像 Bittensor 基金会公告的东西。</strong>编辑是独立的。</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="section-label mb-3">稿费</div>
+      <h2 class="text-3xl font-semibold tracking-tight mb-3">明码标价,不砍价。</h2>
+      <p class="text-[color:var(--color-fg-muted)] leading-relaxed max-w-[640px] mb-10">发布时付美元。电汇 / Wise / USDC。译者拿对应形式稿费的一半。同一形式里长一点短一点,我们不扣你钱。</p>
+
+      <div class="card rounded-md overflow-hidden p-6 bg-[color:var(--color-paper)]">
+        <div class="rate-row"><div>形式</div><div>字数</div><div>稿费 (USD)</div><div>译者 (USD)</div></div>
+        {rates.map((r) => (
+          <div class="rate-row"><div class="text-[color:var(--color-fg)]">{r.format}</div><div class="font-mono text-[color:var(--color-fg-muted)]">{r.words}</div><div class="font-mono">{r.rate}</div><div class="font-mono text-[color:var(--color-fg-muted)]">{r.tr}</div></div>
+        ))}
+      </div>
+
+      <p class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-5">永远没有厂商付费位。我们绝不接受被报道对象的付款。</p>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="section-label mb-3">编辑流程</div>
+      <h2 class="text-3xl font-semibold tracking-tight mb-3">六步。通常六周。</h2>
+      <p class="text-[color:var(--color-fg-muted)] leading-relaxed max-w-[640px] mb-10">提纲是关口。通过之后是协作式的——我们轻度编辑,几乎从不动语气。</p>
+
+      <div class="card rounded-md p-7 bg-[color:var(--color-paper)]">
+        {steps.map((s) => (
+          <div class="step-row"><span class="n">{s.n}</span><div><div class="font-medium">{s.title}</div><div class="text-[color:var(--color-fg-muted)] text-sm mt-1">{s.body}</div></div><span class="when">{s.when}</span></div>
+        ))}
+        <div class="step-row" style="background: rgba(184,71,11,0.03);"><span class="n" style="color: #b8470b;">06</span><div><div class="font-medium">排期 + 发布</div><div class="text-[color:var(--color-fg-muted)] text-sm mt-1">提前 1 周给你预览链接。然后上线 + 处理稿费。</div></div><span class="when" style="color: #b8470b;">第 6 周</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pitch-form" class="border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-[1fr_1.4fr] gap-12">
+
+        <div class="lg:sticky lg:top-24 lg:self-start">
+          <div class="section-label mb-3" style="color: #b8470b;">投稿表</div>
+          <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-5 leading-tight">具体。<br>简短。</h2>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-6">提纲胜过初稿。具体的论断胜过一个话题。一段话我们就能看出这篇能不能成。</p>
+          <ul class="text-sm text-[color:var(--color-fg-muted)] space-y-2 leading-relaxed">
+            <li>· 别为"第一次写"道歉。show 出你懂这件事。</li>
+            <li>· 有初稿就贴链接;我们仍然先读提纲。</li>
+            <li>· idea 跨两种形式,挑一个,并在备注里说明。</li>
+            <li>· 这篇有一部分在别处发过,请声明。</li>
+          </ul>
+        </div>
+
+        <form id="pitch-form" class="card rounded-md p-8 space-y-6" novalidate>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div><label class="label" for="pf-name">姓名</label><input id="pf-name" name="name" class="input" placeholder="署名时显示的名字" required /></div>
+            <div><label class="label" for="pf-twitter">Twitter / GitHub 账号</label><input id="pf-twitter" name="twitter" class="input" placeholder="@handle" /></div>
+          </div>
+          <div>
+            <label class="label" for="pf-format">形式</label>
+            <select id="pf-format" name="format" class="select">
+              <option>深度</option>
+              <option>教程</option>
+              <option>复盘</option>
+              <option>访谈</option>
+              <option>随笔</option>
+              <option>还不确定</option>
+            </select>
+          </div>
+          <div>
+            <label class="label" for="pf-title">暂定标题</label>
+            <input id="pf-title" name="title" class="input" placeholder='如「打分函数对对抗输入漏掉了什么」' required />
+          </div>
+          <div>
+            <label class="label" for="pf-oneliner">一句话(≤ 120 字符)</label>
+            <input id="pf-oneliner" name="oneLiner" class="input" maxlength="120" placeholder="一句话讲清这篇。" />
+          </div>
+          <div>
+            <label class="label" for="pf-outline">提纲(200–500 字)</label>
+            <textarea id="pf-outline" name="outline" class="textarea" rows="8" placeholder="一节一节。要点形式就行。论断是什么、证据是什么、读者是谁?" required></textarea>
+          </div>
+          <div>
+            <label class="label" for="pf-background">你的背景(和这篇相关的)</label>
+            <textarea id="pf-background" name="background" class="textarea" rows="3" placeholder="为什么你是写这篇的合适人选?欢迎贴过往作品链接。"></textarea>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div><label class="label" for="pf-when">初稿什么时候好?</label><input id="pf-when" name="draftWhen" class="input" placeholder='如「通过后 2 周」' /></div>
+            <div><label class="label" for="pf-lang">语言</label>
+              <select id="pf-lang" name="language" class="select">
+                <option>英文</option>
+                <option>中文</option>
+                <option>两种(配我们的译者)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="label" for="pf-notes">还有别的吗?(可选)</label>
+            <textarea id="pf-notes" name="notes" class="textarea" rows="3" placeholder="利益冲突、双重发布、希望我们配的图,等等。"></textarea>
+          </div>
+          <label class="flex items-start gap-3 text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+            <input type="checkbox" name="agreement" class="mt-1" required />
+            <span>我确认这是原创、接受编辑审、并同意发布时采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">CC BY-SA 4.0</a> 授权。</span>
+          </label>
+
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAADYu2uFOOUgAde8v" data-theme="light"></div>
+
+          <p id="pitch-form-error" class="text-sm text-red-700 hidden" role="alert"></p>
+
+          <div class="border-t hairline pt-6 flex flex-wrap items-center justify-between gap-4">
+            <span class="text-xs font-mono text-[color:var(--color-fg-dim)]">以 GitHub Issue 归档 · 编辑 ≤ 7 天回</span>
+            <div class="flex items-center gap-3">
+              <button type="submit" id="pitch-form-submit" class="btn-primary text-sm font-semibold px-6 py-2.5 rounded-md inline-flex items-center gap-2">发送提纲<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+        </form>
+
+        <div id="pitch-form-success" class="card rounded-md p-8 hidden">
+          <div class="section-label mb-3" style="color: #b8470b;">收到提纲</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-3">收到了——谢谢。</h3>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-4">三位编辑会独立读。一周内回你。</p>
+          <p class="text-sm text-[color:var(--color-fg-muted)]">在 GitHub 上追踪:<a id="pitch-form-issue-link" href="#" target="_blank" rel="noopener" class="text-[color:var(--color-fg)] underline underline-offset-2 hover:text-[color:var(--color-accent)]">查看你的 issue</a>。</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <div class="section-label mb-3">FAQ</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-6 leading-tight">常见问题的诚实回答。</h3>
+          <div class="space-y-5">
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">采用率多少?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">约 30%。多数拒稿是范围问题,不是质量——太宽、太窄、或已经写过了。</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">能写我自己的 subnet 吗?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">能,带利益声明。语气重要——读者闻得出推销味。</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">能匿名发吗?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">能,极少数有正当理由时(雇主政策、安全研究)。即便用笔名,编辑也会核实身份。</p></details>
+            <details class="border-b hairline pb-4"><summary class="font-medium cursor-pointer">发完能在自己博客转吗?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">能——我们发布 30 天后,带 canonical 回链。CC BY-SA 4.0 意味着任何人都能再分享。</p></details>
+            <details class="pb-4"><summary class="font-medium cursor-pointer">你们会约稿吗?</summary><p class="text-sm text-[color:var(--color-fg-muted)] mt-2 leading-relaxed">偶尔。愿意接约稿的话,在表单"还有别的吗"里说一声。</p></details>
+          </div>
+        </div>
+        <div>
+          <div class="section-label mb-3">感受一下调性</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-6 leading-tight">三篇我们引以为豪的。</h3>
+          <div class="space-y-3">
+            <a href="/community/insights/bittensor-ecosystem-guide" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">指南 · 30 分钟</div>
+              <h4 class="font-serif italic text-lg leading-snug mb-1">中文世界最完整的 Bittensor 生态指南。</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)]">从零讲清机制、生态与参与方式——我们想要的深度。</p>
+            </a>
+            <a href="/community/insights/tao-and-the-dao" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">随笔 · 24 分钟</div>
+              <h4 class="font-serif italic text-lg leading-snug mb-1">TAO 与道 - 生态的有为与无为。</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)]">把技术叙事和更大的命题连起来。</p>
+            </a>
+            <a href="/community/insights/bittensor-mechanics-part-1" class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">深度 · 18 分钟</div>
+              <h4 class="font-serif italic text-lg leading-snug mb-1">核心机制拆解(上)— emission 怎么分。</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)]">把抽象机制讲成能懂的话。</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script is:inline>
+  (function () {
+    var API_BASE = 'https://opentao-api.cameron-530.workers.dev';
+    var form = document.getElementById('pitch-form');
+    if (!form) return;
+    var errEl = document.getElementById('pitch-form-error');
+    var submitBtn = document.getElementById('pitch-form-submit');
+    var successEl = document.getElementById('pitch-form-success');
+    var linkEl = document.getElementById('pitch-form-issue-link');
+
+    function showError(msg) {
+      if (!errEl) return;
+      errEl.textContent = msg;
+      errEl.classList.remove('hidden');
+    }
+    function clearError() {
+      if (!errEl) return;
+      errEl.textContent = '';
+      errEl.classList.add('hidden');
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      clearError();
+
+      var fd = new FormData(form);
+      var payload = {
+        name: (fd.get('name') || '').toString().trim(),
+        twitter: (fd.get('twitter') || '').toString().trim(),
+        format: (fd.get('format') || '').toString().trim(),
+        title: (fd.get('title') || '').toString().trim(),
+        oneLiner: (fd.get('oneLiner') || '').toString().trim(),
+        outline: (fd.get('outline') || '').toString().trim(),
+        background: (fd.get('background') || '').toString().trim(),
+        draftWhen: (fd.get('draftWhen') || '').toString().trim(),
+        language: (fd.get('language') || '').toString().trim(),
+        notes: (fd.get('notes') || '').toString().trim(),
+        agreement: fd.get('agreement') === 'on' || fd.get('agreement') === 'true',
+        turnstileToken: '',
+      };
+
+      if (!payload.name || !payload.title || !payload.outline) {
+        showError('姓名、标题、提纲是必填的。');
+        return;
+      }
+      if (!payload.agreement) {
+        showError('请勾选原创 + 授权确认。');
+        return;
+      }
+
+      try {
+        if (typeof window.turnstile !== 'undefined' && window.turnstile.getResponse) {
+          payload.turnstileToken = window.turnstile.getResponse() || '';
+        }
+      } catch (_e) {}
+      if (!payload.turnstileToken) {
+        showError('请完成人机校验。');
+        return;
+      }
+
+      submitBtn.setAttribute('disabled', 'true');
+      submitBtn.textContent = '发送中…';
+
+      try {
+        var res = await fetch(API_BASE + '/insight-pitch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) {
+          var msg = data && data.error ? data.error : 'submit_failed';
+          if (msg === 'rate_limited') msg = '你已达到提交上限,一小时后再试。';
+          else if (msg === 'spam_check_failed') msg = '人机校验失败——请刷新后重试。';
+          else msg = '出了点问题(' + msg + ')。你填的内容还在,再试一次。';
+          showError(msg);
+          submitBtn.removeAttribute('disabled');
+          submitBtn.textContent = '发送提纲';
+          try { window.turnstile && window.turnstile.reset(); } catch (_e) {}
+          return;
+        }
+        if (linkEl && data.issueUrl) {
+          linkEl.setAttribute('href', data.issueUrl);
+          linkEl.textContent = data.issueUrl;
+        }
+        form.classList.add('hidden');
+        if (successEl) successEl.classList.remove('hidden');
+      } catch (err) {
+        showError('网络错误——请重试。');
+        submitBtn.removeAttribute('disabled');
+        submitBtn.textContent = '发送提纲';
+      }
+    });
+  })();
+</script>
+
+<style>
+  .input, .textarea, .select { width: 100%; background: #ffffff; border: 1px solid rgba(15,15,18,0.12); border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: #0c0c10; outline: none; transition: border-color .15s; }
+  .input:focus, .textarea:focus, .select:focus { border-color: rgba(15,15,18,0.4); }
+  .textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #4a4a52; text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .step-row { display: grid; grid-template-columns: 28px 1fr auto; gap: 14px; align-items: start; padding: 18px 0; border-top: 1px solid rgba(15,15,18,0.06); }
+  .step-row:first-child { border-top: 0; }
+  .step-row .n { font-family: 'JetBrains Mono', monospace; color: #b8470b; font-size: 11px; padding-top: 2px; letter-spacing: 0.08em; }
+  .step-row .when { font-family: 'JetBrains Mono', monospace; color: #767680; font-size: 11px; padding-top: 3px; }
+  .rate-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); font-size: 14px; align-items: center; }
+  .rate-row:first-child { border-top: 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #767680; letter-spacing: 0.06em; text-transform: uppercase; }
+</style>

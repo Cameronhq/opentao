@@ -21,6 +21,10 @@ export const ZH_ROUTES = new Set<string>([
   '/community/events',
   '/community/chapters',
   '/community/insights',
+  '/community/become-a-host',
+  '/community/insights/contribute',
+  '/community/events/2026-tokyo-meetup-03',
+  '/community/chapters/tokyo',
 ]);
 
 /** Detect the active locale from the URL pathname. */

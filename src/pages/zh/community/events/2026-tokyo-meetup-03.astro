@@ -1,0 +1,289 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import SubNav from '../../../../components/SubNav.astro';
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
+import { getEvent } from '../../../../data/events';
+import { localizePath, hasZh } from '../../../../i18n/utils';
+
+const event = getEvent('2026-tokyo-meetup-03');
+const lumaUrl = event?.lumaUrl;
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+
+const subnav = [
+  { href: L('/community/events'), label: '活动' },
+  { href: L('/community/chapters'), label: '城市分会' },
+  { href: L('/community/insights'), label: '长文' },
+];
+
+const agenda = [
+  { t: '19:00', title: '入场 · 酒水 & 互相认识', body: '由 Yuki + Takahiro 主持。边桌有贴纸和啤酒。' },
+  { t: '19:30', title: '欢迎 & OpenTAO 最新进展', body: 'Yuki Tanaka — 5 分钟。' },
+  { t: '19:35', title: '创始人简报 · 早知道就好了', body: '10 分钟 × 3 — Ke Zhang(SN3)、Wei Lin(SN18)、Maya Iyer(SN42)。' },
+  { t: '20:10', title: '主持人圆桌 + 观众 Q&A', body: '40 分钟 · 由 Rho Carter(@rho.lab)主持。' },
+  { t: '20:50', title: '自由畅饮 · 找到同路人', body: '到 22:00。场地我们包了。' },
+  { t: '22:00', title: '可选第二场', body: '走去附近的居酒屋。AA。' },
+];
+
+const speakers = [
+  { name: 'Ke Zhang', handle: 'SN3 · @ke.ng', bio: '做了一个长文摘要 subnet,目前 4,200 个活跃 miner。', grad: 'linear-gradient(135deg, #b8470b, #c2410c)' },
+  { name: 'Wei Lin', handle: 'SN18 · @wei', bio: '运行最久的 subnet 之一。出现在最近的 SN-18 深度文里。', grad: 'linear-gradient(135deg, #1c6ea4, #6741d9)' },
+  { name: 'Maya Iyer', handle: 'SN42 · @maya', bio: '2025 年从零做出推理链 subnet。写了我们的打分函数实操指南。', grad: 'linear-gradient(135deg, #15803d, #c2410c)' },
+];
+
+const sponsors = [
+  { name: 'WeWork', meta: '场地伙伴' },
+  { name: 'Lambda Labs', meta: '算力' },
+  { name: 'HackQuest', meta: '媒体' },
+  { name: 'Asahi', meta: '酒水' },
+];
+
+const calTitle = encodeURIComponent('Bittensor 东京 Meetup #03');
+const calLoc = encodeURIComponent('WeWork Shibuya Scramble Square 34F, Tokyo');
+const calDesc = encodeURIComponent('三位 subnet 创始人聊聊第一天要是知道就好了的事。结束后还有酒。https://opentao.ai/community/events/2026-tokyo-meetup-03');
+const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=20260608T100000Z/20260608T130000Z&details=${calDesc}&location=${calLoc}`;
+const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${calTitle}&body=${calDesc}&location=${calLoc}&startdt=2026-06-08T10:00:00Z&enddt=2026-06-08T13:00:00Z&path=/calendar/action/compose&rru=addevent`;
+const tokyoPast = [
+  { title: '东京 Meetup #02 — Validator 之夜', meta: '2026·03·14 · 64 人参加' },
+  { title: 'Workshop · 挖你的第一个 subnet', meta: '2026·02·22 · 38 人参加' },
+  { title: '东京 Meetup #01 — Kickoff', meta: '2026·01·18 · 87 人参加' },
+];
+const related = [
+  { href: '/community/events/2026-sn3-fireside-ke-ng', tag: 'Jun 12 · 线上', title: '"运营 SN3 一年我们学到了什么" — 与 @ke.ng 炉边谈', sub: '同一批创始人,更长的形式。AMA。' },
+  { href: '/community/events/2026-berlin-garden-edition', tag: 'Jun 28 · 柏林', title: '柏林 — Bittensor 花园版', sub: '姊妹分会活动。BBQ + 简短分享。' },
+  { href: '/community/events/2026-sf-demo-day-season-01', tag: 'Jul 22 · SF + 全球', title: '第一季 Demo Day', sub: '黑客松决赛。30 队 pitch。Wei Lin 当评委。' },
+];
+const shareUrl = 'https://opentao.ai/community/events/2026-tokyo-meetup-03';
+const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('Bittensor 东京 Meetup #03 — 三位创始人,聊第一天要是知道就好了的事。')}&url=${encodeURIComponent(shareUrl)}`;
+---
+<BaseLayout
+  title="Bittensor 东京 Meetup #03 — 活动 — OpenTAO"
+  description="三位 subnet 创始人。第一天要是知道就好了的事。WeWork 涩谷,6 月 8 日。"
+  section="community"
+>
+  <SubNav items={subnav} active="/community/events" rightMeta="还有 12 天 · 东京分会" />
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 pt-12 pb-2">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/community/events', label: '社区' },
+        { href: '/community/events', label: '活动' },
+        { label: '东京 Meetup #03' },
+      ]} />
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="cover"><div class="city">东京</div></div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-12">
+      <div class="grid lg:grid-cols-[1.5fr_1fr] gap-12 items-start">
+        <div>
+          <div class="flex items-center gap-2 mb-5">
+            <span class="tag" style="color: #b8470b; border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.06);">即将</span>
+            <span class="tag">Meetup</span>
+            <span class="tag">线下</span>
+            <span class="text-xs text-[color:var(--color-fg-dim)] font-mono">·  由 <a href={L('/community/chapters/tokyo')} class="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)]">东京分会</a> 主办</span>
+          </div>
+          <h1 class="text-[44px] md:text-[56px] leading-[1.04] tracking-[-0.025em] font-semibold mb-6">Bittensor 东京 Meetup #03</h1>
+          <h2 class="text-lg text-[color:var(--color-fg-muted)] font-serif italic leading-snug max-w-[600px]">三位 subnet 创始人。第一天要是知道就好了的事。结束后还有酒。</h2>
+        </div>
+        <div class="card rounded-md p-6 lg:sticky lg:top-24">
+          <div class="space-y-4 mb-6">
+            <div>
+              <div class="section-label mb-1">时间</div>
+              <div class="font-medium">6 月 8 日(周一)· 19:00–22:00 JST</div>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">06:00 EDT · 12:00 CEST · 18:00 SGT</div>
+            </div>
+            <div>
+              <div class="section-label mb-1">地点</div>
+              <div class="font-medium">WeWork Shibuya Scramble Square</div>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">东京涩谷 2-24-12</div>
+            </div>
+            <div>
+              <div class="section-label mb-1">容量</div>
+              <div class="font-medium">80 个名额 · 已报名 62</div>
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">还剩 18 · 通常提前 2 天开始 waitlist</div>
+            </div>
+            <div>
+              <div class="section-label mb-1">费用</div>
+              <div class="font-medium">免费</div>
+            </div>
+          </div>
+          {lumaUrl ? (
+            <a href={lumaUrl} target="_blank" rel="noopener" class="btn-accent inline-flex items-center justify-center gap-2 text-sm w-full px-5 py-3 rounded-md">
+              在 Luma 报名
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg>
+            </a>
+          ) : (
+            <span class="inline-flex items-center justify-center gap-2 text-sm w-full px-5 py-3 rounded-md border hairline-strong text-[color:var(--color-fg-dim)] cursor-not-allowed">
+              RSVP 链接 · 即将补上
+            </span>
+          )}
+          <details class="mt-4">
+            <summary class="text-xs font-mono text-[color:var(--color-fg-dim)] hover:text-[color:var(--color-fg)] cursor-pointer add-cal">加入日历 ▾</summary>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+              <a href={gcalUrl} target="_blank" rel="noopener" class="btn-secondary px-3 py-2 rounded text-center">Google</a>
+              <a href="/events.ics" class="btn-secondary px-3 py-2 rounded text-center">Apple</a>
+              <a href={outlookUrl} target="_blank" rel="noopener" class="btn-secondary px-3 py-2 rounded text-center">Outlook</a>
+              <a href="/events.ics" class="btn-secondary px-3 py-2 rounded text-center">.ics 文件</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+      <div class="grid lg:grid-cols-[1.5fr_1fr] gap-12">
+
+        <div>
+          <div class="section-label mb-3">关于</div>
+          <h2 class="text-2xl font-semibold tracking-tight mb-5">这是什么。</h2>
+          <p class="text-[color:var(--color-fg)] leading-relaxed mb-5">
+            2026 年东京的第三场 Bittensor meetup。我们请了三位 subnet 创始人——两位来自 APAC、一位来自 SF——聊聊运行一个在线 subnet 的头 90 天里,他们希望当初有人告诉自己的事。
+          </p>
+          <p class="text-[color:var(--color-fg-muted)] leading-relaxed mb-5">
+            形式:每位创始人先做简短开场(各 10 分钟),然后主持人圆桌(40 分钟),最后自由畅饮。全程欢迎 Q&A。如果你一直想问一个 subnet 运营者"说真的,你的 validator 凌晨 3 点到底在干嘛"——这就是那个房间。
+          </p>
+
+          <div class="card rounded-md p-5 my-7" style="background: #fafaf9;">
+            <div class="section-label mb-3">适合谁</div>
+            <ul class="text-sm leading-relaxed space-y-1.5 text-[color:var(--color-fg-muted)]">
+              <li>· 在考虑报下一届 OpenTAO 黑客松的开发者</li>
+              <li>· 正在跑 miner / validator、想交流经验的人</li>
+              <li>· 好奇的新人——带着问题来,不要求懂行</li>
+              <li>· 不太适合:纯找内幕消息的投资者。这类问题我们会引开。</li>
+            </ul>
+          </div>
+
+          <div class="section-label mb-3 mt-12">议程</div>
+          <h3 class="text-xl font-semibold tracking-tight mb-5">时间线。</h3>
+          <div>
+            {agenda.map((a) => (
+              <div class="agenda-row"><div class="t">{a.t}</div><div><div class="font-medium">{a.title}</div><div class="text-[color:var(--color-fg-muted)] text-xs mt-0.5">{a.body}</div></div></div>
+            ))}
+          </div>
+
+          <div class="section-label mb-3 mt-12">嘉宾</div>
+          <h3 class="text-xl font-semibold tracking-tight mb-6">三位创始人。</h3>
+          <div class="grid sm:grid-cols-3 gap-4">
+            {speakers.map((s) => (
+              <div class="speaker"><div class="av" style={`background: ${s.grad};`}></div><div><div class="font-medium">{s.name}</div><div class="text-xs text-[color:var(--color-fg-dim)] font-mono">{s.handle}</div><p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed mt-2">{s.bio}</p></div></div>
+            ))}
+          </div>
+
+          <div class="section-label mb-3 mt-12">现场信息</div>
+          <h3 class="text-xl font-semibold tracking-tight mb-6">怎么到。</h3>
+          <div class="map-box mb-5">
+            <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><defs><pattern id="streets" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(15,15,18,0.08)" stroke-width="1"/></pattern></defs><rect width="800" height="450" fill="url(#streets)" /><circle cx="400" cy="220" r="60" fill="rgba(184,71,11,0.08)" /></svg>
+            <div class="pin-large"></div>
+          </div>
+          <ul class="space-y-2 text-sm text-[color:var(--color-fg-muted)] leading-relaxed">
+            <li><strong class="text-[color:var(--color-fg)]">地址。</strong>WeWork Shibuya Scramble Square 34F · 东京涩谷区涩谷 2-24-12,150-6134</li>
+            <li><strong class="text-[color:var(--color-fg)]">坐电车。</strong>涩谷站,scramble 出口。WeWork 在新塔楼顶部——和车站直连。</li>
+            <li><strong class="text-[color:var(--color-fg)]">签到。</strong>1F 大堂前台,报"Bittensor meetup",会给你访客证。</li>
+            <li><strong class="text-[color:var(--color-fg)]">餐饮。</strong>提供小食 + 啤酒 / 软饮。素食有标注。</li>
+            <li><strong class="text-[color:var(--color-fg)]">无障碍。</strong>从车站到活动楼层全程无台阶。同层有洗手间。</li>
+          </ul>
+
+          <div class="section-label mb-3 mt-12">赞助</div>
+          <div class="grid grid-cols-4 gap-3">
+            {sponsors.map((s) => (
+              <div class="card rounded-md p-5 text-center text-xs font-mono text-[color:var(--color-fg-dim)]">{s.name}<br><span class="text-[10px] mt-1 block">{s.meta}</span></div>
+            ))}
+          </div>
+        </div>
+
+        <aside class="space-y-6">
+          <div class="card rounded-md p-6">
+            <div class="section-label mb-3">主办方</div>
+            <a href={L('/community/chapters/tokyo')} class="flex items-center gap-3 group">
+              <div class="w-12 h-12 rounded-full" style="background: linear-gradient(135deg, #b8470b, #c2410c);"></div>
+              <div>
+                <div class="font-medium group-hover:text-[color:var(--color-accent)]">东京分会</div>
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)]">办过 12 场 · 412 成员</div>
+              </div>
+            </a>
+            <div class="mt-5 border-t hairline pt-4">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">主理人</div>
+              <div class="flex items-center gap-3 text-sm"><span>@yuki</span><span class="text-[color:var(--color-fg-dim)]">·</span><span>@takahiro</span></div>
+            </div>
+          </div>
+
+          <div class="card rounded-md p-6">
+            <div class="section-label mb-3">东京分会近期</div>
+            {tokyoPast.map((p, i) => (
+              <div class={`block py-3 text-sm text-[color:var(--color-fg-muted)] ${i < tokyoPast.length - 1 ? 'border-b hairline' : ''}`}>
+                {p.title}
+                <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mt-1">{p.meta}</div>
+              </div>
+            ))}
+            <a href={L('/community/chapters/tokyo')} class="text-xs text-[color:var(--color-accent)] hover:underline mt-3 inline-block">东京全部活动 →</a>
+          </div>
+
+          <div class="card rounded-md p-6">
+            <div class="section-label mb-3">分享</div>
+            <div class="flex gap-2">
+              <a href={twitterShareUrl} target="_blank" rel="noopener" class="btn-secondary text-xs px-3 py-2 rounded">Twitter</a>
+              <button class="btn-secondary text-xs px-3 py-2 rounded" data-copy-link={shareUrl}>复制链接</button>
+              <span class="btn-secondary text-xs px-3 py-2 rounded opacity-60" style="cursor: default;">QR <span class="coming-soon" style="font-size: 8px; padding: 1px 5px; margin-left: 4px;">即将</span></span>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b hairline bg-[color:var(--color-surface)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-14">
+      <div class="section-label mb-3">相关活动</div>
+      <h3 class="text-2xl font-semibold tracking-tight mb-8">更多找到同路人的地方。</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        {related.map((r) => (
+          <a href={r.href} class="card rounded-md p-5 block">
+            <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">{r.tag}</div>
+            <h4 class="font-semibold mb-2 leading-snug">{r.title}</h4>
+            <div class="text-xs text-[color:var(--color-fg-muted)]">{r.sub}</div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.querySelectorAll<HTMLButtonElement>('[data-copy-link]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const url = btn.dataset.copyLink || '';
+        try {
+          await navigator.clipboard.writeText(url);
+          const orig = btn.textContent;
+          btn.textContent = '已复制 ✓';
+          setTimeout(() => { btn.textContent = orig; }, 1400);
+        } catch {
+          btn.textContent = '复制失败';
+        }
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 7px; border-radius: 3px; border: 1px solid rgba(15,15,18,0.14); color: #4a4a52; }
+  .cover { aspect-ratio: 21/9; background: linear-gradient(135deg, #fdf3e3 0%, #f5e8d2 50%, #fbcf9e 100%); position: relative; overflow: hidden; }
+  .cover::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(184,71,11,0.18) 1px, transparent 1px); background-size: 24px 24px; opacity: 0.5; }
+  .cover .city { position: absolute; right: 32px; bottom: 28px; font-family: 'Fraunces', serif; font-style: italic; font-size: 56px; color: #b8470b; line-height: 1; letter-spacing: -0.02em; }
+  .agenda-row { display: grid; grid-template-columns: 100px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); font-size: 14px; }
+  .agenda-row:first-child { border-top: 0; }
+  .agenda-row .t { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4a4a52; }
+  .speaker { display: flex; align-items: flex-start; gap: 12px; }
+  .speaker .av { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+  .map-box { aspect-ratio: 16/9; background: #fafaf9; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; position: relative; overflow: hidden; }
+  .map-box svg { width: 100%; height: 100%; }
+  .pin-large { position: absolute; top: 46%; left: 48%; width: 14px; height: 14px; border-radius: 50%; background: #b8470b; box-shadow: 0 0 0 6px rgba(184,71,11,0.18); }
+  .add-cal { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+</style>
