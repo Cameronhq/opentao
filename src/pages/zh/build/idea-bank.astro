@@ -1,0 +1,615 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SubNav from '../../../components/SubNav.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { localizePath, hasZh } from '../../../i18n/utils';
+
+const L = (route: string) => localizePath(route, hasZh(route) ? 'zh' : 'en');
+const subnav = [
+  { href: L('/build/hackathon'), label: '黑客松' },
+  { href: L('/build/incubator'), label: '孵化器' },
+  { href: L('/build/idea-bank'), label: 'Idea 库' },
+];
+
+const domainCounts = [
+  { code: 'EDU', n: 2 }, { code: 'FIN', n: 3 }, { code: 'ROBOT', n: 2 },
+  { code: 'DATA', n: 2 }, { code: 'HEALTH', n: 2 }, { code: 'CODE', n: 1 },
+];
+
+const filters = [
+  { label: '全部 · 12',   domain: 'all',       active: true },
+  { label: '教育 · 2',    domain: 'EDUCATION', active: false },
+  { label: '金融 · 3',    domain: 'FINANCE',   active: false },
+  { label: '机器人 · 2',  domain: 'ROBOTICS',  active: false },
+  { label: '数据 · 2',    domain: 'DATA',      active: false },
+  { label: '代码 · 1',    domain: 'CODE',      active: false },
+  { label: '医疗 · 2',    domain: 'HEALTH',    active: false },
+];
+
+const domainStyles: Record<string, string> = {
+  EDUCATION: 'background: rgba(184,71,11,0.08); color: #b8470b;',
+  FINANCE: 'background: rgba(28,110,164,0.08); color: #1c6ea4;',
+  ROBOTICS: 'background: rgba(103,65,217,0.08); color: #6741d9;',
+  HEALTH: 'background: rgba(21,128,61,0.08); color: #15803d;',
+  DATA: 'background: rgba(194,65,12,0.08); color: #c2410c;',
+  CODE: 'background: rgba(75,85,99,0.08); color: #4b5563;',
+};
+
+const ideas = [
+  {
+    domain: 'EDUCATION', heat: 92,
+    title: 'K-12 数学作业的初评打分器',
+    body: '学校和辅导机构每周花几百小时批改长篇数学作业。一个能返回"对齐评分标准的分数 + 下一步提示"的 subnet,把这件事变成一次按页计费的 API 调用。',
+    rowA: [
+      { k: '买家', v: '辅导机构、学区、教育科技 app' },
+      { k: 'Miner 的活', v: '给一张扫描页,返回打分 + 提示的 JSON' },
+      { k: 'Validator', v: '绑定评分标准的 LLM judge + 留出 gold set' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按页计算、compute-bound', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '页面 hash + 扰动;重放失败' },
+      { k: '退出口', v: '按页计费的 SaaS API' },
+    ],
+  },
+  {
+    domain: 'FINANCE', heat: 88,
+    title: '财报电话会的情绪与指引抽取',
+    body: 'quant 团队为 800+ 家上市公司的"首小时转写 + 结构化情绪"付六位数。一个吃音频、在会议窗口内吐结构化 JSON 的 subnet,有干净的企业 SKU。',
+    rowA: [
+      { k: '买家', v: 'quant 基金、卖方研究、金融数据厂商' },
+      { k: 'Miner 的活', v: '音频 → 带说话人标记的 JSON,含情绪 + 指引字段' },
+      { k: 'Validator', v: '对照会后 SEC 文件 + 集成一致性' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按场推理', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '实时音频,无法预先算' },
+      { k: '退出口', v: 'API + S3 投递,$15K/席/年' },
+    ],
+  },
+  {
+    domain: 'ROBOTICS', heat: 70,
+    title: '操作任务的 sim-to-real 策略蒸馏',
+    body: '机器人创业公司攒了一堆遥操作演示,却没算力把它们蒸馏成可部署策略。买家给演示;miner 训练紧凑策略;validator 在留出的 sim 套件上打分。',
+    rowA: [
+      { k: '买家', v: '人形 + 操作类创业公司(数据已在外部采好)' },
+      { k: 'Miner 的活', v: '在给定轨迹上训练策略网络,返回 checkpoint' },
+      { k: 'Validator', v: '在锁定的 sim 环境里 replay,按任务成功率打分' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: 'sim 并行跑', scaling: '超线性' },
+      { k: 'L3 — 作弊路径', v: '每轮随机环境,无法过拟合' },
+      { k: '退出口', v: '授权 checkpoint,每个 $5–25K' },
+    ],
+  },
+  {
+    domain: 'HEALTH', heat: 76,
+    title: '放射科预读分诊',
+    body: '放射科需要分诊模型,把可能紧急的检查先挑出来。买家(诊所)给检查;miner 跑推理;validator 对照放射科医生最终的判读打分。',
+    rowA: [
+      { k: '买家', v: '放射科诊所、远程放射公司、医院 IT' },
+      { k: 'Miner 的活', v: 'DICOM → 紧急度评分 + 病灶标签' },
+      { k: 'Validator', v: '延迟打分,对照医生实际标注' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按检查推理', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '检查一次性,无公开 benchmark' },
+      { k: '退出口', v: '按检查计费或席位授权' },
+    ],
+  },
+  {
+    domain: 'FINANCE', heat: 82,
+    title: '贷款文档字段抽取',
+    body: '中端贷款机构为"从信贷备忘录和报税表里抽结构化字段"付每页 $4–8。一个按页跑 OCR + 字段分类模型的 subnet 天然并行。',
+    rowA: [
+      { k: '买家', v: '中端商业贷款方、BPO 厂商、fintech 承保方' },
+      { k: 'Miner 的活', v: 'PDF 页 → 带置信度的结构化字段 JSON' },
+      { k: 'Validator', v: '每个 epoch 抽查对照人工标注的 gold 样本' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '尴尬并行', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '实时客户文档,不会见第二次' },
+      { k: '退出口', v: '按页计费的 API 网关' },
+    ],
+  },
+  {
+    domain: 'EDUCATION', heat: 64,
+    title: '面向职业资格考试的个性化题库生成',
+    body: '备考公司卖自适应题库。一个生成"新鲜、对齐大纲、难度校准好"题目的 subnet(按留出的人类通过率打分),让题库跑在死记硬背前面。',
+    rowA: [
+      { k: '买家', v: '备考平台、职业认证机构' },
+      { k: 'Miner 的活', v: '主题 + 难度 → 题目 + 答案 + 解析' },
+      { k: 'Validator', v: '从历年真题心理测量学蒸馏打分 + 集成一致性' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按题生成', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '难度种子私有,无法预算' },
+      { k: '退出口', v: '按题授权或打包题库' },
+    ],
+  },
+  {
+    domain: 'DATA', heat: 78,
+    title: '数学/代码的合成推理链',
+    body: '前沿实验室买长篇推理链。miner 产出多样、经 verifier 校验的推理链;validator 用留出的单元测试或逐步检查器打分。每张 H100 每小时产几千条。',
+    rowA: [
+      { k: '买家', v: '模型实验室、post-training 服务商、开源 RLHF 项目' },
+      { k: 'Miner 的活', v: '题目 → 推理链 + 经校验的最终答案' },
+      { k: 'Validator', v: 'verifier 模型 + 对终答案的可执行检查' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: 'trace-bound', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '每 epoch 换种子 + 多样性惩罚' },
+      { k: '退出口', v: '批量数据集授权' },
+    ],
+  },
+  {
+    domain: 'HEALTH', heat: 58,
+    title: '临床试验方案偏离检测',
+    body: 'CRO 需要实时扫描试验文档里的方案偏离。subnet 吃试验记录 + EDC 录入,标出异常——按最终监查裁定打分。',
+    rowA: [
+      { k: '买家', v: '合同研究组织(CRO)、药企申办方' },
+      { k: 'Miner 的活', v: '试验事件日志 → 标记 + 原因 JSON' },
+      { k: 'Validator', v: '延迟对账,对照监查报告' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按事件推理', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '实时试验数据,从不重复' },
+      { k: '退出口', v: '按试验中心计费的 SaaS' },
+    ],
+  },
+  {
+    domain: 'ROBOTICS', heat: 56,
+    title: '仓储自主的闭环视频理解',
+    body: '仓储机器人玩家要从深度 + RGB 流里做场景图和意图预测。买家给滚动片段;miner 输出事件轨迹;validator 对照锁定测试集的 ground truth 打分。',
+    rowA: [
+      { k: '买家', v: '仓储自动化 OEM、第三方物流集成商' },
+      { k: 'Miner 的活', v: '视频块 → 事件 + 物体轨迹 JSON' },
+      { k: 'Validator', v: '每周轮换的留出片段 + ground truth 标注' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按片段推理', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '买家私有片段,无法缓存' },
+      { k: '退出口', v: '按摄像头小时计费的 API' },
+    ],
+  },
+  {
+    domain: 'DATA', heat: 68,
+    title: '长上下文检索打分',
+    body: '模型实验室需要长上下文检索的对抗基准。subnet 生成"大海捞针"任务(法律、科学、代码库)+ 参考段落,并给 miner 提交的检索器打分。',
+    rowA: [
+      { k: '买家', v: '模型实验室、eval 框架(lm-eval-harness 那类)' },
+      { k: 'Miner 的活', v: 'query + 语料 → 带分数的 top-k 段落' },
+      { k: 'Validator', v: '程序化精确匹配对照生成器锁定的 needle' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按 query 检索', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '每轮换新语料' },
+      { k: '退出口', v: 'Eval-as-a-service 合同' },
+    ],
+  },
+  {
+    domain: 'CODE', heat: 72,
+    title: '面向无人维护 repo 的测试生成 subnet',
+    body: '企业付外部公司给老旧服务补测试覆盖。miner 给目标 repo 产基于属性的测试;validator 跑测试,按 mutation 存活率和覆盖增量打分。',
+    rowA: [
+      { k: '买家', v: '企业工程团队、开发工具厂商' },
+      { k: 'Miner 的活', v: 'repo 快照 → 生成的测试套件 + 推理' },
+      { k: 'Validator', v: '沙箱里跑 mutation testing + 覆盖增量' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '沙箱执行可并行', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '每 epoch 变异目标,无法预算' },
+      { k: '退出口', v: '按 repo 的覆盖授权' },
+    ],
+  },
+  {
+    domain: 'FINANCE', heat: 60,
+    title: '交易对手新闻事件抽取',
+    body: '银行和保险公司监控交易对手新闻里的信用事件。subnet 吃新闻 + 监管 feed,吐带严重度评分的结构化事件;validator 对照事后的权威记录核对。',
+    rowA: [
+      { k: '买家', v: '商业银行、贸易信用保险公司、KYC 厂商' },
+      { k: 'Miner 的活', v: '新闻 → 实体 + 事件类型 + 严重度 JSON' },
+      { k: 'Validator', v: '每周对照人工整理的事件账本' },
+    ],
+    rowB: [
+      { k: 'L2 — 扩展性', v: '按文章推理', scaling: '线性' },
+      { k: 'L3 — 作弊路径', v: '来源轮换、有禁运期保护' },
+      { k: '退出口', v: '按监控实体订阅' },
+    ],
+  },
+];
+
+const lenses = [
+  {
+    n: 'L1 — 需求',
+    title: '谁是买家,他们愿意付多少?',
+    body: '不是"crypto 社区会不会觉得这有用"——而是 Bittensor 之外的买家今天会不会为这个产出掏现金?如果你能点名三个具体买家、以及他们愿意为每次调用付的价,你就有需求。否则,你只是在代币跑步机上的爱好项目。',
+    good: '"中端律所为合同初审付每页 $0.40——我们 pipeline 里有三家已经签了 LOI。"',
+  },
+  {
+    n: 'L2 — 扩展性',
+    title: '算力翻倍,产出翻倍吗?',
+    body: '一个 subnet 大约 192 个 miner 槽位。如果产出增长卡在"循环里的那个人"身上,这个设计撑不过第一期。Bittensor 付的是算力周期,不是人头。compute-bound 的问题繁荣;people-bound 的问题窒息。',
+    good: '"每张 H100 每小时产 ~1,200 条细粒度推理链。GPU ×2 → trace ×2。买家侧的采集是独立的。"',
+  },
+  {
+    n: 'L3 — 可作弊性',
+    title: 'miner 伪造"好产出"最便宜的办法是什么?',
+    body: '如果 miner 能硬编码答案、重放昨天的结果、或调个便宜 API 转卖,你的打分就死了。好设计让作弊比诚实挖矿更贵:新鲜的 ground truth、隐藏种子、对抗式 verifier。',
+    good: '"种子从买家侧私有语料里采,每小时轮换。预算白费;唯一诚实的策略就是真的跑模型。"',
+  },
+  {
+    n: 'L4 — 收敛',
+    title: '两个诚实的 validator 能给出同一个排序吗?',
+    body: 'Yuma 共识要求 validator 在权重上收敛,否则 emission 被砍。如果你的打分依赖主观判断、慢预言机、或不稳定的模型 API,validator 不会一致,subnet 会漂移。',
+    good: '"validator replay 同一个 hash 过的种子 → 确定性 verifier 模型 → 数值分数误差 ±0.5% 内一致。"',
+  },
+];
+
+const failures = [
+  { code: 'F1 · 需求长得像论坛', title: '"Bittensor 上的 builder 会想要这个。"', body: '用户画像只存在于这个网络里。美元从不进来。挑一个 crypto 之外的买家。' },
+  { code: 'F2 · 人速产出', title: '"miner 雇标注员 / 司机。"', body: '192 槽位 × N 个人 = 一个挂在链上的小外包公司。L2 不过关。' },
+  { code: 'F3 · 参考-重放攻击', title: '"按和公开数据集的相似度打分。"', body: '头部 miner 直接背下数据集。轮换 ground truth,或每 epoch 对抗式生成。' },
+  { code: 'F4 · 主观打分', title: '"validator 给创意 / 质量打分。"', body: 'validator 不会收敛。需要一个确定性替身:verifier 模型,或下游任务准确率。' },
+  { code: 'F5 · API 转卖 subnet', title: '"miner 代理 GPT-4 / Claude。"', body: '买家付网关、网关付 OpenAI,多绕几步。没有可防御的增量价值。' },
+  { code: 'F6 · 没有退出口', title: '"变现以后再想。"', body: '没有市场出口,miner 只靠 emission 活。TAO 价格撑着你——直到撑不住。' },
+];
+
+const refSubnets = [
+  { slug: '64-chutes',   netuid: '64',  name: 'Chutes',   body: '推理市场,对输出字节有硬确定性。L3/L4 干净。' },
+  { slug: '22-desearch', netuid: '22',  name: 'Desearch', body: '搜索排序,对照轮换的私有 gold set 判分。L3 很强。' },
+  { slug: '120-affine',  netuid: '120', name: 'Affine',   body: '推理链,verifier 打分。规模下算力被充分利用。' },
+];
+
+const onePager = [
+  { n: '1 · 买家', v: 'Bittensor 之外的一个明确细分。三个能联系上的人。' },
+  { n: '2 · 痛点', v: '他们现在为什么付费,以及哪里坏了。' },
+  { n: '3 · Miner 的活', v: '一句话。输入 schema → 输出 schema。' },
+  { n: '4 · Validator 打分', v: '确定性函数。能从日志 replay。' },
+  { n: '5 · L2 检查', v: '1×/2×/4×/8× GPU 的吞吐。展示线性(或更好)扩展。' },
+  { n: '6 · 最便宜的作弊路径', v: '最诱人的作弊方式,以及你的设计为什么让它无利可图。' },
+  { n: '7 · 退出口', v: '从链上产出到美元账单的路径。API、授权、app——选一个。' },
+  { n: '8 · 90 天证据', v: '你已经建好或验证过的东西。一个 demo、一份 LOI、一个能跑的 verifier。' },
+];
+
+const computeRowsA = [
+  { g: '1× GPU', w: 20, t: '1k/天' }, { g: '2× GPU', w: 22, t: '1.1k/天' },
+  { g: '4× GPU', w: 24, t: '1.2k/天' }, { g: '8× GPU', w: 24, t: '1.2k/天' },
+];
+const computeRowsB = [
+  { g: '1× GPU', w: 12, t: '1k/时' }, { g: '2× GPU', w: 24, t: '2k/时' },
+  { g: '4× GPU', w: 48, t: '4k/时' }, { g: '8× GPU', w: 96, t: '8k/时' },
+];
+---
+<BaseLayout
+  title="Idea 库 — 做 subnet — OpenTAO"
+  description="一份可用的 subnet 方向目录,都先用我们评估每个申请者的四个 lens 过过筛。"
+  section="build"
+>
+  <SubNav items={subnav} active="/build/idea-bank" rightMeta="12 个开放 · 每周刷新" />
+
+  <section class="relative overflow-hidden border-b hairline">
+    <div class="absolute inset-0 dot-grid opacity-40"></div>
+    <div class="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16">
+      <Breadcrumb crumbs={[
+        { href: '/zh/', label: 'OpenTAO' },
+        { href: '/build/hackathon', label: '做 subnet' },
+        { label: 'Idea 库' },
+      ]} />
+
+      <div class="flex items-center gap-3 mb-5">
+        <span class="accent-dot"></span>
+        <span class="section-label" style="color: #b8470b">开放问题 · 预筛过 · 未被认领</span>
+      </div>
+      <h1 class="text-[60px] md:text-[72px] leading-[0.98] tracking-[-0.03em] font-semibold max-w-[920px]">
+        十二个<br><span class="font-serif italic font-normal text-[color:var(--color-fg-muted)]">还不存在的 subnet。</span>
+      </h1>
+      <p class="mt-7 text-lg text-[color:var(--color-fg-muted)] max-w-[640px] leading-relaxed">
+        一份可用的 subnet 方向目录。每一条都有一个 crypto 之外的明确买家、随 GPU 线性扩展、并扛得住最明显的作弊——都用我们评估每个申请者的四个 lens 压测过。
+      </p>
+      <p class="mt-4 text-sm text-[color:var(--color-fg-muted)] max-w-[640px] leading-relaxed">
+        挑一个。偷一个。拼两个。这个库就是用来被搬空的。
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="#catalog" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">浏览目录<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <a href="#vetting" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">我们怎么筛 idea →</a>
+      </div>
+
+      <div class="mt-14 grid grid-cols-2 md:grid-cols-6 gap-2 max-w-3xl text-center">
+        {domainCounts.map((d) => (
+          <div class="border hairline rounded-md py-3">
+            <div class="font-mono text-[11px] text-[color:var(--color-fg-dim)]">{d.code}</div>
+            <div class="font-semibold mt-1">{d.n}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="catalog" class="border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-16">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
+        <div class="flex flex-wrap gap-2">
+          {filters.map((f) => (
+            <button class={`filter-btn ${f.active ? 'active' : ''}`} data-filter-domain={f.domain}>{f.label}</button>
+          ))}
+        </div>
+        <div class="flex items-center gap-3 text-xs font-mono text-[color:var(--color-fg-dim)]">
+          <span>排序</span>
+          <select id="idea-sort" class="bg-transparent border hairline rounded px-2 py-1 text-[color:var(--color-fg)]">
+            <option value="heat">买家就绪度</option>
+            <option value="recent">最近添加</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4" id="idea-grid">
+        {ideas.map((idea, i) => (
+          <article class="card rounded-md p-7" data-domain={idea.domain} data-heat={idea.heat} data-order={i}>
+            <div class="flex items-baseline justify-between mb-3">
+              <span class="domain-tag" style={domainStyles[idea.domain]}>{idea.domain}</span>
+              <span class="heat text-[color:var(--color-fg-dim)]">买家就绪 <span class="heat-bar"><span style={`width: ${idea.heat}%`}></span></span></span>
+            </div>
+            <h3 class="text-xl font-semibold tracking-tight mb-2 leading-snug">{idea.title}</h3>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">{idea.body}</p>
+            <div class="idea-row">
+              {idea.rowA.map((c) => (
+                <div><div class="k">{c.k}</div>{c.v}</div>
+              ))}
+            </div>
+            <div class="idea-row">
+              {idea.rowB.map((c) => (
+                <div>
+                  <div class="k">{c.k}</div>
+                  {c.scaling && <><span class="check-pill check-ok">✓ {c.scaling}</span> </>}{c.v}
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-12 grid md:grid-cols-[1.4fr_1fr] gap-6 items-stretch">
+        <div class="card stripe rounded-md p-7">
+          <div class="section-label mb-3" style="color: #b8470b;">有别的 idea?</div>
+          <h3 class="text-2xl font-semibold tracking-tight mb-3 leading-snug">用四个 lens 过一遍。活下来,就提交。</h3>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">
+            这个目录是起点,不是围栏。今天最好的那些 subnet,大多一年前不在任何人的清单上。如果你有一个 compute-bound、且在 crypto 之外有真实买家的东西,我们想看。
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="/zh/build/hackathon" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-md">提交到黑客松<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+            <a href="#vetting" class="text-sm text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)]">读读四个 lens →</a>
+          </div>
+        </div>
+        <div class="card rounded-md p-7">
+          <div class="section-label mb-3">我们会礼貌谢绝的</div>
+          <ul class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed space-y-2.5">
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">"crypto 原生"工具。</strong>买家得活在 crypto 之外。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">人速产出。</strong>标注工厂、零工派单。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">API 转卖 subnet。</strong>miner 只是代理一个前沿模型。</span></li>
+            <li class="flex gap-3"><span class="text-[color:var(--color-fg-dim)] font-mono text-xs mt-0.5">×</span><span><strong class="text-[color:var(--color-fg)]">主观打分。</strong>Yuma 不收敛,emission 被砍。</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vetting" class="vetting-section border-b hairline scroll-mt-16">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+
+      <div class="mb-14 max-w-[680px]">
+        <div class="section-label mb-3" style="color: #b8470b;">我们怎么筛 idea</div>
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tight mb-4 leading-[1.05]">
+          <span class="font-serif italic text-[color:var(--color-fg-muted)] font-normal">上面每一条</span><br>背后的评分标准。
+        </h2>
+        <p class="text-[color:var(--color-fg-muted)] leading-relaxed">
+          库里每个 idea 在被收进来前都过了这四个 lens。你带自己的来,同样的 lens 也适用——评委会从这里开始看。
+        </p>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">四个 lens</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-10 max-w-[640px]">四个问题。写代码前,诚实地回答。</h3>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          {lenses.map((l) => (
+            <div class="lens">
+              <div class="lens-num mb-3">{l.n}</div>
+              <h4 class="text-lg font-semibold tracking-tight mb-3">{l.title}</h4>
+              <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-5">{l.body}</p>
+              <div class="border-t hairline pt-4 mt-auto">
+                <div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] mb-2">好的回答长这样</div>
+                <p class="text-sm leading-relaxed">{l.good}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">解剖</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">上面每一条都填满三列。</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">
+          如果这三列你没法各用三句话填好,这个设计还没准备好。模糊的列产出模糊的代码,模糊的代码产出"有 emission、没买家"。
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="anatomy-col">
+            <header>Miner 的活</header>
+            <h4 class="font-semibold text-base mb-2">miner 产出什么</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">每个挑战一个定义清晰的输出。不是"给 X 做 AI"——而是"给定 prompt P,返回带字段 A、B、C 的 JSON"。</p>
+          </div>
+          <div class="anatomy-col" style="border-color: rgba(184,71,11,0.3); background: rgba(184,71,11,0.03);">
+            <header>Validator 打分</header>
+            <h4 class="font-semibold text-base mb-2">"好"怎么量</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">一个从(miner 输出, ground truth)到标量的确定性函数。如果两个 validator 的分歧超过噪声,subnet 就不会收敛。</p>
+          </div>
+          <div class="anatomy-col">
+            <header>市场出口</header>
+            <h4 class="font-semibold text-base mb-2">谁消费这个产出</h4>
+            <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed">从链上产出到美元收入的路径。没有它,emission 是唯一付钱方,subnet 就是套了 Python 壳的 Ponzi。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">算力测试</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">GPU 翻倍,产出翻倍吗?</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">
+          这是最有用的单项测试。拿你的草稿 idea 套一下,体会那个答案。
+        </p>
+
+        <div class="lens mb-8">
+          <div class="lens-num mb-4">一个实例——语言数据标注</div>
+          <p class="text-sm text-[color:var(--color-fg-muted)] leading-relaxed mb-6">
+            两个版本。版本 A 让 miner 去招标注员。版本 B 让 miner 跑一个模型,给买家提供的数据集打分。
+          </p>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <div class="flex items-center gap-2 mb-4"><span class="pill no">版本 A — 人速绑定</span></div>
+              {computeRowsA.map((r) => (
+                <div class="compute-row">
+                  <span class="text-[color:var(--color-fg-dim)] font-mono text-xs">{r.g}</span>
+                  <div class="bar"><span style={`width: ${r.w}%`}></span></div>
+                  <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{r.t}</span>
+                </div>
+              ))}
+              <p class="text-xs text-[color:var(--color-fg-muted)] mt-4 leading-relaxed">产出被标注员速度卡住。GPU 闲着。emission 出去了,活没回来。<span class="text-[color:var(--color-accent)]">L2 不过关。</span></p>
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2 mb-4"><span class="pill ok">版本 B — compute-bound</span></div>
+              {computeRowsB.map((r) => (
+                <div class="compute-row">
+                  <span class="text-[color:var(--color-fg-dim)] font-mono text-xs">{r.g}</span>
+                  <div class="bar"><span style={`width: ${r.w}%`}></span></div>
+                  <span class="font-mono text-xs text-[color:var(--color-fg-dim)]">{r.t}</span>
+                </div>
+              ))}
+              <p class="text-xs text-[color:var(--color-fg-muted)] mt-4 leading-relaxed">每张 GPU 端到端跑一个 eval 模型。买家在自己那边采语料。<span class="text-[color:var(--color-accent)]">L2 过关。</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail">
+          <p class="text-sm leading-relaxed italic font-serif text-[color:var(--color-fg-muted)]">
+            数据采集本身可以很有价值——但它属于 subnet <em>之外</em>,在买家那边或一个单独的聚合器里。subnet 内部,唯一随 miner 槽位线性扩展的,是 GPU 能干的事。
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">常见死法</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-10 max-w-[640px]">subnet 悄悄死掉的六种方式。</h3>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {failures.map((f) => (
+            <div class="fail-card">
+              <div class="text-[11px] font-mono text-[color:var(--color-fg-dim)] mb-2">{f.code}</div>
+              <h4 class="font-semibold mb-2 text-sm">{f.title}</h4>
+              <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="mb-16">
+        <div class="section-label mb-3">参考 subnet</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">三个已经过了评分标准的在线 subnet。</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">把它们当尸检报告读——买家是谁、GPU 实际在干嘛、verifier 在 replay 什么?</p>
+
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {refSubnets.map((s) => (
+            <a href={`/beginner/subnets/${s.slug}`} class="card rounded-md p-5 block">
+              <div class="text-xs font-mono text-[color:var(--color-fg-dim)] mb-2">netuid {s.netuid} · 在线</div>
+              <h4 class="font-semibold mb-1">{s.name}</h4>
+              <p class="text-xs text-[color:var(--color-fg-muted)] leading-relaxed">{s.body}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label mb-3">申请前</div>
+        <h3 class="text-2xl md:text-3xl font-semibold tracking-tight mb-3 max-w-[640px]">你应该能写出的那一页纸。</h3>
+        <p class="text-[color:var(--color-fg-muted)] max-w-[640px] mb-10 leading-relaxed">
+          如果这 8 行你都能用大白话填满,你就可以上黑客松或孵化器了。如果还有两行在打太极,先把它们解决掉。
+        </p>
+
+        <div class="border hairline rounded-md overflow-hidden bg-[color:var(--color-paper)]">
+          {onePager.map((row, i) => (
+            <div class={`grid grid-cols-[180px_1fr] ${i < onePager.length - 1 ? 'border-b hairline' : ''}`}>
+              <div class="bg-[color:var(--color-surface)] p-4 text-xs font-mono text-[color:var(--color-fg-dim)] border-r hairline">{row.n}</div>
+              <div class="p-4 text-sm">{row.v}</div>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-10 flex flex-wrap items-center gap-3">
+          <a href="/zh/build/hackathon" class="btn-primary inline-flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-md">带去黑客松<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+          <a href="/zh/build/incubator" class="btn-secondary inline-flex items-center gap-2 text-sm font-medium px-5 py-3 rounded-md">或者申请孵化器</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    const grid = document.getElementById('idea-grid');
+    const cards = grid ? Array.from(grid.querySelectorAll<HTMLElement>('article[data-domain]')) : [];
+    let domain = 'all';
+
+    function render() {
+      if (!grid) return;
+      const sortSel = document.getElementById('idea-sort') as HTMLSelectElement | null;
+      const mode = sortSel?.value || 'heat';
+      const sorted = [...cards].sort((a, b) => {
+        if (mode === 'heat') return Number(b.dataset.heat) - Number(a.dataset.heat);
+        return Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      for (const c of sorted) grid.appendChild(c);
+      for (const c of cards) {
+        const match = domain === 'all' || c.dataset.domain === domain;
+        c.style.display = match ? '' : 'none';
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-filter-domain]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        domain = btn.dataset.filterDomain || 'all';
+        document.querySelectorAll('[data-filter-domain]').forEach((b) => b.classList.toggle('active', b === btn));
+        render();
+      });
+    });
+    document.getElementById('idea-sort')?.addEventListener('change', render);
+  </script>
+</BaseLayout>
+
+<style>
+  .lens { border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; padding: 24px; background: #ffffff; }
+  .lens-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #b8470b; letter-spacing: 0.1em; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; border: 1px solid rgba(15,15,18,0.1); }
+  .pill.ok { background: rgba(21,128,61,0.06); color: #15803d; border-color: rgba(21,128,61,0.2); }
+  .pill.no { background: rgba(184,28,28,0.05); color: #b91c1c; border-color: rgba(184,28,28,0.2); }
+  .rail { border-left: 2px solid rgba(184,71,11,0.18); padding-left: 20px; }
+  .anatomy-col { padding: 24px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #ffffff; }
+  .anatomy-col header { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #b8470b; text-transform: uppercase; margin-bottom: 10px; }
+  .compute-row { display: grid; grid-template-columns: 100px 1fr 80px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(15,15,18,0.06); font-size: 14px; }
+  .compute-row:last-child { border-bottom: 0; }
+  .bar { height: 10px; border-radius: 999px; background: rgba(184,71,11,0.18); }
+  .bar > span { display: block; height: 100%; border-radius: 999px; background: #b8470b; }
+  .fail-card { padding: 20px; border: 1px solid rgba(15,15,18,0.08); border-radius: 6px; background: #fafaf9; }
+  .filter-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 12px; border: 1px solid rgba(15,15,18,0.12); border-radius: 999px; color: #4a4a52; transition: all .15s; cursor: pointer; background: transparent; }
+  .filter-btn:hover { color: #0c0c10; border-color: rgba(15,15,18,0.3); }
+  .filter-btn.active { background: #0c0c10; color: #ffffff; border-color: #0c0c10; }
+  .domain-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+  .heat { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; }
+  .heat-bar { display: inline-block; vertical-align: middle; width: 36px; height: 4px; border-radius: 2px; background: rgba(15,15,18,0.08); margin-left: 6px; position: relative; overflow: hidden; }
+  .heat-bar > span { position: absolute; left: 0; top: 0; bottom: 0; background: #b8470b; }
+  .idea-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid rgba(15,15,18,0.06); font-size: 13px; }
+  .idea-row .k { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #767680; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+  .check-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+  .check-ok { background: rgba(21,128,61,0.08); color: #15803d; }
+  .vetting-section { background: #fafaf9; }
+</style>

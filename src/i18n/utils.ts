@@ -17,6 +17,7 @@ export const ZH_ROUTES = new Set<string>([
   '/beginner/subnets',
   '/build/hackathon',
   '/build/incubator',
+  '/build/idea-bank',
 ]);
 
 /** Detect the active locale from the URL pathname. */
