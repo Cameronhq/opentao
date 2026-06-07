@@ -3,7 +3,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import SubNav from '../../../components/SubNav.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { playbooks, type Playbook } from '../../../data/playbooks';
-import { getRichPlaybook, playbookStatus, type RichPlaybook } from '../../../data/playbook-rich';
+import { getRichPlaybookByNetuid, playbookStatusByNetuid, type RichPlaybook } from '../../../data/playbook-rich';
 import { subnets } from '../../../data/subnets';
 
 export async function getStaticPaths() {
@@ -12,8 +12,8 @@ export async function getStaticPaths() {
 
 interface Props { playbook: Playbook }
 const { playbook } = Astro.props;
-const rich: RichPlaybook | undefined = getRichPlaybook(playbook.slug);
-const pbStatus = playbookStatus(playbook.slug);
+const rich: RichPlaybook | undefined = getRichPlaybookByNetuid(Number(playbook.netuid));
+const pbStatus = playbookStatusByNetuid(Number(playbook.netuid));
 // Miner numbers come from the same SD-4 source as the listing + subnet pages
 // (subnets.ts, refreshed every 6h) — "registered / slots · N earning" — so the
 // three views can't disagree. Falls back to the rich snapshot if not joined.

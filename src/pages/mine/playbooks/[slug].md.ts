@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { playbooks } from '../../../data/playbooks';
-import { getRichPlaybook, type RichPlaybook } from '../../../data/playbook-rich';
+import { getRichPlaybookByNetuid, type RichPlaybook } from '../../../data/playbook-rich';
 
 export async function getStaticPaths() {
   return playbooks.map((p) => ({ params: { slug: p.slug } }));
@@ -149,7 +149,7 @@ function renderMarkdown(rich: RichPlaybook): string {
 export const GET: APIRoute = ({ params }) => {
   const slug = params.slug as string;
   const list = playbooks.find((p) => p.slug === slug);
-  const rich = getRichPlaybook(slug);
+  const rich = list ? getRichPlaybookByNetuid(Number(list.netuid)) : undefined;
 
   if (!list) {
     return new Response('# Not found\n', {

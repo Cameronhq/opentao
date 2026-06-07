@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { subnets } from '../data/subnets';
-import { playbooks } from '../data/playbooks';
-import { getRichPlaybook, playbookStatus } from '../data/playbook-rich';
+import { getRichPlaybookByNetuid, playbookStatusByNetuid } from '../data/playbook-rich';
 import { agentSetupGuide } from '../data/setup-guide';
 import chainStats from '../data/chain-stats.json';
 
@@ -21,14 +20,10 @@ const emissionTao = (s: string | undefined): number | null => {
   return num(s); // "269 τ" → 269
 };
 
-const byNetuid = new Map(playbooks.map((p) => [Number(p.netuid), p]));
-
 export const GET: APIRoute = () => {
   const records = subnets.map((s) => {
-    const pb = byNetuid.get(s.netuid);
-    // Resolve rich/status by the playbook's own slug (joined by netuid) — the
-    // taostats-generated subnet slug can drift from the hand-keyed playbook slug.
-    const rich = getRichPlaybook(pb?.slug ?? s.slug);
+    // Join rich/status by netuid (canonical chain identity) — drift-proof.
+    const rich = getRichPlaybookByNetuid(s.netuid);
     const minersReg = num(s.miners);
     const minersEarning = num(s.minersEarning);
     return {
@@ -52,13 +47,11 @@ export const GET: APIRoute = () => {
         rewardConcentration: minersReg ? +(minersEarning / minersReg).toFixed(3) : null,
       },
       validators: num(s.validators),
-      // playbook coverage — status derived from the rich registry (single source
-      // of truth), same as the website listing/detail pages. Resolve by the
-      // playbook's own slug (joined by netuid) since subnets.ts slugs are
-      // taostats-generated and can drift from the hand-keyed playbook slugs.
+      // playbook coverage — status derived from the rich registry by netuid,
+      // same as the website listing/detail pages.
       playbook: {
-        status: playbookStatus(pb?.slug ?? s.slug).status, // verified | draft | missing
-        url: `${SITE}/mine/playbooks/${pb?.slug ?? s.slug}`,
+        status: playbookStatusByNetuid(s.netuid).status, // verified | draft | missing
+        url: `${SITE}/mine/playbooks/${s.slug}`,
         hasRich: !!rich,
       },
       links: { github: s.github ?? null, twitter: s.twitter ?? null, site: s.url ?? null },

@@ -6,9 +6,14 @@ import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 
+import { playbookRedirects } from './src/data/playbook-redirects';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://opentao.ai',
+
+  // 301 old playbook URLs whose subnet was renamed on-chain → current slug.
+  redirects: playbookRedirects,
 
   vite: {
     plugins: [tailwindcss()],

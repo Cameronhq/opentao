@@ -367,6 +367,16 @@ export function getRichPlaybook(slug: string): RichPlaybook | undefined {
   return richPlaybooks[slug];
 }
 
+// netuid is the canonical chain identity and never drifts, unlike the
+// taostats-generated slug. Prefer these for joins across subnets.ts / rich.
+const richByNetuid: Map<number, RichPlaybook> = new Map(
+  Object.values(richPlaybooks).map((r) => [r.netuid, r]),
+);
+
+export function getRichPlaybookByNetuid(netuid: number): RichPlaybook | undefined {
+  return richByNetuid.get(netuid);
+}
+
 export type DerivedStatus = 'verified' | 'draft' | 'missing';
 
 /**
@@ -380,7 +390,23 @@ export function playbookStatus(slug: string): {
   statusText: string;
   order: number;
 } {
-  const r = richPlaybooks[slug];
+  return statusFromRich(richPlaybooks[slug]);
+}
+
+/** Same as playbookStatus but keyed by netuid (drift-proof). */
+export function playbookStatusByNetuid(netuid: number): {
+  status: DerivedStatus;
+  statusText: string;
+  order: number;
+} {
+  return statusFromRich(richByNetuid.get(netuid));
+}
+
+function statusFromRich(r: RichPlaybook | undefined): {
+  status: DerivedStatus;
+  statusText: string;
+  order: number;
+} {
   if (!r) return { status: 'missing', statusText: '— playbook missing · help wanted', order: 2 };
   if (r.placeholder) return { status: 'draft', statusText: '◷ draft · pending operator docs', order: 1 };
   return { status: 'verified', statusText: `✓ verified ${r.verifiedAt} by ${r.verifiedBy}`, order: 0 };

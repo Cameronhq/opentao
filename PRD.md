@@ -96,6 +96,6 @@
 ## 待办 / 开放问题
 
 - [x] ~~子网/playbook 详情页 `data-live` 矿工口径与 SD-4 统一~~ ✅ 2026-06-07 — playbook `[slug].astro` 的 Miners 改 join `subnets.ts`(SD-4),去掉裸数字 live override + 硬编码 256 cap。
-- [ ] **【新发现,需决策】`playbooks.ts` 陈旧导致 26 个子网 slug 漂移**:自 05-13 生成后 26 个子网改名/换 owner,netuid 对得上但 slug 对不上 rich(如 netuid 3 子网=`3-deprecated` vs playbook=`3-templar`、netuid 12=`12-compute-horde` vs `12-echelon`)。后果:这 23 个详情页 join 不到 rich 内容、列表/MCP 显示 "missing"、URL 是旧名、对应 rich 文件无法访问。当前已让三处口径一致(103 verified/2 draft/23 missing),但根治需把 playbook 列表+详情改为以 live registry(`subnets.ts` + rich,按 netuid)为脊,demote 陈旧的 `playbooks.ts`(会改 26 个 URL,需确认)。
+- [x] ~~`playbooks.ts` 陈旧导致 27 个子网 slug 漂移~~ ✅ 根治于 2026-06-08 — `playbooks.ts` 改为从 `subnets.ts` + rich **按 netuid 派生**(netuid 恒定,子网改名页面自动跟随)。结果 122 verified/6 draft/0 missing;27 个详情页恢复 rich;旧 URL 经 `astro.config` redirects 重定向(快照 `src/data/playbook-redirects.ts`)。
 - [ ] playbooks 的"硬件门槛"列:若日后拿到每个子网硬件需求数据源,再加回(PB-3)。
 - [ ] playbooks 的 emission/矿工数依赖 `subnets.ts` 快照,随 6h cron 刷新(见 INF-1,已不再是手动)。

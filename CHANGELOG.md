@@ -3,6 +3,14 @@
 > 每次实际改动后在顶部加一条。格式:`## 日期`,下列 `- 改了什么 — 涉及文件`。
 > 决策性的"为什么"记在 `PRD.md`,这里只记"改了什么"。
 
+## 2026-06-08
+
+- **根治 playbook slug 漂移:registry 改为按 netuid 从 live 数据派生** — `playbooks.ts` 由手维护静态数组(05-13 快照,27 个子网改名后 slug 漂移、详情页 join 不到 rich)改为**从 `subnets.ts` + rich 按 netuid 派生**。netuid 是链上恒定身份,以后子网再改名页面自动跟随。
+  - 结果:列表/详情/`mining-data.json`/MCP 全部 **122 verified · 6 draft · 0 missing**(原 11 verified / 117 "missing");27 个原本访问不到 rich 的详情页恢复内容。
+  - 新增 `getRichPlaybookByNetuid` / `playbookStatusByNetuid`(playbook-rich.ts);详情页 `[slug].astro`、`[slug].json.ts`、`[slug].md.ts`、`mining-data.json.ts` 全改按 netuid join。
+  - 详情页 URL 改用 live subnet slug;27 个旧 URL 通过 `astro.config` `redirects` 做重定向(快照存 `src/data/playbook-redirects.ts`)。
+  - zh 列表(`zh/mine/playbooks.astro`)同步 Verified/Draft(原来还是 stale/missing 旧逻辑)。
+
 ## 2026-06-07
 
 - **修复 "Refresh chain data" 6 小时 cron 一直挂(429)** — 两步脚本背靠背在同一分钟内打了 7 次 taostats(`fetch-chain-stats` 4 次 + `refresh-subnets` 3 次),超免费 5/min 限额,撞 429 即 `exit 1`,数据自 06-02 起卡死 5 天。

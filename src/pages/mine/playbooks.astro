@@ -3,7 +3,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SubNav from '../../components/SubNav.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { playbooks as allPlaybooks } from '../../data/playbooks';
-import { playbookStatus } from '../../data/playbook-rich';
 import { subnets } from '../../data/subnets';
 
 const subnav = [
@@ -45,15 +44,12 @@ const rows = allPlaybooks.map((p) => {
   const regN = parseSI(s?.miners);
   const earnN = parseSI(s?.minersEarning);
   const spread = rewardSpread(regN, earnN);
-  // Status is derived from the rich registry (single source of truth), NOT from
-  // playbooks.ts's stale `status` field which still labelled 117 fully-written
-  // playbooks as "missing · help wanted".
-  const st = playbookStatus(p.slug);
+  // p.status/statusText already derived from the rich registry by netuid (see
+  // playbooks.ts). statusN drives the sort order.
+  const statusN = { verified: 0, draft: 1, missing: 2 }[p.status] ?? 9;
   return {
     ...p,
-    status: st.status,
-    statusText: st.statusText,
-    statusN: st.order,
+    statusN,
     cat: s?.cat ?? p.category,
     catLabel: s?.catLabel ?? p.categoryLabel,
     emission: s?.emission ?? '—',
