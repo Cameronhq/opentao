@@ -31,12 +31,27 @@ const HEADERS = { Authorization: API_KEY, accept: 'application/json' };
 // 1 TAO = 10^9 RAO
 const RAO_PER_TAO = 1_000_000_000n;
 
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+// taostats free tier is ~5 req/min and returns 429 when exceeded. Retry on
+// 429/5xx with exponential backoff (honoring Retry-After) so a near-limit burst
+// self-heals instead of failing the run.
 async function get(path: string): Promise<any> {
-  const res = await fetch(`${BASE}${path}`, { headers: HEADERS });
-  if (!res.ok) {
-    throw new Error(`GET ${path} → ${res.status} ${res.statusText}: ${await res.text().catch(() => '')}`);
+  const maxAttempts = 5;
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(`${BASE}${path}`, { headers: HEADERS });
+    if (res.ok) return res.json();
+    const retryable = res.status === 429 || res.status >= 500;
+    if (!retryable || attempt >= maxAttempts) {
+      throw new Error(`GET ${path} → ${res.status} ${res.statusText}: ${await res.text().catch(() => '')}`);
+    }
+    const retryAfter = Number(res.headers.get('retry-after'));
+    const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : Math.min(60_000, 15_000 * attempt); // 15s, 30s, 45s, 60s
+    console.error(`[fetch-chain-stats] ${path} → ${res.status}, retry ${attempt}/${maxAttempts - 1} in ${Math.round(waitMs / 1000)}s`);
+    await sleep(waitMs);
   }
-  return res.json();
 }
 
 function fmtThousands(n: number): string {

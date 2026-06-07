@@ -3,6 +3,14 @@
 > 每次实际改动后在顶部加一条。格式:`## 日期`,下列 `- 改了什么 — 涉及文件`。
 > 决策性的"为什么"记在 `PRD.md`,这里只记"改了什么"。
 
+## 2026-06-07
+
+- **修复 "Refresh chain data" 6 小时 cron 一直挂(429)** — 两步脚本背靠背在同一分钟内打了 7 次 taostats(`fetch-chain-stats` 4 次 + `refresh-subnets` 3 次),超免费 5/min 限额,撞 429 即 `exit 1`,数据自 06-02 起卡死 5 天。
+  - 两个 fetch 封装(`scripts/fetch-chain-stats.ts` 的 `get`、`scripts/refresh-subnets.ts` 的 `fetchTaostats`)加 429/5xx 指数退避重试(尊重 `Retry-After`,最多 5 次,15/30/45/60s)。
+  - `refresh-subnets.ts` 的 3 个 `Promise.all` 并发改串行,避免瞬时突发。
+  - workflow(`.github/workflows/refresh-chain-stats.yml`)两步之间加 `sleep 60`,让两批请求落在不同分钟窗口。
+  - 顺手补上 5 天的陈旧数据:`src/data/chain-stats.json` + `src/data/subnets.ts` 重新生成(128 子网,build 通过)。
+
 ## 2026-06-05
 
 - **中文全量上线:21 个手写页全部翻完** [PRD I18N-1/4] — 首页 + Mine(agent/general-setup/playbooks/resources)+ Beginner(wiki/subnets/3 concept)+ Build(hackathon/incubator/idea-bank)+ Community(events/chapters/insights/become-a-host/contribute/东京活动/东京分会)+ 404(双语)。

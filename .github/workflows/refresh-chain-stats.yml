@@ -37,6 +37,12 @@ jobs:
           TAOSTATS_API_KEY: ${{ secrets.TAOSTATS_API_KEY }}
         run: bun run scripts/fetch-chain-stats.ts
 
+      # taostats free tier is ~5 req/min. The step above already spent ~4 calls;
+      # wait out the window so this step's calls don't trip a 429 (the scripts
+      # also retry/backoff on 429 as a safety net).
+      - name: Wait out taostats rate-limit window
+        run: sleep 60
+
       - name: Refresh subnet registry
         env:
           TAOSTATS_API_KEY: ${{ secrets.TAOSTATS_API_KEY }}

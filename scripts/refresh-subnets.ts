@@ -17,10 +17,27 @@ if (!KEY) {
 
 const BASE = 'https://api.taostats.io';
 
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+// taostats free tier is ~5 req/min and returns 429 when exceeded. Retry on
+// 429/5xx with exponential backoff (honoring Retry-After when present) so a
+// burst near the limit self-heals instead of failing the whole run.
 async function fetchTaostats<T = unknown>(path: string): Promise<T> {
-  const r = await fetch(`${BASE}${path}`, { headers: { Authorization: KEY! } });
-  if (!r.ok) throw new Error(`taostats ${path} → ${r.status}`);
-  return r.json() as Promise<T>;
+  const maxAttempts = 5;
+  for (let attempt = 1; ; attempt++) {
+    const r = await fetch(`${BASE}${path}`, { headers: { Authorization: KEY! } });
+    if (r.ok) return r.json() as Promise<T>;
+    const retryable = r.status === 429 || r.status >= 500;
+    if (!retryable || attempt >= maxAttempts) {
+      throw new Error(`taostats ${path} → ${r.status}`);
+    }
+    const retryAfter = Number(r.headers.get('retry-after'));
+    const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : Math.min(60_000, 15_000 * attempt); // 15s, 30s, 45s, 60s
+    console.error(`taostats ${path} → ${r.status}, retry ${attempt}/${maxAttempts - 1} in ${Math.round(waitMs / 1000)}s`);
+    await sleep(waitMs);
+  }
 }
 
 interface SubnetRow {
@@ -114,11 +131,11 @@ const RICH_SLUGS = new Set<string>([]);
 
 async function main() {
   console.error('Fetching 3 bulk endpoints from taostats…');
-  const [subRes, idRes, poolRes] = await Promise.all([
-    fetchTaostats<{ data: SubnetRow[] }>('/api/subnet/latest/v1?limit=1024&order=netuid_asc'),
-    fetchTaostats<{ data: IdentityRow[] }>('/api/subnet/identity/v1?limit=200'),
-    fetchTaostats<{ data: PoolRow[] }>('/api/dtao/pool/latest/v1?limit=200&order=netuid_asc'),
-  ]);
+  // Serial (not Promise.all) so we don't fire 3 simultaneous requests into the
+  // 5/min free-tier limit; the retry/backoff in fetchTaostats handles any 429.
+  const subRes  = await fetchTaostats<{ data: SubnetRow[] }>('/api/subnet/latest/v1?limit=1024&order=netuid_asc');
+  const idRes   = await fetchTaostats<{ data: IdentityRow[] }>('/api/subnet/identity/v1?limit=200');
+  const poolRes = await fetchTaostats<{ data: PoolRow[] }>('/api/dtao/pool/latest/v1?limit=200&order=netuid_asc');
 
   const idByNetuid    = new Map(idRes.data.map((r) => [r.netuid, r]));
   const poolByNetuid  = new Map(poolRes.data.map((r) => [r.netuid, r]));
