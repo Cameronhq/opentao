@@ -10,6 +10,13 @@
   - `refresh-subnets.ts` 的 3 个 `Promise.all` 并发改串行,避免瞬时突发。
   - workflow(`.github/workflows/refresh-chain-stats.yml`)两步之间加 `sleep 60`,让两批请求落在不同分钟窗口。
   - 顺手补上 5 天的陈旧数据:`src/data/chain-stats.json` + `src/data/subnets.ts` 重新生成(128 子网,build 通过)。
+- **cron 失败不再静默** — `refresh-chain-stats.yml` 失败时自动开/评论一个 tracking issue(去重,不刷屏),成功时自动关闭。`permissions` 加 `issues: write`。
+- **`actions/checkout` v4 → v5** — 消除 Node 20 弃用警告,跑在 Node 24。
+- **hreflang alternate** [SEO] — `BaseLayout.astro` 为有 `/zh` 版本的 21 个手写页输出 `en`/`zh-Hans`/`x-default` alternate;数据驱动 `[slug]` 页(单语回退英文)不输出,只保留 canonical。
+- **playbook status 改为从 rich registry 派生** [PRD 对齐] — 列表/详情/MCP 不再读 `playbooks.ts` 那个陈旧的 `status`(它把 117 个有完整内容的 playbook 标成 "missing")。新增 `playbookStatus()` helper + `RichPlaybook.placeholder` 标记(6 个占位页:3/19/20/69/86/101),三处统一显示 verified/draft。改动:`playbook-rich.ts`、`playbooks.astro`(含筛选 Verified/Draft、coverage 重算)、`playbooks/[slug].astro`、`mining-data.json.ts`。
+  - **发现更深的 bug(待决策)**:`playbooks.ts` 的 slug/name 自 05-13 起陈旧,26 个子网改名后 netuid 对得上但 slug 对不上 rich(如 netuid 3 子网=`3-deprecated` vs playbook=`3-templar`),导致这 23 个详情页 join 不到 rich 内容、URL 也是旧名。当前已让三处口径一致(103 verified/2 draft/23 missing),但根治需把 playbook 页改为以 live registry(netuid)为脊。
+- **playbook 详情页矿工口径统一 SD-4** — `playbooks/[slug].astro` 的 "Miners" 改为 join `subnets.ts`(`注册/槽位 · earning`,6h 刷新),去掉只覆盖单个裸数字、还硬编码 "256 slot cap" 的 live override(emission/burn/price 的 live 保留)。
+- **setup guide 抽成单一数据源** — 新建 `src/data/setup-guide.ts`(types + 8 步 + agent 投影);`general-setup.astro` 从它渲染;`mining-data.json` 新增 `setupGuide` 字段;`opentao-mcp` 的 `get_setup_guide` 改读这份数据,不再自带硬编码 7 步副本(消除站点 8 步 vs MCP 7 步漂移)。
 
 ## 2026-06-05
 

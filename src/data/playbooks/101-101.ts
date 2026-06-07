@@ -32,4 +32,5 @@ export const sn101: RichPlaybook = {
   monitoring: [{ metric: 'Subnet activity', threshold: 'any', where: 'taostats.io/subnets/101/' }],
   knownIssues: [{ symptom: 'No public miner code found', cause: 'Slot tracked as unnamed/dormant.', fix: 'Skip until operator publishes a verified repo and roadmap.' }],
   notes: ['Stub entry — replace with full playbook once SN101 has a verified operator and miner repository.'],
+  placeholder: true,
 };

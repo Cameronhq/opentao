@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { getLangFromUrl } from '../i18n/utils';
+import { getLangFromUrl, toBaseRoute, hasZh, localizePath } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 
@@ -18,7 +18,20 @@ const {
   section = null,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://opentao.ai').toString();
+const site = Astro.site ?? 'https://opentao.ai';
+const canonical = new URL(Astro.url.pathname, site).toString();
+
+// hreflang alternates — only when this page has a hand-translated /zh/ twin
+// (the 21 hand pages in ZH_ROUTES). Data-driven [slug] pages fall back to
+// English with no /zh variant, so they stay single-language (canonical only).
+const baseRoute = toBaseRoute(Astro.url.pathname);
+const alternates = hasZh(baseRoute)
+  ? [
+      { hreflang: 'en',        href: new URL(localizePath(baseRoute, 'en'), site).toString() },
+      { hreflang: 'zh-Hans',   href: new URL(localizePath(baseRoute, 'zh'), site).toString() },
+      { hreflang: 'x-default', href: new URL(localizePath(baseRoute, 'en'), site).toString() },
+    ]
+  : [];
 
 // Per-page OG image. The /og/[...slug].png.ts endpoint emits one PNG per page.
 // Landing (/) maps to /og/index.png, everything else to /og/{path}.png.
@@ -33,6 +46,9 @@ const ogImage = new URL(`/og/${ogSlug}.png`, Astro.site ?? 'https://opentao.ai')
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {alternates.map((a) => (
+      <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+    ))}
 
     <!-- OG / social -->
     <meta property="og:type" content="website" />

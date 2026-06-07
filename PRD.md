@@ -59,7 +59,8 @@
 | MCP-4 | **安全红线**:无写操作;花钱/动钱包的命令只返回文本 + cost/risk 字段,必须人确认 | ✅ 决策 2026-06-02 | 不自动注册、不自动跑 miner |
 | MCP-5 | 前端露出:`/mine/agent` 落地页(接入配置 + 示例 prompt)+ playbooks/subnet 页"问 agent"复制按钮 + SubNav 加项 | ✅ 2026-06-02 | server 已部署 `https://opentao-mcp.cameron-530.workers.dev/mcp` |
 
-待办:`get_setup_guide` 的步骤目前硬编码在 `general-setup.astro`,MCP 用时需抽成数据或在 server 内置。playbooks.ts 的 status 与 playbook-rich 的存在性不一致(如 Zeus 有 rich 但 status=missing),需对齐。
+| MCP-6 | `get_setup_guide` 步骤抽成单一数据源 `src/data/setup-guide.ts`,站点 + `mining-data.json` + MCP 共用 | ✅ 2026-06-07 | 原来站点(8 步)和 MCP(7 步)各自硬编码会漂移;现在 MCP 从 `mining-data.json.setupGuide` 读 |
+| MCP-7 | playbook status 改为从 rich registry 派生(`playbookStatus()`),列表/详情/MCP 三处统一 | ✅ 2026-06-07 | 原 `playbooks.ts` 的硬编码 status 把 117 个有内容的 playbook 标 missing;新增 `RichPlaybook.placeholder` 区分 verified/draft |
 
 ## 全站 i18n / 中文 `/zh/`
 
@@ -86,13 +87,15 @@
 
 | # | 决策 | 状态 | 备注 |
 |---|---|---|---|
-| INF-1 | `subnets.ts` 由 `refresh-subnets.ts` 拉 taostats 生成,**手动刷新**(不在 6h CI cron 里) | ✅ | 数据会停在上次手动刷新的快照 |
+| INF-1 | `subnets.ts` 由 `refresh-subnets.ts` 拉 taostats 生成,**已纳入 6h CI cron**(与 chain-stats.json 同一个 workflow 一起刷) | ✅ 2026-06-02 起 | 改记于 2026-06-07:原写"手动刷新不在 cron"已过时——`refresh-chain-stats.yml` 第二步就是 `refresh-subnets.ts > subnets.ts`。本地仍可手动重跑 |
 | INF-2 | 落地页 Section[03] 链上数据走 `chain-stats.json`,由 GitHub Action 每 6h 刷新 | ✅ | 见 README "Live data" |
+| INF-3 | taostats 免费额度 5/min;两脚本的 fetch 封装均有 429/5xx 退避重试,workflow 两步间 `sleep 60` | ✅ 2026-06-07 | 历史教训:曾因背靠背 7 次请求超限,cron 静默挂 5 天 |
 
 ---
 
 ## 待办 / 开放问题
 
-- [ ] 子网详情页 `[slug].astro` 的 `data-live` 从 `opentao-api` 抓 `miner_count`,口径可能还是旧的 `active_miners`,需与 SD-4 统一。
+- [x] ~~子网/playbook 详情页 `data-live` 矿工口径与 SD-4 统一~~ ✅ 2026-06-07 — playbook `[slug].astro` 的 Miners 改 join `subnets.ts`(SD-4),去掉裸数字 live override + 硬编码 256 cap。
+- [ ] **【新发现,需决策】`playbooks.ts` 陈旧导致 26 个子网 slug 漂移**:自 05-13 生成后 26 个子网改名/换 owner,netuid 对得上但 slug 对不上 rich(如 netuid 3 子网=`3-deprecated` vs playbook=`3-templar`、netuid 12=`12-compute-horde` vs `12-echelon`)。后果:这 23 个详情页 join 不到 rich 内容、列表/MCP 显示 "missing"、URL 是旧名、对应 rich 文件无法访问。当前已让三处口径一致(103 verified/2 draft/23 missing),但根治需把 playbook 列表+详情改为以 live registry(`subnets.ts` + rich,按 netuid)为脊,demote 陈旧的 `playbooks.ts`(会改 26 个 URL,需确认)。
 - [ ] playbooks 的"硬件门槛"列:若日后拿到每个子网硬件需求数据源,再加回(PB-3)。
-- [ ] playbooks 的 emission/矿工数依赖 `subnets.ts` 快照,会随手动刷新过期(同 INF-1)。
+- [ ] playbooks 的 emission/矿工数依赖 `subnets.ts` 快照,随 6h cron 刷新(见 INF-1,已不再是手动)。

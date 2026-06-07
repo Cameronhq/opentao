@@ -3,7 +3,8 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import SubNav from '../../../components/SubNav.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { playbooks, type Playbook } from '../../../data/playbooks';
-import { getRichPlaybook, type RichPlaybook } from '../../../data/playbook-rich';
+import { getRichPlaybook, playbookStatus, type RichPlaybook } from '../../../data/playbook-rich';
+import { subnets } from '../../../data/subnets';
 
 export async function getStaticPaths() {
   return playbooks.map((p) => ({ params: { slug: p.slug }, props: { playbook: p } }));
@@ -12,6 +13,11 @@ export async function getStaticPaths() {
 interface Props { playbook: Playbook }
 const { playbook } = Astro.props;
 const rich: RichPlaybook | undefined = getRichPlaybook(playbook.slug);
+const pbStatus = playbookStatus(playbook.slug);
+// Miner numbers come from the same SD-4 source as the listing + subnet pages
+// (subnets.ts, refreshed every 6h) — "registered / slots · N earning" — so the
+// three views can't disagree. Falls back to the rich snapshot if not joined.
+const sub = subnets.find((s) => s.netuid === Number(playbook.netuid));
 
 const subnav = [
   { href: '/mine/general-setup', label: 'General setup' },
@@ -45,11 +51,7 @@ const related = playbooks
         <div>
           <div class="flex items-center gap-3 mb-4 flex-wrap">
             <span class={`cat cat-${playbook.category}`}>{playbook.categoryLabel}</span>
-            {rich ? (
-              <span class="text-xs font-mono pb-verified">✓ verified {rich.verifiedAt} by {rich.verifiedBy}</span>
-            ) : (
-              <span class={`text-xs font-mono pb-${playbook.status}`}>{playbook.statusText}</span>
-            )}
+            <span class={`text-xs font-mono pb-${pbStatus.status}`}>{pbStatus.statusText}</span>
           </div>
           <div class="flex items-baseline gap-5 mb-3">
             <span class="font-mono text-[color:var(--color-fg-dim)] text-sm">netuid</span>
@@ -88,9 +90,9 @@ const related = playbooks
               <div class="sub">across all active miners</div>
             </div>
             <div class="signal">
-              <div class="label">Active miners</div>
-              <div class="value" data-live="miners" data-fallback={String(rich.minerCountFallback)}>{rich.minerCountFallback || '—'}</div>
-              <div class="sub">vs 256 slot cap</div>
+              <div class="label">Miners</div>
+              <div class="value">{sub ? `${sub.miners} / ${sub.minerSlots}` : (rich.minerCountFallback || '—')}</div>
+              <div class="sub">{sub ? `${sub.minersEarning} earning` : `vs ${rich.slotCap} slot cap`}</div>
             </div>
             <div class="signal">
               <div class="label">Last verified</div>
@@ -435,7 +437,9 @@ const related = playbooks
             setText('burn-cost', `${data.burn_cost_tao.toFixed(3)} τ`);
             setVal('burn-cost-input', data.burn_cost_tao.toFixed(3));
           }
-          if (data.miner_count != null) setText('miners', String(data.miner_count));
+          // Miner numbers are sourced statically from subnets.ts (SD-4 format,
+          // 6h refresh) to stay consistent with the listing + subnet pages, so
+          // we intentionally don't override them with the bare live count here.
           if (data.price_usd != null) {
             setVal('tao-price-input', data.price_usd.toFixed(2));
           }
@@ -526,6 +530,7 @@ Report back after 24h with: assigned UID, current incentive, p95 latency, and an
   .cat-compute  { color: #4a4a52; border-color: rgba(15,15,18,0.15); background: rgba(15,15,18,0.03); }
 
   .pb-verified { color: #15803d; }
+  .pb-draft    { color: #b8470b; }
   .pb-stale    { color: #b8470b; }
   .pb-missing  { color: #b91c1c; opacity: 0.85; }
 

@@ -118,4 +118,5 @@ export const sn19: RichPlaybook = {
     'Project surface is blockmachine.io; a public GitHub repo is not currently identified.',
     'Upgrade this page once the operator publishes a repo URL + setup docs.',
   ],
+  placeholder: true,
 };

@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { subnets } from '../data/subnets';
 import { playbooks } from '../data/playbooks';
-import { getRichPlaybook } from '../data/playbook-rich';
+import { getRichPlaybook, playbookStatus } from '../data/playbook-rich';
+import { agentSetupGuide } from '../data/setup-guide';
 import chainStats from '../data/chain-stats.json';
 
 // Single machine-readable source of truth for the "Start mining" surface.
@@ -25,7 +26,9 @@ const byNetuid = new Map(playbooks.map((p) => [Number(p.netuid), p]));
 export const GET: APIRoute = () => {
   const records = subnets.map((s) => {
     const pb = byNetuid.get(s.netuid);
-    const rich = getRichPlaybook(s.slug);
+    // Resolve rich/status by the playbook's own slug (joined by netuid) — the
+    // taostats-generated subnet slug can drift from the hand-keyed playbook slug.
+    const rich = getRichPlaybook(pb?.slug ?? s.slug);
     const minersReg = num(s.miners);
     const minersEarning = num(s.minersEarning);
     return {
@@ -49,10 +52,13 @@ export const GET: APIRoute = () => {
         rewardConcentration: minersReg ? +(minersEarning / minersReg).toFixed(3) : null,
       },
       validators: num(s.validators),
-      // playbook coverage
+      // playbook coverage — status derived from the rich registry (single source
+      // of truth), same as the website listing/detail pages. Resolve by the
+      // playbook's own slug (joined by netuid) since subnets.ts slugs are
+      // taostats-generated and can drift from the hand-keyed playbook slugs.
       playbook: {
-        status: pb?.status ?? 'missing', // verified | stale | missing
-        url: `${SITE}/mine/playbooks/${s.slug}`,
+        status: playbookStatus(pb?.slug ?? s.slug).status, // verified | draft | missing
+        url: `${SITE}/mine/playbooks/${pb?.slug ?? s.slug}`,
         hasRich: !!rich,
       },
       links: { github: s.github ?? null, twitter: s.twitter ?? null, site: s.url ?? null },
@@ -87,9 +93,12 @@ export const GET: APIRoute = () => {
     counts: {
       subnets: records.length,
       playbooksVerified: records.filter((r) => r.playbook.status === 'verified').length,
-      playbooksMissing: records.filter((r) => r.playbook.status === 'missing').length,
+      playbooksDraft: records.filter((r) => r.playbook.status === 'draft').length,
     },
     setupGuideUrl: `${SITE}/mine/general-setup`,
+    // Full one-time setup guide (steps + per-OS commands) so the MCP serves it
+    // from this single source instead of its own hardcoded copy.
+    setupGuide: agentSetupGuide,
     subnets: records,
   };
 

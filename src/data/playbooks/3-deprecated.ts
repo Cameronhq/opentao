@@ -83,4 +83,5 @@ export const sn3: RichPlaybook = {
     'Covenant AI publicly exited Bittensor in April 2026 amid an Opentensor Foundation dispute, triggering a ~20% TAO drawdown.',
     'Slot remains registered but no production behaviour to analyse.',
   ],
+  placeholder: true,
 };

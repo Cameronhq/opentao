@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: write
+  issues: write   # open/comment a tracking issue when the cron fails
 
 concurrency:
   group: refresh-chain-data
@@ -62,3 +63,38 @@ jobs:
 
           git commit -m "chore: refresh chain data (auto)"
           git push
+
+      # Don't let this cron fail silently again (it was broken 5 days unnoticed).
+      # On failure, open a tracking issue — or comment on the existing one so we
+      # don't spawn a new issue every 6h while it stays broken.
+      - name: Alert on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          body="The scheduled **Refresh chain data** workflow failed.
+
+          - Run log: ${run_url}
+          - Most likely cause: taostats rate-limit (429) or an API change. The fetch wrappers retry/backoff on 429, so a persistent failure usually means an API/auth change or an outage.
+
+          This issue auto-closes the next time the cron succeeds."
+          existing=$(gh issue list --state open --search "Refresh chain data cron failing in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "⚠️ Refresh chain data cron failing" --body "$body"
+          fi
+
+      # On a clean success, close any open failure issue so it reflects reality.
+      - name: Resolve failure issue on success
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          existing=$(gh issue list --state open --search "Refresh chain data cron failing in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue close "$existing" --comment "Cron succeeded again in run ${{ github.run_id }} — auto-closing."
+          fi

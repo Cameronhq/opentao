@@ -43,4 +43,5 @@ export const sn69: RichPlaybook = {
   monitoring: [{ metric: 'Public repo + challenge spec', threshold: 'published', where: 'taostats.io/subnets/69/' }],
   knownIssues: [{ symptom: 'No miner repo exists', cause: 'Slot not yet claimed by a public operator.', fix: 'Wait for an announcement; re-verify monthly.' }],
   notes: ['Treat this page as a placeholder until an operator lands the slot.'],
+  placeholder: true,
 };

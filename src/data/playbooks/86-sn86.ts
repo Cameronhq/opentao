@@ -87,4 +87,5 @@ export const sn86: RichPlaybook = {
     'Operator uses the "⚒" glyph rather than a full brand name on taostats — this is intentional, not a placeholder.',
     'Reported team size is roughly 4 people including a senior data scientist; no public bios available at time of writing.',
   ],
+  placeholder: true,
 };

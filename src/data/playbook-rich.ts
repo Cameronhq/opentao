@@ -94,6 +94,12 @@ export interface RichPlaybook {
 
   // Operator notes
   notes?: string[];
+
+  // True when this page is a stub pending operator disclosure (no public repo /
+  // miner flow yet) — NOT a verified playbook. Drives the "draft" status badge
+  // on both the listing and the detail page so we don't claim "✓ verified" on a
+  // placeholder.
+  placeholder?: boolean;
 }
 
 // Registry — imported as needed by [slug].astro
@@ -359,4 +365,23 @@ export const richPlaybooks: Record<string, RichPlaybook> = {
 
 export function getRichPlaybook(slug: string): RichPlaybook | undefined {
   return richPlaybooks[slug];
+}
+
+export type DerivedStatus = 'verified' | 'draft' | 'missing';
+
+/**
+ * Single source of truth for a playbook's status, derived from the rich
+ * registry — NOT from the stale hand-maintained `status` field in playbooks.ts
+ * (which still said "missing · help wanted" for 117 fully-written playbooks).
+ * Used by both the listing and the detail page so they can't contradict.
+ */
+export function playbookStatus(slug: string): {
+  status: DerivedStatus;
+  statusText: string;
+  order: number;
+} {
+  const r = richPlaybooks[slug];
+  if (!r) return { status: 'missing', statusText: '— playbook missing · help wanted', order: 2 };
+  if (r.placeholder) return { status: 'draft', statusText: '◷ draft · pending operator docs', order: 1 };
+  return { status: 'verified', statusText: `✓ verified ${r.verifiedAt} by ${r.verifiedBy}`, order: 0 };
 }

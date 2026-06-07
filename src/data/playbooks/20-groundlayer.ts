@@ -111,4 +111,5 @@ export const sn20: RichPlaybook = {
     'Surface is gated by application at groundlayer.xyz across three lanes — investors, fund managers, subnet owners.',
     'Treat anyone selling a "GroundLayer miner repo" before public launch with skepticism.',
   ],
+  placeholder: true,
 };
