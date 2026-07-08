@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-07T20:00:32.360Z",
+  "fetchedAt": "2026-07-08T03:13:58.862Z",
   "subnets": {
     "total": 129,
     "totalText": "129",
@@ -14,7 +14,7 @@
     "stakedTao": 7368417,
     "stakedText": "7.37M",
     "unit": "τ",
-    "deltaText": "~$1.6B notional"
+    "deltaText": "~$1.5B notional"
   },
   "validators": {
     "total": 1137,
