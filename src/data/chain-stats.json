@@ -1,24 +1,24 @@
 {
-  "fetchedAt": "2026-07-24T19:34:11.930Z",
+  "fetchedAt": "2026-07-25T02:54:26.242Z",
   "subnets": {
     "total": 129,
     "totalText": "129",
     "deltaText": "flat in last 30d"
   },
   "miners": {
-    "total": 4752,
-    "totalText": "4,752",
-    "deltaText": "30,108 active neurons across 129 subnets"
+    "total": 4713,
+    "totalText": "4,713",
+    "deltaText": "30,110 active neurons across 129 subnets"
   },
   "tao": {
-    "stakedTao": 7444618,
-    "stakedText": "7.44M",
+    "stakedTao": 7447153,
+    "stakedText": "7.45M",
     "unit": "τ",
     "deltaText": "~$1.4B notional"
   },
   "validators": {
-    "total": 1134,
-    "totalText": "1,134",
+    "total": 1127,
+    "totalText": "1,127",
     "deltaText": "top 64 receive emission"
   }
 }
