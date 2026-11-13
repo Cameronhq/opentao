@@ -10,7 +10,7 @@ export const sn15: RichPlaybook = {
   categoryLabel: 'AI agent · commerce',
 
   blurb:
-    'AI shopping agents evaluated on Bittensor. Miners write Python agents that solve real shopping tasks (ShoppingBench, 2.5M real products); validators run each agent in a Docker sandbox and score against ground truth.',
+    'AI shopping agents evaluated on Bittensor. Miners write Python agents that solve real shopping tasks (ORO Bench; ShoppingBench was its predecessor); validators run each agent in a Docker sandbox and score against ground truth.',
 
   whatMinersDo:
     "A miner writes a Python module exposing an `agent_main()` function. Inside a validator-run Docker sandbox the agent has access to tools — `find_product`, `view_product_information`, `recommend_product` — over a 2.5M-product index. The agent must reach the correct product, satisfy field constraints, and complete the requested action. The best-scoring agent on the leaderboard becomes the king and earns emissions; challengers must exceed a decaying score threshold to dethrone it.",
@@ -73,7 +73,7 @@ export const sn15: RichPlaybook = {
     { step: 'Test agent locally with Docker',
       note: 'Follow docs.oroagents.com Local Testing guide — runs the same sandbox the validator uses.' },
     { step: 'Submit the agent',
-      note: 'Submission flow per Miner Quickstart — the agent is fetched by validators, run in sandbox, scored against ShoppingBench.' },
+      note: 'Submission flow per Miner Quickstart — the agent is fetched by validators, run in sandbox, scored against ORO Bench.' },
     { step: 'Watch the leaderboard',
       cmd:  'open https://oroagents.com',
       note: 'The king holds emissions; challengers need a passing margin over a decaying threshold to take over.' },
@@ -86,8 +86,8 @@ export const sn15: RichPlaybook = {
 
   scoring: {
     summary:
-      'Validators run each miner agent inside an isolated Docker sandbox against the ShoppingBench problem suite (2.5M real products). Scoring combines ground-truth accuracy, format compliance, and field matching. Top-of-leaderboard becomes the king; challengers must exceed a decaying score threshold to take the top spot, which prevents trivial improvements from churning the leader.',
-    rule: 'Build the agent that solves the most ShoppingBench problems correctly with valid output format.',
+      'Validators run each miner agent inside an isolated Docker sandbox against ORO Bench (ShoppingBench was its predecessor; see https://oroagents.com/docs/resources/changelog#2026-09-17). Scoring combines ground-truth accuracy, format compliance, and field matching. Top-of-leaderboard becomes the king; challengers must exceed a decaying score threshold to take the top spot, which prevents trivial improvements from churning the leader.',
+    rule: 'Build the agent that solves the most ORO Bench problems correctly with valid output format.',
     sourcePath: 'ORO-AI/oro · src/agent/ + validator pipeline',
     cheatPath:
       "Don't memorize product IDs from prior tasks — the benchmark draws from 2.5M products and rotates. Don't return fixed format-passing junk — ground-truth field matching catches it. Don't try to escape the Docker sandbox — submissions are isolated and audited.",
@@ -112,7 +112,7 @@ export const sn15: RichPlaybook = {
   ],
 
   monitoring: [
-    { metric: 'Agent local score on ShoppingBench sample', threshold: 'rising',  where: 'Local Docker test harness' },
+    { metric: 'Agent local score on ORO Bench sample',     threshold: 'rising',  where: 'Local Docker test harness' },
     { metric: 'Leaderboard rank',                          threshold: 'top decile', where: 'https://oroagents.com' },
     { metric: 'Submission acceptance rate',                threshold: '100%',     where: 'Submission API response / validator logs' },
     { metric: 'Hotkey incentive',                          threshold: 'rising or flat', where: 'btcli subnet metagraph --netuid 15' },
@@ -137,7 +137,7 @@ export const sn15: RichPlaybook = {
   ],
 
   notes: [
-    'ShoppingBench paper: arxiv.org/abs/2508.04266 — read it before tuning the agent.',
+    'ShoppingBench (the predecessor of ORO Bench) paper: arxiv.org/abs/2508.04266 — read it before tuning the agent.',
     'Full docs at docs.oroagents.com cover agent interface, local testing, and validator config.',
     'Validators bundle a local Prometheus on 127.0.0.1:9090 with a prebuilt Grafana dashboard at docker/prometheus/dashboards/oro-validator.json.',
   ],
