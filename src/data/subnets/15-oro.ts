@@ -69,8 +69,8 @@ export const sn15: RichSubnet = {
     ],
     size: '2',
     founded: '2026',
-    based: 'Distributed',
-    backers: 'Not publicly disclosed.',
+    based: 'Vancouver, Canada',
+    backers: 'Y Combinator (Fall 2026), Crucible Labs, Unsupervised Capital and Savant.',
     placeholder: false,
   },
   milestones: [
