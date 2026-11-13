@@ -36,15 +36,15 @@ export const sn15: RichSubnet = {
     leadOneLine: 'An agent attempts a real shopping task. Did it work?',
     explanation: [
       'The validator issues a concrete commerce task — "find the cheapest iPhone 15 Pro 256GB in stock," "compare prices for X across three retailers," "add to cart" — and broadcasts it to active miners. Each miner runs its agent in a sandboxed browser, returning the action trace and final state. The validator then checks whether the agent reached the correct product, found a valid price, and completed the requested action.',
-      'Scoring weighs accuracy first, then latency. An agent that returns the right answer in 15 seconds beats one that returns the right answer in 90 seconds. An agent that hallucinates the wrong product scores zero regardless of speed.',
+      'The current scoring rules and evaluation setup are documented at https://oroagents.com/docs.',
     ],
-    cheatPath: 'Memorizing known product URLs — the catalog of tasks rotates and includes new SKUs each week. Returning cached results — the validator injects fresh tasks the miner has not seen. Scraping prior validator scores — the trace check verifies the agent actually navigated the site.',
+    cheatPath: 'Memorizing known product URLs — the catalog of tasks rotates and includes new SKUs each week. Returning cached results — the validator injects fresh tasks the miner has not seen.',
   },
   customer: {
-    leadOneLine: 'The customer outside Bittensor is the team shipping a consumer shopping agent.',
+    leadOneLine: 'ORO AI is an applied AI research lab.',
     explanation: [
-      'Anyone building a "ChatGPT for shopping" product needs (a) a high-quality agent and (b) a benchmark to know it actually works. ORO produces both — the network selects for the best agent, and the eval pipeline doubles as a customer-facing benchmark. ORO-AI can resell the best miner agent as an API, or sell access to the benchmark itself to enterprise R&D teams.',
-      'Concretely: the trace dataset (real agents acting on real commerce sites) is rare and valuable. Each successful task produces a labeled action trajectory — exactly the kind of data needed to fine-tune the next generation of commerce agents.',
+      "It builds high-fidelity simulation environments grounded in real data to teach AI the tacit knowledge required to run safe and profitable autonomous businesses. Its first public benchmark, SMB Bench, tests a frontier model on a produce wholesaler's buying decisions over a simulated 90-day quarter.",
+      'ORO AI also runs an open agent competition on Bittensor Subnet 15.',
     ],
   },
   competitive: {
@@ -60,18 +60,18 @@ export const sn15: RichSubnet = {
   },
   team: {
     intro: [
-      'ORO-AI is the team operating subnet 15. The project name carries a triple meaning: "oro" means gold in Spanish and Italian (the value layer), and "oro-" (ὄρος) means mountain in Ancient Greek — an homage to where the founders met. The team focuses on the agent-evaluation pipeline and the open dataset.',
+      'ORO AI is the team operating subnet 15. The project name carries a triple meaning: "oro" means gold in Spanish and Italian (the value layer), and "oro-" (ὄρος) means mountain in Ancient Greek — an homage to where the founders met. The team focuses on the agent-evaluation pipeline and the open dataset.',
       'The pitch they make: nobody has shipped a shopping agent that actually works, and the bottleneck is evaluation. Whoever owns the eval owns the category.',
     ],
     founders: [
-      { initials: 'OR', gradient: 'v', name: '[Founder 1 name]', role: 'Co-founder', bio: 'Background in ML evaluation and agent benchmarks. Owns the validator and the task generator. Public commits under the ORO-AI GitHub org.', github: 'https://github.com/ORO-AI' },
-      { initials: 'OA', gradient: 'a', name: '[Founder 2 name]', role: 'Co-founder', bio: 'Background in commerce / browser automation. Owns the reference miner agent and the trace-collection pipeline.' },
+      { initials: 'SB', gradient: 'v', name: 'Shardul Bansal', role: 'Founder & CEO', bio: 'Founder at ORO AI.', github: 'https://github.com/ORO-AI' },
+      { initials: 'SS', gradient: 'a', name: 'Seth Schilbe', role: 'Founder & CTO', bio: 'Founder at ORO AI.' },
     ],
-    size: '~3–5',
-    founded: '2024',
-    based: 'Distributed',
-    backers: 'Not publicly disclosed.',
-    placeholder: true,
+    size: '2',
+    founded: '2026',
+    based: 'Vancouver, Canada',
+    backers: 'Y Combinator (Fall 2026), Crucible Labs, Unsupervised Capital and Savant.',
+    placeholder: false,
   },
   milestones: [
     { date: '2024·Q2', text: 'Subnet 15 registered on mainnet.' },
@@ -87,8 +87,8 @@ export const sn15: RichSubnet = {
   tags: ['ai-agent', 'commerce', 'benchmark', 'evaluation'],
   external: {
     github: 'https://github.com/ORO-AI/oro',
-    website: 'https://oro.ai',
-    twitter: 'https://twitter.com/oro_ai',
+    website: 'https://oroagents.com',
+    twitter: 'https://x.com/oroagents',
     taostats: 'https://taostats.io/subnets/15/',
   },
 };
